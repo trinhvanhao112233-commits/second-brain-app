@@ -173,16 +173,28 @@
                 <h4 class="font-bold text-base text-white truncate">{{ wallet.name }}</h4>
               </div>
 
-              <!-- Nút chỉnh sửa hạn mức -->
-              <button
-                type="button"
-                @click.stop="openBudgetModal(wallet)"
-                class="px-2 py-1 rounded-lg bg-[#1c2029] hover:bg-[#262a34] text-[11px] font-mono font-semibold text-[#8b9198] hover:text-[#5dfec1] border border-[#262a34] flex items-center gap-1 transition-colors"
-                title="Sửa hạn mức ví này"
-              >
-                <span>NS: {{ formatQuick(wallet.monthlyBudget || 0) }}</span>
-                <span class="material-symbols-rounded text-xs">edit</span>
-              </button>
+              <div class="flex items-center gap-1.5">
+                <!-- Nút chỉnh sửa hạn mức -->
+                <button
+                  type="button"
+                  @click.stop="openBudgetModal(wallet)"
+                  class="px-2 py-1 rounded-lg bg-[#1c2029] hover:bg-[#262a34] text-[11px] font-mono font-semibold text-[#8b9198] hover:text-[#5dfec1] border border-[#262a34] flex items-center gap-1 transition-colors"
+                  title="Sửa hạn mức ví này"
+                >
+                  <span>NS: {{ formatQuick(wallet.monthlyBudget || 0) }}</span>
+                  <span class="material-symbols-rounded text-xs">edit</span>
+                </button>
+
+                <!-- Nút Xóa / Hủy Ví -->
+                <button
+                  type="button"
+                  @click.stop="handleDeleteWallet(wallet)"
+                  class="w-7 h-7 rounded-lg bg-[#1c2029] hover:bg-rose-500/20 text-[#8b9198] hover:text-rose-400 border border-[#262a34] flex items-center justify-center transition-colors"
+                  title="Hủy ví này"
+                >
+                  <span class="material-symbols-rounded text-sm">delete</span>
+                </button>
+              </div>
             </div>
 
             <!-- Balance Number -->
@@ -959,6 +971,31 @@ const handleCreateWallet = async () => {
   } catch (err) {
     console.error(err);
     alert('Đã xảy ra lỗi khi tạo ví mới.');
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const handleDeleteWallet = async (wallet) => {
+  if (!wallet) return;
+  const confirmed = window.confirm(`Bạn có chắc chắn muốn hủy ví "${wallet.name}" không?\nToàn bộ lịch sử giao dịch thuộc ví này cũng sẽ bị xóa vĩnh viễn.`);
+  if (!confirmed) return;
+
+  isSubmitting.value = true;
+  try {
+    const res = await apiFetch(`${API_BASE_URL}/${wallet.id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Không thể hủy ví này.');
+
+    wallets.value = wallets.value.filter(w => w.id !== wallet.id);
+    allTransactions.value = allTransactions.value.filter(t => t.walletId !== wallet.id);
+    if (selectedWalletFilterId.value === wallet.id) {
+      selectedWalletFilterId.value = 'ALL';
+    }
+  } catch (err) {
+    console.error(err);
+    alert(`Lỗi khi hủy ví: ${err.message || 'Không xác định'}`);
   } finally {
     isSubmitting.value = false;
   }

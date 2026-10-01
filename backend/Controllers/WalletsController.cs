@@ -120,6 +120,23 @@ namespace PersonalFinance.API.Controllers
         }
 
         /// <summary>
+        /// DELETE /api/wallets/{id}
+        /// Xóa/Hủy ví tài chính cùng toàn bộ giao dịch liên quan
+        /// </summary>
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteWallet(Guid id)
+        {
+            var wallet = await _context.Wallets.Include(w => w.Transactions).FirstOrDefaultAsync(w => w.Id == id);
+            if (wallet == null)
+                return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
+
+            _context.Wallets.Remove(wallet);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// GET /api/wallets/{id}/transactions
         /// Lấy danh sách lịch sử giao dịch của ví (mới nhất lên đầu)
         /// </summary>

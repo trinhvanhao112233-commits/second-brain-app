@@ -195,9 +195,6 @@
               <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#ffb4ab]/15 text-[#ffb4ab] border border-[#ffb4ab]/30">
                 {{ getCountdownText(t.dueDate) }}
               </span>
-              <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase" :class="getPriorityClass(t.priority)">
-                {{ t.priority }}
-              </span>
               <button @click="openEditModal(t)" class="w-7 h-7 rounded-lg hover:bg-[#1c2029] text-[#8b9198] hover:text-white flex items-center justify-center">
                 <span class="material-symbols-rounded text-sm">edit</span>
               </button>
@@ -249,9 +246,6 @@
               <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#38e1a6]/15 text-[#38e1a6] border border-[#38e1a6]/30">
                 Hôm nay!
               </span>
-              <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase" :class="getPriorityClass(t.priority)">
-                {{ t.priority }}
-              </span>
               <button @click="openEditModal(t)" class="w-7 h-7 rounded-lg hover:bg-[#1c2029] text-[#8b9198] hover:text-white flex items-center justify-center">
                 <span class="material-symbols-rounded text-sm">edit</span>
               </button>
@@ -302,9 +296,6 @@
             <div class="flex items-center gap-2 flex-shrink-0">
               <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
                 {{ getCountdownText(t.dueDate) }}
-              </span>
-              <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase" :class="getPriorityClass(t.priority)">
-                {{ t.priority }}
               </span>
               <button @click="openEditModal(t)" class="w-7 h-7 rounded-lg hover:bg-[#1c2029] text-[#8b9198] hover:text-white flex items-center justify-center">
                 <span class="material-symbols-rounded text-sm">edit</span>
@@ -363,9 +354,6 @@
               <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-[#005237] text-[#5dfec1] border border-[#38e1a6]/40">
                 ⏳ {{ getCountdownText(t.dueDate) }}
               </span>
-              <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase" :class="getPriorityClass(t.priority)">
-                {{ t.priority }}
-              </span>
               <button @click="openEditModal(t)" class="w-7 h-7 rounded-lg hover:bg-[#1c2029] text-[#8b9198] hover:text-white flex items-center justify-center">
                 <span class="material-symbols-rounded text-sm">edit</span>
               </button>
@@ -411,9 +399,6 @@
             </div>
 
             <div class="flex items-center gap-2 flex-shrink-0">
-              <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase" :class="getPriorityClass(t.priority)">
-                {{ t.priority }}
-              </span>
               <button @click="openEditModal(t)" class="w-7 h-7 rounded-lg hover:bg-[#1c2029] text-[#8b9198] hover:text-white flex items-center justify-center">
                 <span class="material-symbols-rounded text-sm">edit</span>
               </button>
@@ -465,9 +450,6 @@
           >
             {{ getCountdownText(t.dueDate) }}
           </span>
-          <span class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase" :class="getPriorityClass(t.priority)">
-            {{ t.priority }}
-          </span>
           <button @click="openEditModal(t)" class="w-7 h-7 rounded-lg hover:bg-[#1c2029] text-[#8b9198] hover:text-white flex items-center justify-center">
             <span class="material-symbols-rounded text-sm">edit</span>
           </button>
@@ -509,22 +491,7 @@
             />
           </div>
 
-          <!-- Mức độ ưu tiên (Priority Chips) -->
-          <div>
-            <label class="block text-xs font-semibold text-[#c1c7ce] mb-1.5">Mức độ quan trọng</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                v-for="p in [{ id: 'High', label: 'Khẩn cấp / Cao', color: 'text-[#ffb4ab] border-[#ffb4ab]/40 bg-[#ffb4ab]/10' }, { id: 'Medium', label: 'Vừa phải', color: 'text-amber-300 border-amber-500/40 bg-amber-500/10' }, { id: 'Low', label: 'Thong thả', color: 'text-[#cee9da] border-[#cee9da]/40 bg-[#cee9da]/10' }]"
-                :key="p.id"
-                type="button"
-                @click="taskForm.priority = p.id"
-                class="py-1.5 px-2 rounded-xl text-xs font-semibold transition-all border text-center"
-                :class="taskForm.priority === p.id ? p.color + ' ring-1' : 'bg-[#171c24] border-[#262a34] text-[#8b9198] hover:text-[#c1c7ce]'"
-              >
-                {{ p.label }}
-              </button>
-            </div>
-          </div>
+
 
           <!-- Hạn chót (Due Date) -->
           <div>

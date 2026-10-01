@@ -178,16 +178,6 @@
                 </div>
                 <span class="text-xs font-semibold text-[#e1e2ec] truncate">{{ task.title }}</span>
               </div>
-              <span
-                class="text-[9px] px-2 py-0.5 rounded-md font-bold uppercase shrink-0"
-                :class="{
-                  'bg-[#ffb4ab]/15 text-[#ffb4ab] border border-[#ffb4ab]/30': task.priority === 'High',
-                  'bg-amber-500/15 text-amber-300 border border-amber-500/30': task.priority === 'Medium',
-                  'bg-[#171c24] text-[#8b9198] border border-[#262a34]': task.priority === 'Low',
-                }"
-              >
-                {{ task.priority }}
-              </span>
             </div>
           </div>
         </div>

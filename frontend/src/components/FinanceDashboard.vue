@@ -378,7 +378,7 @@
                 v-model.number="budgetForm.monthlyBudget"
                 type="number"
                 min="0"
-                step="50000"
+                step="any"
                 required
                 placeholder="5000000"
                 class="w-full px-4 py-3 bg-[#171c24] border border-[#41474d] rounded-2xl text-white font-mono text-lg font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
@@ -463,8 +463,8 @@
               <input
                 v-model.number="expenseForm.amount"
                 type="number"
-                min="1000"
-                step="1000"
+                min="0"
+                step="any"
                 required
                 placeholder="50000"
                 class="w-full px-4 py-2.5 bg-[#171c24] border border-[#41474d] rounded-xl text-white font-mono text-base font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
@@ -484,24 +484,6 @@
             >
               {{ formatQuick(amt) }}
             </button>
-          </div>
-
-          <!-- 3. Danh mục -->
-          <div>
-            <label class="block text-xs font-semibold text-[#c1c7ce] mb-1">Danh mục</label>
-            <div class="grid grid-cols-3 gap-1.5">
-              <button
-                v-for="cat in expenseCategories"
-                :key="cat"
-                type="button"
-                @click="expenseForm.category = cat"
-                class="py-1.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 border transition-all"
-                :class="expenseForm.category === cat ? 'bg-[#005237] text-[#5dfec1] border-[#38e1a6]' : 'bg-[#171c24] border-[#41474d] text-[#c1c7ce] hover:bg-[#262a34]'"
-              >
-                <span class="material-symbols-rounded text-sm">{{ getCategorySymbol(cat) }}</span>
-                <span>{{ cat }}</span>
-              </button>
-            </div>
           </div>
 
           <!-- 4. Ghi chú -->
@@ -577,7 +559,7 @@
               v-model.number="newWalletBudget"
               type="number"
               min="0"
-              step="500000"
+              step="any"
               placeholder="0"
               class="w-full px-4 py-2 bg-[#171c24] border border-[#41474d] rounded-xl text-white font-mono text-xs focus:outline-none focus:border-[#38e1a6]"
             />
@@ -623,8 +605,8 @@
             <input
               v-model.number="txAmountInput"
               type="number"
-              min="1000"
-              step="1000"
+              min="0"
+              step="any"
               required
               placeholder="0"
               class="w-full px-4 py-2.5 bg-[#171c24] border border-[#41474d] rounded-xl text-white font-mono text-lg font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
@@ -934,7 +916,7 @@ const handleCreateExpense = async () => {
       method: 'POST',
       body: JSON.stringify({
         amount: expenseAmount,
-        category: expenseForm.value.category,
+        category: 'Chi tiêu',
         note: expenseForm.value.note || '',
         transactionDate: expenseForm.value.transactionDate ? new Date(expenseForm.value.transactionDate).toISOString() : new Date().toISOString()
       }),

@@ -1,5 +1,5 @@
 // API Client helper that automatically attaches X-User-Id header if logged in
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export const getStoredUser = () => {
   try {

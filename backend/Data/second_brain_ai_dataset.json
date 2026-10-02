@@ -1,45 +1,538 @@
 [
-  // ==========================================
-  // NHÓM 1: CHI TIÊU & TÀI CHÍNH (EXPENSES & INCOMES)
-  // ==========================================
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Đã ăn sáng hết 70k",
+    "id": 1,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa ăn sáng phở bò hết 80k bằng ví chính",
     "output": {
       "actionType": "add_expense",
-      "amount": 70000,
+      "amount": 80000,
       "category": "Ăn uống",
-      "note": "Ăn sáng",
+      "note": "Ăn sáng phở bò",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho ăn sáng phở bò vào ví."
+    }
+  },
+  {
+    "id": 2,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay ăn sáng phở bò hết 80k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Ăn uống",
+      "note": "Ăn sáng phở bò",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho ăn sáng phở bò vào ví."
+    }
+  },
+  {
+    "id": 3,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay bún chả hết 50.000đ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Ăn uống",
+      "note": "Bún chả",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho bún chả vào ví."
+    }
+  },
+  {
+    "id": 4,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay bún chả hết 1.2 củ bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Ăn uống",
+      "note": "Bún chả",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho bún chả vào ví."
+    }
+  },
+  {
+    "id": 5,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay cơm tấm sườn bì hết 250 ngàn bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Ăn uống",
+      "note": "Cơm tấm sườn bì",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho cơm tấm sườn bì vào ví."
+    }
+  },
+  {
+    "id": 6,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa cơm tấm sườn bì hết 45k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 45000,
+      "category": "Ăn uống",
+      "note": "Cơm tấm sườn bì",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho cơm tấm sườn bì vào ví."
+    }
+  },
+  {
+    "id": 7,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay bánh mì pate hết 350k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Ăn uống",
+      "note": "Bánh mì pate",
       "walletName": null,
       "title": null,
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã ghi nhận chi tiêu 70.000đ cho bữa sáng vào ví."
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho bánh mì pate vào ví."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Trưa nay ăn bún bò 55k thanh toán bằng Ví Phụ",
+    "id": 8,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay bánh mì pate hết 500k bằng ví tiết kiệm",
     "output": {
       "actionType": "add_expense",
-      "amount": 55000,
+      "amount": 500000,
       "category": "Ăn uống",
-      "note": "Ăn bún bò",
-      "walletName": "Ví Phụ",
+      "note": "Bánh mì pate",
+      "walletName": "ví tiết kiệm",
       "title": null,
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã trừ 55.000đ từ 'Ví Phụ' cho bữa bún bò trưa nay."
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho bánh mì pate vào ví."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Vừa đổ đầy bình xăng xe máy hết 85 ngàn",
+    "id": 9,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay hủ tiếu Nam Vang hết 250 ngàn bằng ví phụ",
     "output": {
       "actionType": "add_expense",
-      "amount": 85000,
+      "amount": 250000,
+      "category": "Ăn uống",
+      "note": "Hủ tiếu Nam Vang",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho hủ tiếu Nam Vang vào ví."
+    }
+  },
+  {
+    "id": 10,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay hủ tiếu Nam Vang hết 350k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Ăn uống",
+      "note": "Hủ tiếu Nam Vang",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho hủ tiếu Nam Vang vào ví."
+    }
+  },
+  {
+    "id": 11,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa cơm rang dưa bò hết 1.2 củ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Ăn uống",
+      "note": "Cơm rang dưa bò",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho cơm rang dưa bò vào ví."
+    }
+  },
+  {
+    "id": 12,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới cơm rang dưa bò hết 120k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Ăn uống",
+      "note": "Cơm rang dưa bò",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho cơm rang dưa bò vào ví."
+    }
+  },
+  {
+    "id": 13,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay trà sữa trân châu đường đen hết 80k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Ăn uống",
+      "note": "Trà sữa trân châu đường đen",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho trà sữa trân châu đường đen vào ví."
+    }
+  },
+  {
+    "id": 14,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay trà sữa trân châu đường đen hết 30k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Ăn uống",
+      "note": "Trà sữa trân châu đường đen",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho trà sữa trân châu đường đen vào ví."
+    }
+  },
+  {
+    "id": 15,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa cà phê muối hết 50.000đ bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Ăn uống",
+      "note": "Cà phê muối",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho cà phê muối vào ví."
+    }
+  },
+  {
+    "id": 16,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã cà phê muối hết 100.000đ bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 100000,
+      "category": "Ăn uống",
+      "note": "Cà phê muối",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 100.000đ cho cà phê muối vào ví."
+    }
+  },
+  {
+    "id": 17,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua bánh ngọt hết 30k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Ăn uống",
+      "note": "Mua bánh ngọt",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho mua bánh ngọt vào ví."
+    }
+  },
+  {
+    "id": 18,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay mua bánh ngọt hết 350k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Ăn uống",
+      "note": "Mua bánh ngọt",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua bánh ngọt vào ví."
+    }
+  },
+  {
+    "id": 19,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay ăn lẩu cùng bạn bè hết 350k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Ăn uống",
+      "note": "Ăn lẩu cùng bạn bè",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho ăn lẩu cùng bạn bè vào ví."
+    }
+  },
+  {
+    "id": 20,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa ăn lẩu cùng bạn bè hết 500k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Ăn uống",
+      "note": "Ăn lẩu cùng bạn bè",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho ăn lẩu cùng bạn bè vào ví."
+    }
+  },
+  {
+    "id": 21,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay ăn trưa văn phòng hết 1.2 củ bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Ăn uống",
+      "note": "Ăn trưa văn phòng",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho ăn trưa văn phòng vào ví."
+    }
+  },
+  {
+    "id": 22,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay ăn trưa văn phòng hết 120k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Ăn uống",
+      "note": "Ăn trưa văn phòng",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho ăn trưa văn phòng vào ví."
+    }
+  },
+  {
+    "id": 23,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay ăn tối cùng gia đình hết 500k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Ăn uống",
+      "note": "Ăn tối cùng gia đình",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho ăn tối cùng gia đình vào ví."
+    }
+  },
+  {
+    "id": 24,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay ăn tối cùng gia đình hết 80k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Ăn uống",
+      "note": "Ăn tối cùng gia đình",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho ăn tối cùng gia đình vào ví."
+    }
+  },
+  {
+    "id": 25,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay ăn ốc luộc hết 1.2 củ bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Ăn uống",
+      "note": "Ăn ốc luộc",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho ăn ốc luộc vào ví."
+    }
+  },
+  {
+    "id": 26,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay ăn ốc luộc hết 80k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Ăn uống",
+      "note": "Ăn ốc luộc",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho ăn ốc luộc vào ví."
+    }
+  },
+  {
+    "id": 27,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay uống sinh tố bơ hết 65k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Ăn uống",
+      "note": "Uống sinh tố bơ",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho uống sinh tố bơ vào ví."
+    }
+  },
+  {
+    "id": 28,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay uống sinh tố bơ hết 45k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 45000,
+      "category": "Ăn uống",
+      "note": "Uống sinh tố bơ",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho uống sinh tố bơ vào ví."
+    }
+  },
+  {
+    "id": 29,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã mua trà tắc hết 1.2 củ bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Ăn uống",
+      "note": "Mua trà tắc",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho mua trà tắc vào ví."
+    }
+  },
+  {
+    "id": 30,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua trà tắc hết 50.000đ bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Ăn uống",
+      "note": "Mua trà tắc",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho mua trà tắc vào ví."
+    }
+  },
+  {
+    "id": 31,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa đổ xăng xe máy hết 30k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Đi lại",
+      "note": "Đổ xăng xe máy",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho đổ xăng xe máy vào ví."
+    }
+  },
+  {
+    "id": 32,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay đổ xăng xe máy hết 20k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 20000,
       "category": "Đi lại",
       "note": "Đổ xăng xe máy",
       "walletName": null,
@@ -47,176 +540,2223 @@
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã ghi nhận khoản chi 85.000đ tiền xăng vào mục Đi lại."
+      "replyMessage": "Đã ghi nhận khoản chi 20.000đ cho đổ xăng xe máy vào ví."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Đi Grab bike sang trường hết 32k",
+    "id": 33,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay đi Grab bike hết 50.000đ bằng ví tiền mặt",
     "output": {
       "actionType": "add_expense",
-      "amount": 32000,
+      "amount": 50000,
       "category": "Đi lại",
-      "note": "Đi Grab bike sang trường",
-      "walletName": null,
+      "note": "Đi Grab bike",
+      "walletName": "ví tiền mặt",
       "title": null,
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã ghi 32.000đ phí Grab bike vào chi phí Đi lại."
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho đi Grab bike vào ví."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Mua 1 ly matcha đá xay ở Highland 65k",
+    "id": 34,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay đi Grab bike hết 45k bằng ví phụ",
     "output": {
       "actionType": "add_expense",
-      "amount": 65000,
-      "category": "Ăn uống",
-      "note": "Matcha đá xay Highland",
-      "walletName": null,
+      "amount": 45000,
+      "category": "Đi lại",
+      "note": "Đi Grab bike",
+      "walletName": "ví phụ",
       "title": null,
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã lưu khoản chi 65.000đ cho ly matcha Highland."
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho đi Grab bike vào ví."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Đặt đơn Shopee mua sách hết 230k",
+    "id": 35,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã bắt Grab car hết 1.2 củ bằng ví tiết kiệm",
     "output": {
       "actionType": "add_expense",
-      "amount": 230000,
-      "category": "Mua sắm",
-      "note": "Mua sách trên Shopee",
-      "walletName": null,
-      "title": null,
-      "startTime": null,
-      "endTime": null,
-      "priority": null,
-      "replyMessage": "Đã trừ 230.000đ mua sách Shopee vào mục Mua sắm."
-    }
-  },
-  {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Thanh toán tiền điện tháng này 650.000đ bằng ví chính",
-    "output": {
-      "actionType": "add_expense",
-      "amount": 650000,
-      "category": "Hóa đơn",
-      "note": "Tiền điện tháng này",
-      "walletName": "ví chính",
-      "title": null,
-      "startTime": null,
-      "endTime": null,
-      "priority": null,
-      "replyMessage": "Đã trừ hóa đơn tiền điện 650.000đ từ Ví chính."
-    }
-  },
-  {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Đóng cước mạng internet 220k",
-    "output": {
-      "actionType": "add_expense",
-      "amount": 220000,
-      "category": "Hóa đơn",
-      "note": "Cước mạng internet",
-      "walletName": null,
-      "title": null,
-      "startTime": null,
-      "endTime": null,
-      "priority": null,
-      "replyMessage": "Đã ghi nhận 220.000đ tiền cước internet vào Hóa đơn."
-    }
-  },
-  {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Đi xem phim rạp CGV cuối tuần hết 180k",
-    "output": {
-      "actionType": "add_expense",
-      "amount": 180000,
-      "category": "Giải trí",
-      "note": "Xem phim rạp CGV",
-      "walletName": null,
-      "title": null,
-      "startTime": null,
-      "endTime": null,
-      "priority": null,
-      "replyMessage": "Đã lưu chi phí xem phim 180.000đ vào mục Giải trí."
-    }
-  },
-  {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Mua thuốc cảm cúm ở Long Châu hết 85.000đ",
-    "output": {
-      "actionType": "add_expense",
-      "amount": 85000,
-      "category": "Y tế",
-      "note": "Mua thuốc cảm cúm Long Châu",
-      "walletName": null,
-      "title": null,
-      "startTime": null,
-      "endTime": null,
-      "priority": null,
-      "replyMessage": "Đã lưu khoản chi thuốc men 85.000đ vào mục Y tế."
-    }
-  },
-  {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Lương công ty chuyển về tài khoản 18.5 củ",
-    "output": {
-      "actionType": "add_income",
-      "amount": 18500000,
-      "category": "Nạp tiền",
-      "note": "Lương công ty chuyển về",
-      "walletName": null,
-      "title": null,
-      "startTime": null,
-      "endTime": null,
-      "priority": null,
-      "replyMessage": "Tuyệt vời! Đã cộng 18.500.000đ tiền lương vào ví của bạn."
-    }
-  },
-  {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Được thưởng dự án 2 triệu nạp vào ví tiết kiệm",
-    "output": {
-      "actionType": "add_income",
-      "amount": 2000000,
-      "category": "Nạp tiền",
-      "note": "Thưởng dự án",
+      "amount": 1200000,
+      "category": "Đi lại",
+      "note": "Bắt Grab car",
       "walletName": "ví tiết kiệm",
       "title": null,
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã cộng thêm 2.000.000đ tiền thưởng vào 'Ví tiết kiệm'."
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho bắt Grab car vào ví."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng vào hệ thống Second Brain",
-    "input": "Vừa nạp 500k vào ví",
+    "id": 36,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay bắt Grab car hết 2.5 triệu bằng ví phụ",
     "output": {
-      "actionType": "add_income",
-      "amount": 500000,
-      "category": "Nạp tiền",
-      "note": "Nạp tiền vào ví",
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Đi lại",
+      "note": "Bắt Grab car",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho bắt Grab car vào ví."
+    }
+  },
+  {
+    "id": 37,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay nạp thẻ xe buýt hết 80k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Đi lại",
+      "note": "Nạp thẻ xe buýt",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho nạp thẻ xe buýt vào ví."
+    }
+  },
+  {
+    "id": 38,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã nạp thẻ xe buýt hết 100.000đ bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 100000,
+      "category": "Đi lại",
+      "note": "Nạp thẻ xe buýt",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 100.000đ cho nạp thẻ xe buýt vào ví."
+    }
+  },
+  {
+    "id": 39,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay vé tàu điện Cát Linh hết 45k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 45000,
+      "category": "Đi lại",
+      "note": "Vé tàu điện Cát Linh",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho vé tàu điện Cát Linh vào ví."
+    }
+  },
+  {
+    "id": 40,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay vé tàu điện Cát Linh hết 120k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Đi lại",
+      "note": "Vé tàu điện Cát Linh",
       "walletName": null,
       "title": null,
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Đã nạp thành công 500.000đ vào ví."
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho vé tàu điện Cát Linh vào ví."
     }
   },
-
-  // ==========================================
-  // NHÓM 2: LỊCH BIỂU & SỰ KIỆN (CALENDAR & SCHEDULE)
-  // ==========================================
   {
-    "instruction": "Phân tích yêu cầu thêm sự kiện lịch trình của người dùng",
-    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "id": 41,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới gửi xe tháng hết 250 ngàn bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Đi lại",
+      "note": "Gửi xe tháng",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho gửi xe tháng vào ví."
+    }
+  },
+  {
+    "id": 42,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay gửi xe tháng hết 65k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Đi lại",
+      "note": "Gửi xe tháng",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho gửi xe tháng vào ví."
+    }
+  },
+  {
+    "id": 43,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa thay nhớt xe máy hết 350k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Đi lại",
+      "note": "Thay nhớt xe máy",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho thay nhớt xe máy vào ví."
+    }
+  },
+  {
+    "id": 44,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay thay nhớt xe máy hết 120k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Đi lại",
+      "note": "Thay nhớt xe máy",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho thay nhớt xe máy vào ví."
+    }
+  },
+  {
+    "id": 45,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới vá săm xe hết 20k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 20000,
+      "category": "Đi lại",
+      "note": "Vá săm xe",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 20.000đ cho vá săm xe vào ví."
+    }
+  },
+  {
+    "id": 46,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay vá săm xe hết 250 ngàn bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Đi lại",
+      "note": "Vá săm xe",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho vá săm xe vào ví."
+    }
+  },
+  {
+    "id": 47,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới tiền phí cầu đường BOT hết 120k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Đi lại",
+      "note": "Tiền phí cầu đường BOT",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho tiền phí cầu đường BOT vào ví."
+    }
+  },
+  {
+    "id": 48,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay tiền phí cầu đường BOT hết 500k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Đi lại",
+      "note": "Tiền phí cầu đường BOT",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho tiền phí cầu đường BOT vào ví."
+    }
+  },
+  {
+    "id": 49,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay rửa xe bọt tuyết hết 80k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Đi lại",
+      "note": "Rửa xe bọt tuyết",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho rửa xe bọt tuyết vào ví."
+    }
+  },
+  {
+    "id": 50,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa rửa xe bọt tuyết hết 65k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Đi lại",
+      "note": "Rửa xe bọt tuyết",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho rửa xe bọt tuyết vào ví."
+    }
+  },
+  {
+    "id": 51,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới đi taxi Mai Linh hết 50.000đ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Đi lại",
+      "note": "Đi taxi Mai Linh",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho đi taxi Mai Linh vào ví."
+    }
+  },
+  {
+    "id": 52,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới đi taxi Mai Linh hết 250 ngàn bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Đi lại",
+      "note": "Đi taxi Mai Linh",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho đi taxi Mai Linh vào ví."
+    }
+  },
+  {
+    "id": 53,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay mua áo thun trên Shopee hết 20k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 20000,
+      "category": "Mua sắm",
+      "note": "Mua áo thun trên Shopee",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 20.000đ cho mua áo thun trên Shopee vào ví."
+    }
+  },
+  {
+    "id": 54,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã mua áo thun trên Shopee hết 100.000đ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 100000,
+      "category": "Mua sắm",
+      "note": "Mua áo thun trên Shopee",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 100.000đ cho mua áo thun trên Shopee vào ví."
+    }
+  },
+  {
+    "id": 55,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay mua tai nghe Bluetooth hết 2.5 triệu bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Mua sắm",
+      "note": "Mua tai nghe Bluetooth",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho mua tai nghe Bluetooth vào ví."
+    }
+  },
+  {
+    "id": 56,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay mua tai nghe Bluetooth hết 1.2 củ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Mua sắm",
+      "note": "Mua tai nghe Bluetooth",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho mua tai nghe Bluetooth vào ví."
+    }
+  },
+  {
+    "id": 57,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay mua sạc dự phòng hết 50.000đ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Mua sắm",
+      "note": "Mua sạc dự phòng",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho mua sạc dự phòng vào ví."
+    }
+  },
+  {
+    "id": 58,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay mua sạc dự phòng hết 350k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Mua sắm",
+      "note": "Mua sạc dự phòng",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua sạc dự phòng vào ví."
+    }
+  },
+  {
+    "id": 59,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa đi siêu thị WinMart hết 30k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Mua sắm",
+      "note": "Đi siêu thị WinMart",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho đi siêu thị WinMart vào ví."
+    }
+  },
+  {
+    "id": 60,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa đi siêu thị WinMart hết 65k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Mua sắm",
+      "note": "Đi siêu thị WinMart",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho đi siêu thị WinMart vào ví."
+    }
+  },
+  {
+    "id": 61,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua đôi giày sneaker mới hết 2.5 triệu",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Mua sắm",
+      "note": "Mua đôi giày sneaker mới",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho mua đôi giày sneaker mới vào ví."
+    }
+  },
+  {
+    "id": 62,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay mua đôi giày sneaker mới hết 350k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Mua sắm",
+      "note": "Mua đôi giày sneaker mới",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua đôi giày sneaker mới vào ví."
+    }
+  },
+  {
+    "id": 63,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua sách lập trình Clean Code hết 500k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Mua sắm",
+      "note": "Mua sách lập trình Clean Code",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho mua sách lập trình Clean Code vào ví."
+    }
+  },
+  {
+    "id": 64,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay mua sách lập trình Clean Code hết 20k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 20000,
+      "category": "Mua sắm",
+      "note": "Mua sách lập trình Clean Code",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 20.000đ cho mua sách lập trình Clean Code vào ví."
+    }
+  },
+  {
+    "id": 65,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay mua đồ decor bàn học hết 350k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Mua sắm",
+      "note": "Mua đồ decor bàn học",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua đồ decor bàn học vào ví."
+    }
+  },
+  {
+    "id": 66,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay mua đồ decor bàn học hết 500k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Mua sắm",
+      "note": "Mua đồ decor bàn học",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho mua đồ decor bàn học vào ví."
+    }
+  },
+  {
+    "id": 67,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay mua chuột không dây Logitech hết 65k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Mua sắm",
+      "note": "Mua chuột không dây Logitech",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho mua chuột không dây Logitech vào ví."
+    }
+  },
+  {
+    "id": 68,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua chuột không dây Logitech hết 80k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Mua sắm",
+      "note": "Mua chuột không dây Logitech",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho mua chuột không dây Logitech vào ví."
+    }
+  },
+  {
+    "id": 69,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua bàn phím cơ hết 120k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Mua sắm",
+      "note": "Mua bàn phím cơ",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho mua bàn phím cơ vào ví."
+    }
+  },
+  {
+    "id": 70,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua bàn phím cơ hết 2.5 triệu",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Mua sắm",
+      "note": "Mua bàn phím cơ",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho mua bàn phím cơ vào ví."
+    }
+  },
+  {
+    "id": 71,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay tiền điện tháng này hết 120k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Hóa đơn",
+      "note": "Tiền điện tháng này",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho tiền điện tháng này vào ví."
+    }
+  },
+  {
+    "id": 72,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa tiền điện tháng này hết 250 ngàn bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Hóa đơn",
+      "note": "Tiền điện tháng này",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho tiền điện tháng này vào ví."
+    }
+  },
+  {
+    "id": 73,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa tiền nước sinh hoạt hết 500k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Hóa đơn",
+      "note": "Tiền nước sinh hoạt",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho tiền nước sinh hoạt vào ví."
+    }
+  },
+  {
+    "id": 74,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã tiền nước sinh hoạt hết 50.000đ bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Hóa đơn",
+      "note": "Tiền nước sinh hoạt",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho tiền nước sinh hoạt vào ví."
+    }
+  },
+  {
+    "id": 75,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay cước internet VNPT hết 500k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 500000,
+      "category": "Hóa đơn",
+      "note": "Cước internet VNPT",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 500.000đ cho cước internet VNPT vào ví."
+    }
+  },
+  {
+    "id": 76,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay cước internet VNPT hết 1.2 củ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Hóa đơn",
+      "note": "Cước internet VNPT",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho cước internet VNPT vào ví."
+    }
+  },
+  {
+    "id": 77,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay tiền phòng trọ hết 30k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Hóa đơn",
+      "note": "Tiền phòng trọ",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho tiền phòng trọ vào ví."
+    }
+  },
+  {
+    "id": 78,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới tiền phòng trọ hết 2.5 triệu",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Hóa đơn",
+      "note": "Tiền phòng trọ",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho tiền phòng trọ vào ví."
+    }
+  },
+  {
+    "id": 79,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay phí quản lý chung cư hết 350k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Hóa đơn",
+      "note": "Phí quản lý chung cư",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho phí quản lý chung cư vào ví."
+    }
+  },
+  {
+    "id": 80,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay phí quản lý chung cư hết 1.2 củ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Hóa đơn",
+      "note": "Phí quản lý chung cư",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho phí quản lý chung cư vào ví."
+    }
+  },
+  {
+    "id": 81,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa tiền rác hết 80k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Hóa đơn",
+      "note": "Tiền rác",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho tiền rác vào ví."
+    }
+  },
+  {
+    "id": 82,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã tiền rác hết 250 ngàn",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Hóa đơn",
+      "note": "Tiền rác",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho tiền rác vào ví."
+    }
+  },
+  {
+    "id": 83,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa nạp tiền điện thoại Viettel hết 50.000đ bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Hóa đơn",
+      "note": "Nạp tiền điện thoại Viettel",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho nạp tiền điện thoại Viettel vào ví."
+    }
+  },
+  {
+    "id": 84,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới nạp tiền điện thoại Viettel hết 65k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Hóa đơn",
+      "note": "Nạp tiền điện thoại Viettel",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho nạp tiền điện thoại Viettel vào ví."
+    }
+  },
+  {
+    "id": 85,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay gia hạn gói Netflix hết 350k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Hóa đơn",
+      "note": "Gia hạn gói Netflix",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho gia hạn gói Netflix vào ví."
+    }
+  },
+  {
+    "id": 86,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Trưa nay gia hạn gói Netflix hết 30k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Hóa đơn",
+      "note": "Gia hạn gói Netflix",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho gia hạn gói Netflix vào ví."
+    }
+  },
+  {
+    "id": 87,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa thanh toán Spotify Premium hết 20k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 20000,
+      "category": "Hóa đơn",
+      "note": "Thanh toán Spotify Premium",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 20.000đ cho thanh toán Spotify Premium vào ví."
+    }
+  },
+  {
+    "id": 88,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay thanh toán Spotify Premium hết 2.5 triệu bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Hóa đơn",
+      "note": "Thanh toán Spotify Premium",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho thanh toán Spotify Premium vào ví."
+    }
+  },
+  {
+    "id": 89,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua vé xem phim CGV hết 30k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Giải trí",
+      "note": "Mua vé xem phim CGV",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho mua vé xem phim CGV vào ví."
+    }
+  },
+  {
+    "id": 90,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua vé xem phim CGV hết 45k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 45000,
+      "category": "Giải trí",
+      "note": "Mua vé xem phim CGV",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho mua vé xem phim CGV vào ví."
+    }
+  },
+  {
+    "id": 91,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay đi hát karaoke cùng lớp hết 1.2 củ bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Giải trí",
+      "note": "Đi hát karaoke cùng lớp",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho đi hát karaoke cùng lớp vào ví."
+    }
+  },
+  {
+    "id": 92,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa đi hát karaoke cùng lớp hết 350k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Giải trí",
+      "note": "Đi hát karaoke cùng lớp",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho đi hát karaoke cùng lớp vào ví."
+    }
+  },
+  {
+    "id": 93,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới mua game trên Steam hết 350k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Giải trí",
+      "note": "Mua game trên Steam",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua game trên Steam vào ví."
+    }
+  },
+  {
+    "id": 94,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay mua game trên Steam hết 100.000đ bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 100000,
+      "category": "Giải trí",
+      "note": "Mua game trên Steam",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 100.000đ cho mua game trên Steam vào ví."
+    }
+  },
+  {
+    "id": 95,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay đi đánh bida với hội bạn hết 65k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Giải trí",
+      "note": "Đi đánh bida với hội bạn",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho đi đánh bida với hội bạn vào ví."
+    }
+  },
+  {
+    "id": 96,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa đi đánh bida với hội bạn hết 30k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Giải trí",
+      "note": "Đi đánh bida với hội bạn",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho đi đánh bida với hội bạn vào ví."
+    }
+  },
+  {
+    "id": 97,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa đi cà phê acoustic cuối tuần hết 100.000đ bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 100000,
+      "category": "Giải trí",
+      "note": "Đi cà phê acoustic cuối tuần",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 100.000đ cho đi cà phê acoustic cuối tuần vào ví."
+    }
+  },
+  {
+    "id": 98,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã đi cà phê acoustic cuối tuần hết 80k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Giải trí",
+      "note": "Đi cà phê acoustic cuối tuần",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho đi cà phê acoustic cuối tuần vào ví."
+    }
+  },
+  {
+    "id": 99,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay mua vé xem ca nhạc live concert hết 2.5 triệu bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 2500000,
+      "category": "Giải trí",
+      "note": "Mua vé xem ca nhạc live concert",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 2.500.000đ cho mua vé xem ca nhạc live concert vào ví."
+    }
+  },
+  {
+    "id": 100,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua vé xem ca nhạc live concert hết 350k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Giải trí",
+      "note": "Mua vé xem ca nhạc live concert",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua vé xem ca nhạc live concert vào ví."
+    }
+  },
+  {
+    "id": 101,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua thuốc cảm sốt ở Long Châu hết 45k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 45000,
+      "category": "Y tế",
+      "note": "Mua thuốc cảm sốt ở Long Châu",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho mua thuốc cảm sốt ở Long Châu vào ví."
+    }
+  },
+  {
+    "id": 102,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay mua thuốc cảm sốt ở Long Châu hết 30k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Y tế",
+      "note": "Mua thuốc cảm sốt ở Long Châu",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho mua thuốc cảm sốt ở Long Châu vào ví."
+    }
+  },
+  {
+    "id": 103,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã đi khám răng lấy cao răng hết 120k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 120000,
+      "category": "Y tế",
+      "note": "Đi khám răng lấy cao răng",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 120.000đ cho đi khám răng lấy cao răng vào ví."
+    }
+  },
+  {
+    "id": 104,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới đi khám răng lấy cao răng hết 45k bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 45000,
+      "category": "Y tế",
+      "note": "Đi khám răng lấy cao răng",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 45.000đ cho đi khám răng lấy cao răng vào ví."
+    }
+  },
+  {
+    "id": 105,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay mua khẩu trang y tế hết 30k",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 30000,
+      "category": "Y tế",
+      "note": "Mua khẩu trang y tế",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 30.000đ cho mua khẩu trang y tế vào ví."
+    }
+  },
+  {
+    "id": 106,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Hôm nay mua khẩu trang y tế hết 1.2 củ bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 1200000,
+      "category": "Y tế",
+      "note": "Mua khẩu trang y tế",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 1.200.000đ cho mua khẩu trang y tế vào ví."
+    }
+  },
+  {
+    "id": 107,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay khám tổng quát ở bệnh viện hết 80k bằng ví tiết kiệm",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 80000,
+      "category": "Y tế",
+      "note": "Khám tổng quát ở bệnh viện",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 80.000đ cho khám tổng quát ở bệnh viện vào ví."
+    }
+  },
+  {
+    "id": 108,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Mới khám tổng quát ở bệnh viện hết 65k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 65000,
+      "category": "Y tế",
+      "note": "Khám tổng quát ở bệnh viện",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 65.000đ cho khám tổng quát ở bệnh viện vào ví."
+    }
+  },
+  {
+    "id": 109,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua vitamin C và kẽm hết 350k bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Y tế",
+      "note": "Mua vitamin C và kẽm",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua vitamin C và kẽm vào ví."
+    }
+  },
+  {
+    "id": 110,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Sáng nay mua vitamin C và kẽm hết 50.000đ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Y tế",
+      "note": "Mua vitamin C và kẽm",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho mua vitamin C và kẽm vào ví."
+    }
+  },
+  {
+    "id": 111,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Vừa mua chai thuốc nhỏ mắt hết 50.000đ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 50000,
+      "category": "Y tế",
+      "note": "Mua chai thuốc nhỏ mắt",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 50.000đ cho mua chai thuốc nhỏ mắt vào ví."
+    }
+  },
+  {
+    "id": 112,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Chiều nay mua chai thuốc nhỏ mắt hết 100.000đ bằng ví phụ",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 100000,
+      "category": "Y tế",
+      "note": "Mua chai thuốc nhỏ mắt",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 100.000đ cho mua chai thuốc nhỏ mắt vào ví."
+    }
+  },
+  {
+    "id": 113,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã mua hộp gạc y tế hết 250 ngàn bằng ví chính",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 250000,
+      "category": "Y tế",
+      "note": "Mua hộp gạc y tế",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 250.000đ cho mua hộp gạc y tế vào ví."
+    }
+  },
+  {
+    "id": 114,
+    "instruction": "Phân tích yêu cầu ghi chép tài chính của người dùng",
+    "input": "Đã mua hộp gạc y tế hết 350k bằng ví tiền mặt",
+    "output": {
+      "actionType": "add_expense",
+      "amount": 350000,
+      "category": "Y tế",
+      "note": "Mua hộp gạc y tế",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã ghi nhận khoản chi 350.000đ cho mua hộp gạc y tế vào ví."
+    }
+  },
+  {
+    "id": 115,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lương tháng công ty 500k vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Lương tháng công ty",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (lương tháng công ty) vào ví."
+    }
+  },
+  {
+    "id": 116,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lương tháng công ty 1 triệu vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Lương tháng công ty",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (lương tháng công ty) vào ví."
+    }
+  },
+  {
+    "id": 117,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lương tháng công ty 2.5 triệu vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Lương tháng công ty",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (lương tháng công ty) vào ví."
+    }
+  },
+  {
+    "id": 118,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lương tháng công ty 5 củ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Lương tháng công ty",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (lương tháng công ty) vào ví."
+    }
+  },
+  {
+    "id": 119,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lương tháng công ty 15 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Lương tháng công ty",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (lương tháng công ty) vào ví."
+    }
+  },
+  {
+    "id": 120,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lương tháng công ty 25 củ vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Lương tháng công ty",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (lương tháng công ty) vào ví."
+    }
+  },
+  {
+    "id": 121,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền thưởng nóng dự án 500k vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Tiền thưởng nóng dự án",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (tiền thưởng nóng dự án) vào ví."
+    }
+  },
+  {
+    "id": 122,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền thưởng nóng dự án 1 triệu vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Tiền thưởng nóng dự án",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (tiền thưởng nóng dự án) vào ví."
+    }
+  },
+  {
+    "id": 123,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền thưởng nóng dự án 2.5 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Tiền thưởng nóng dự án",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (tiền thưởng nóng dự án) vào ví."
+    }
+  },
+  {
+    "id": 124,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền thưởng nóng dự án 5 củ vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Tiền thưởng nóng dự án",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (tiền thưởng nóng dự án) vào ví."
+    }
+  },
+  {
+    "id": 125,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền thưởng nóng dự án 15 triệu",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Tiền thưởng nóng dự án",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (tiền thưởng nóng dự án) vào ví."
+    }
+  },
+  {
+    "id": 126,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền thưởng nóng dự án 25 củ vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Tiền thưởng nóng dự án",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (tiền thưởng nóng dự án) vào ví."
+    }
+  },
+  {
+    "id": 127,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận bố mẹ gửi tiền sinh hoạt 500k vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Bố mẹ gửi tiền sinh hoạt",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (bố mẹ gửi tiền sinh hoạt) vào ví."
+    }
+  },
+  {
+    "id": 128,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận bố mẹ gửi tiền sinh hoạt 1 triệu vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Bố mẹ gửi tiền sinh hoạt",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (bố mẹ gửi tiền sinh hoạt) vào ví."
+    }
+  },
+  {
+    "id": 129,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận bố mẹ gửi tiền sinh hoạt 2.5 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Bố mẹ gửi tiền sinh hoạt",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (bố mẹ gửi tiền sinh hoạt) vào ví."
+    }
+  },
+  {
+    "id": 130,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận bố mẹ gửi tiền sinh hoạt 5 củ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Bố mẹ gửi tiền sinh hoạt",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (bố mẹ gửi tiền sinh hoạt) vào ví."
+    }
+  },
+  {
+    "id": 131,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận bố mẹ gửi tiền sinh hoạt 15 triệu vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Bố mẹ gửi tiền sinh hoạt",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (bố mẹ gửi tiền sinh hoạt) vào ví."
+    }
+  },
+  {
+    "id": 132,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận bố mẹ gửi tiền sinh hoạt 25 củ vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Bố mẹ gửi tiền sinh hoạt",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (bố mẹ gửi tiền sinh hoạt) vào ví."
+    }
+  },
+  {
+    "id": 133,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền làm thêm freelance 500k vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Tiền làm thêm freelance",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (tiền làm thêm freelance) vào ví."
+    }
+  },
+  {
+    "id": 134,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền làm thêm freelance 1 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Tiền làm thêm freelance",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (tiền làm thêm freelance) vào ví."
+    }
+  },
+  {
+    "id": 135,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền làm thêm freelance 2.5 triệu vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Tiền làm thêm freelance",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (tiền làm thêm freelance) vào ví."
+    }
+  },
+  {
+    "id": 136,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền làm thêm freelance 5 củ vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Tiền làm thêm freelance",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (tiền làm thêm freelance) vào ví."
+    }
+  },
+  {
+    "id": 137,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền làm thêm freelance 15 triệu vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Tiền làm thêm freelance",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (tiền làm thêm freelance) vào ví."
+    }
+  },
+  {
+    "id": 138,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận tiền làm thêm freelance 25 củ vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Tiền làm thêm freelance",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (tiền làm thêm freelance) vào ví."
+    }
+  },
+  {
+    "id": 139,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận được bạn trả nợ cũ 500k vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Được bạn trả nợ cũ",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (được bạn trả nợ cũ) vào ví."
+    }
+  },
+  {
+    "id": 140,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận được bạn trả nợ cũ 1 triệu vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Được bạn trả nợ cũ",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (được bạn trả nợ cũ) vào ví."
+    }
+  },
+  {
+    "id": 141,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận được bạn trả nợ cũ 2.5 triệu vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Được bạn trả nợ cũ",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (được bạn trả nợ cũ) vào ví."
+    }
+  },
+  {
+    "id": 142,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận được bạn trả nợ cũ 5 củ vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Được bạn trả nợ cũ",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (được bạn trả nợ cũ) vào ví."
+    }
+  },
+  {
+    "id": 143,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận được bạn trả nợ cũ 15 triệu vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Được bạn trả nợ cũ",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (được bạn trả nợ cũ) vào ví."
+    }
+  },
+  {
+    "id": 144,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận được bạn trả nợ cũ 25 củ vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Được bạn trả nợ cũ",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (được bạn trả nợ cũ) vào ví."
+    }
+  },
+  {
+    "id": 145,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận nạp tiền vào tài khoản 500k vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Nạp tiền vào tài khoản",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (nạp tiền vào tài khoản) vào ví."
+    }
+  },
+  {
+    "id": 146,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận nạp tiền vào tài khoản 1 triệu vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Nạp tiền vào tài khoản",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (nạp tiền vào tài khoản) vào ví."
+    }
+  },
+  {
+    "id": 147,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận nạp tiền vào tài khoản 2.5 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Nạp tiền vào tài khoản",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (nạp tiền vào tài khoản) vào ví."
+    }
+  },
+  {
+    "id": 148,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận nạp tiền vào tài khoản 5 củ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Nạp tiền vào tài khoản",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (nạp tiền vào tài khoản) vào ví."
+    }
+  },
+  {
+    "id": 149,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận nạp tiền vào tài khoản 15 triệu vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Nạp tiền vào tài khoản",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (nạp tiền vào tài khoản) vào ví."
+    }
+  },
+  {
+    "id": 150,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận nạp tiền vào tài khoản 25 củ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Nạp tiền vào tài khoản",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (nạp tiền vào tài khoản) vào ví."
+    }
+  },
+  {
+    "id": 151,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận hoa hồng bán hàng 500k",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Hoa hồng bán hàng",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (hoa hồng bán hàng) vào ví."
+    }
+  },
+  {
+    "id": 152,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận hoa hồng bán hàng 1 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Hoa hồng bán hàng",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (hoa hồng bán hàng) vào ví."
+    }
+  },
+  {
+    "id": 153,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận hoa hồng bán hàng 2.5 triệu",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Hoa hồng bán hàng",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (hoa hồng bán hàng) vào ví."
+    }
+  },
+  {
+    "id": 154,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận hoa hồng bán hàng 5 củ vào ví phụ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Hoa hồng bán hàng",
+      "walletName": "ví phụ",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (hoa hồng bán hàng) vào ví."
+    }
+  },
+  {
+    "id": 155,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận hoa hồng bán hàng 15 triệu vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Hoa hồng bán hàng",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (hoa hồng bán hàng) vào ví."
+    }
+  },
+  {
+    "id": 156,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận hoa hồng bán hàng 25 củ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Hoa hồng bán hàng",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (hoa hồng bán hàng) vào ví."
+    }
+  },
+  {
+    "id": 157,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lãi tiết kiệm ngân hàng 500k vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 500000,
+      "category": "Nạp tiền",
+      "note": "Lãi tiết kiệm ngân hàng",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 500.000đ (lãi tiết kiệm ngân hàng) vào ví."
+    }
+  },
+  {
+    "id": 158,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lãi tiết kiệm ngân hàng 1 triệu vào ví tiền mặt",
+    "output": {
+      "actionType": "add_income",
+      "amount": 1000000,
+      "category": "Nạp tiền",
+      "note": "Lãi tiết kiệm ngân hàng",
+      "walletName": "ví tiền mặt",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 1.000.000đ (lãi tiết kiệm ngân hàng) vào ví."
+    }
+  },
+  {
+    "id": 159,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lãi tiết kiệm ngân hàng 2.5 triệu vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 2500000,
+      "category": "Nạp tiền",
+      "note": "Lãi tiết kiệm ngân hàng",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 2.500.000đ (lãi tiết kiệm ngân hàng) vào ví."
+    }
+  },
+  {
+    "id": 160,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lãi tiết kiệm ngân hàng 5 củ vào ví chính",
+    "output": {
+      "actionType": "add_income",
+      "amount": 5000000,
+      "category": "Nạp tiền",
+      "note": "Lãi tiết kiệm ngân hàng",
+      "walletName": "ví chính",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 5.000.000đ (lãi tiết kiệm ngân hàng) vào ví."
+    }
+  },
+  {
+    "id": 161,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lãi tiết kiệm ngân hàng 15 triệu vào ví tiết kiệm",
+    "output": {
+      "actionType": "add_income",
+      "amount": 15000000,
+      "category": "Nạp tiền",
+      "note": "Lãi tiết kiệm ngân hàng",
+      "walletName": "ví tiết kiệm",
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 15.000.000đ (lãi tiết kiệm ngân hàng) vào ví."
+    }
+  },
+  {
+    "id": 162,
+    "instruction": "Phân tích yêu cầu ghi chép thu nhập của người dùng",
+    "input": "Vừa nhận lãi tiết kiệm ngân hàng 25 củ",
+    "output": {
+      "actionType": "add_income",
+      "amount": 25000000,
+      "category": "Nạp tiền",
+      "note": "Lãi tiết kiệm ngân hàng",
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Đã cộng 25.000.000đ (lãi tiết kiệm ngân hàng) vào ví."
+    }
+  },
+  {
+    "id": 163,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển chiều mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
     "output": {
       "actionType": "add_event",
       "amount": null,
@@ -224,16 +2764,503 @@
       "note": null,
       "walletName": null,
       "title": "Học môn thiết kế và phát triển",
-      "description": "Lịch học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
       "startTime": "2026-10-03T07:00:00",
       "endTime": "2026-10-03T09:00:00",
       "priority": null,
-      "replyMessage": "Đã lên lịch 'Học môn thiết kế và phát triển' từ 07:00 đến 09:00 sáng mai!"
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 07:00 đến 09:00!"
     }
   },
   {
-    "instruction": "Phân tích yêu cầu thêm sự kiện lịch trình của người dùng",
-    "input": "Chiều mai từ 14h đến 16h30 có lịch họp sprint dự án với team tech",
+    "id": 164,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển thứ 4 tuần sau từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
+      "startTime": "2026-10-07T08:00:00",
+      "endTime": "2026-10-07T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 165,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển chiều mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 166,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển thứ 2 tuần sau chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
+      "startTime": "2026-10-05T14:00:00",
+      "endTime": "2026-10-05T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 167,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển ngày kia chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
+      "startTime": "2026-10-04T15:30:00",
+      "endTime": "2026-10-04T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 168,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển chiều mai tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
+      "startTime": "2026-10-03T19:00:00",
+      "endTime": "2026-10-03T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 169,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn thiết kế và phát triển chiều mai tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn thiết kế và phát triển",
+      "description": "Học môn thiết kế và phát triển",
+      "startTime": "2026-10-03T19:30:00",
+      "endTime": "2026-10-03T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn thiết kế và phát triển từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 170,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao chiều mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 171,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao sáng mai từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-03T08:00:00",
+      "endTime": "2026-10-03T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 172,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao chiều mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 173,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao sáng mai chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-03T14:00:00",
+      "endTime": "2026-10-03T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 174,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao tối nay chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-02T15:30:00",
+      "endTime": "2026-10-02T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 175,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao sáng mai tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-03T19:00:00",
+      "endTime": "2026-10-03T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 176,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn lập trình web nâng cao thứ 2 tuần sau tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn lập trình web nâng cao",
+      "description": "Học môn lập trình web nâng cao",
+      "startTime": "2026-10-05T19:30:00",
+      "endTime": "2026-10-05T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn lập trình web nâng cao từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 177,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 178,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán thứ 2 tuần sau từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-05T08:00:00",
+      "endTime": "2026-10-05T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 179,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán sáng mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 180,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán ngày kia chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-04T14:00:00",
+      "endTime": "2026-10-04T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 181,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán ngày kia chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-04T15:30:00",
+      "endTime": "2026-10-04T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 182,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán thứ 2 tuần sau tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-05T19:00:00",
+      "endTime": "2026-10-05T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 183,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn cơ sở dữ liệu phân tán chiều mai tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn cơ sở dữ liệu phân tán",
+      "description": "Học môn cơ sở dữ liệu phân tán",
+      "startTime": "2026-10-03T19:30:00",
+      "endTime": "2026-10-03T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn cơ sở dữ liệu phân tán từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 184,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo tối nay bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-02T07:00:00",
+      "endTime": "2026-10-02T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 185,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo thứ 2 tuần sau từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-05T08:00:00",
+      "endTime": "2026-10-05T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 186,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo tối nay lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-02T09:00:00",
+      "endTime": "2026-10-02T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 187,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo tối nay chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-02T14:00:00",
+      "endTime": "2026-10-02T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 188,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo chiều mai chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-03T15:30:00",
+      "endTime": "2026-10-03T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 189,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo thứ 4 tuần sau tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-07T19:00:00",
+      "endTime": "2026-10-07T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 190,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch học môn trí tuệ nhân tạo thứ 4 tuần sau tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Học tập",
+      "note": null,
+      "walletName": null,
+      "title": "Học môn trí tuệ nhân tạo",
+      "description": "Học môn trí tuệ nhân tạo",
+      "startTime": "2026-10-07T19:30:00",
+      "endTime": "2026-10-07T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Học môn trí tuệ nhân tạo từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 191,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech ngày kia bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
     "output": {
       "actionType": "add_event",
       "amount": null,
@@ -242,87 +3269,1510 @@
       "walletName": null,
       "title": "Họp sprint dự án với team tech",
       "description": "Họp sprint dự án với team tech",
-      "startTime": "2026-10-03T14:00:00",
-      "endTime": "2026-10-03T16:30:00",
+      "startTime": "2026-10-04T07:00:00",
+      "endTime": "2026-10-04T09:00:00",
       "priority": null,
-      "replyMessage": "Đã tạo lịch 'Họp sprint dự án với team tech' từ 14:00 đến 16:30 chiều mai."
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 07:00 đến 09:00!"
     }
   },
   {
-    "instruction": "Phân tích yêu cầu thêm sự kiện lịch trình của người dùng",
-    "input": "Tối nay 19h30 đi đá bóng cùng công ty đến 21h",
+    "id": 192,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech ngày kia từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp sprint dự án với team tech",
+      "description": "Họp sprint dự án với team tech",
+      "startTime": "2026-10-04T08:00:00",
+      "endTime": "2026-10-04T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 193,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech thứ 4 tuần sau lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp sprint dự án với team tech",
+      "description": "Họp sprint dự án với team tech",
+      "startTime": "2026-10-07T09:00:00",
+      "endTime": "2026-10-07T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 194,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech thứ 2 tuần sau chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp sprint dự án với team tech",
+      "description": "Họp sprint dự án với team tech",
+      "startTime": "2026-10-05T14:00:00",
+      "endTime": "2026-10-05T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 195,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech tối nay chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp sprint dự án với team tech",
+      "description": "Họp sprint dự án với team tech",
+      "startTime": "2026-10-02T15:30:00",
+      "endTime": "2026-10-02T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 196,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech tối nay tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp sprint dự án với team tech",
+      "description": "Họp sprint dự án với team tech",
+      "startTime": "2026-10-02T19:00:00",
+      "endTime": "2026-10-02T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 197,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp sprint dự án với team tech ngày kia tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp sprint dự án với team tech",
+      "description": "Họp sprint dự án với team tech",
+      "startTime": "2026-10-04T19:30:00",
+      "endTime": "2026-10-04T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp sprint dự án với team tech từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 198,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 199,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần ngày kia từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-04T08:00:00",
+      "endTime": "2026-10-04T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 200,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần thứ 4 tuần sau lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-07T09:00:00",
+      "endTime": "2026-10-07T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 201,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần thứ 2 tuần sau chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-05T14:00:00",
+      "endTime": "2026-10-05T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 202,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần thứ 4 tuần sau chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-07T15:30:00",
+      "endTime": "2026-10-07T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 203,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần tối nay tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-02T19:00:00",
+      "endTime": "2026-10-02T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 204,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch họp báo cáo tiến độ tuần ngày kia tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Họp báo cáo tiến độ tuần",
+      "description": "Họp báo cáo tiến độ tuần",
+      "startTime": "2026-10-04T19:30:00",
+      "endTime": "2026-10-04T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Họp báo cáo tiến độ tuần từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 205,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng thứ 2 tuần sau bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-05T07:00:00",
+      "endTime": "2026-10-05T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 206,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng ngày kia từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-04T08:00:00",
+      "endTime": "2026-10-04T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 207,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng thứ 2 tuần sau lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-05T09:00:00",
+      "endTime": "2026-10-05T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 208,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng ngày kia chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-04T14:00:00",
+      "endTime": "2026-10-04T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 209,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng chiều mai chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-03T15:30:00",
+      "endTime": "2026-10-03T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 210,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng ngày kia tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-04T19:00:00",
+      "endTime": "2026-10-04T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 211,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch gặp khách hàng trao đổi hợp đồng thứ 2 tuần sau tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Gặp khách hàng trao đổi hợp đồng",
+      "description": "Gặp khách hàng trao đổi hợp đồng",
+      "startTime": "2026-10-05T19:30:00",
+      "endTime": "2026-10-05T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Gặp khách hàng trao đổi hợp đồng từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 212,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập thứ 2 tuần sau bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-05T07:00:00",
+      "endTime": "2026-10-05T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 213,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập sáng mai từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-03T08:00:00",
+      "endTime": "2026-10-03T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 214,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập tối nay lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-02T09:00:00",
+      "endTime": "2026-10-02T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 215,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập sáng mai chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-03T14:00:00",
+      "endTime": "2026-10-03T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 216,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập ngày kia chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-04T15:30:00",
+      "endTime": "2026-10-04T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 217,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập sáng mai tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-03T19:00:00",
+      "endTime": "2026-10-03T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 218,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch phỏng vấn ứng viên thực tập chiều mai tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Work",
+      "note": null,
+      "walletName": null,
+      "title": "Phỏng vấn ứng viên thực tập",
+      "description": "Phỏng vấn ứng viên thực tập",
+      "startTime": "2026-10-03T19:30:00",
+      "endTime": "2026-10-03T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Phỏng vấn ứng viên thực tập từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 219,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo chiều mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
     "output": {
       "actionType": "add_event",
       "amount": null,
       "category": "Personal",
       "note": null,
       "walletName": null,
-      "title": "Đi đá bóng cùng công ty",
-      "description": "Đi đá bóng cùng công ty",
-      "startTime": "2026-10-02T19:30:00",
-      "endTime": "2026-10-02T21:00:00",
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
       "priority": null,
-      "replyMessage": "Đã đặt lịch 'Đi đá bóng cùng công ty' lúc 19:30 - 21:00 tối nay."
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 07:00 đến 09:00!"
     }
   },
   {
-    "instruction": "Phân tích yêu cầu thêm sự kiện lịch trình của người dùng",
-    "input": "Sáng thứ 2 lúc 8h có hẹn đi khám sức khỏe tổng quát",
+    "id": 220,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo chiều mai từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-03T08:00:00",
+      "endTime": "2026-10-03T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 221,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo ngày kia lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-04T09:00:00",
+      "endTime": "2026-10-04T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 222,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo ngày kia chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-04T14:00:00",
+      "endTime": "2026-10-04T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 223,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo thứ 4 tuần sau chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-07T15:30:00",
+      "endTime": "2026-10-07T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 224,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo ngày kia tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-04T19:00:00",
+      "endTime": "2026-10-04T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 225,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi đá bóng sân cỏ nhân tạo ngày kia tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi đá bóng sân cỏ nhân tạo",
+      "description": "Đi đá bóng sân cỏ nhân tạo",
+      "startTime": "2026-10-04T19:30:00",
+      "endTime": "2026-10-04T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi đá bóng sân cỏ nhân tạo từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 226,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn thứ 2 tuần sau bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-05T07:00:00",
+      "endTime": "2026-10-05T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 227,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn ngày kia từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-04T08:00:00",
+      "endTime": "2026-10-04T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 228,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn sáng mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 229,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn ngày kia chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-04T14:00:00",
+      "endTime": "2026-10-04T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 230,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn tối nay chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-02T15:30:00",
+      "endTime": "2026-10-02T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 231,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn thứ 2 tuần sau tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-05T19:00:00",
+      "endTime": "2026-10-05T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 232,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi xem phim rạp cùng bạn thứ 4 tuần sau tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Personal",
+      "note": null,
+      "walletName": null,
+      "title": "Đi xem phim rạp cùng bạn",
+      "description": "Đi xem phim rạp cùng bạn",
+      "startTime": "2026-10-07T19:30:00",
+      "endTime": "2026-10-07T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi xem phim rạp cùng bạn từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 233,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ chiều mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
     "output": {
       "actionType": "add_event",
       "amount": null,
       "category": "Health",
       "note": null,
       "walletName": null,
-      "title": "Khám sức khỏe tổng quát",
-      "description": "Hẹn khám sức khỏe tổng quát",
-      "startTime": "2026-10-05T08:00:00",
-      "endTime": "2026-10-05T09:30:00",
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
       "priority": null,
-      "replyMessage": "Đã xếp lịch hẹn 'Khám sức khỏe tổng quát' vào sáng thứ 2 lúc 08:00."
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 07:00 đến 09:00!"
     }
   },
   {
-    "instruction": "Phân tích yêu cầu thêm sự kiện lịch trình của người dùng",
-    "input": "Ngày kia lúc 15h bảo vệ đồ án tốt nghiệp phòng B201",
+    "id": 234,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ ngày kia từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-04T08:00:00",
+      "endTime": "2026-10-04T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 235,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ chiều mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 236,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ thứ 4 tuần sau chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-07T14:00:00",
+      "endTime": "2026-10-07T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 237,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ thứ 4 tuần sau chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-07T15:30:00",
+      "endTime": "2026-10-07T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 238,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ thứ 4 tuần sau tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-07T19:00:00",
+      "endTime": "2026-10-07T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 239,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch đi khám tổng quát định kỳ ngày kia tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Đi khám tổng quát định kỳ",
+      "description": "Đi khám tổng quát định kỳ",
+      "startTime": "2026-10-04T19:30:00",
+      "endTime": "2026-10-04T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Đi khám tổng quát định kỳ từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 240,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 241,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt sáng mai từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-03T08:00:00",
+      "endTime": "2026-10-03T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 242,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt chiều mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 243,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt thứ 4 tuần sau chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-07T14:00:00",
+      "endTime": "2026-10-07T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 244,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt sáng mai chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-03T15:30:00",
+      "endTime": "2026-10-03T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 245,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt chiều mai tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-03T19:00:00",
+      "endTime": "2026-10-03T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 246,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch hẹn đi khám mắt ngày kia tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Health",
+      "note": null,
+      "walletName": null,
+      "title": "Hẹn đi khám mắt",
+      "description": "Hẹn đi khám mắt",
+      "startTime": "2026-10-04T19:30:00",
+      "endTime": "2026-10-04T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Hẹn đi khám mắt từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 247,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
     "output": {
       "actionType": "add_event",
       "amount": null,
       "category": "Important",
       "note": null,
       "walletName": null,
-      "title": "Bảo vệ đồ án tốt nghiệp phòng B201",
-      "description": "Bảo vệ đồ án tốt nghiệp phòng B201",
-      "startTime": "2026-10-04T15:00:00",
-      "endTime": "2026-10-04T17:00:00",
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
       "priority": null,
-      "replyMessage": "Đã lên lịch quan trọng 'Bảo vệ đồ án tốt nghiệp phòng B201' lúc 15:00 ngày kia!"
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 07:00 đến 09:00!"
     }
   },
-
-  // ==========================================
-  // NHÓM 3: CÔNG VIỆC CẦN LÀM (TASKS & HABITS)
-  // ==========================================
   {
-    "instruction": "Phân tích yêu cầu tạo công việc hoặc lời nhắc của người dùng",
-    "input": "Nhớ nộp báo cáo thực tập trước 17h thứ 6 việc này rất gấp",
+    "id": 248,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp sáng mai từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-03T08:00:00",
+      "endTime": "2026-10-03T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 249,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp sáng mai lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-03T09:00:00",
+      "endTime": "2026-10-03T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 250,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp ngày kia chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-04T14:00:00",
+      "endTime": "2026-10-04T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 251,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp thứ 4 tuần sau chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-07T15:30:00",
+      "endTime": "2026-10-07T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 252,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp thứ 4 tuần sau tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-07T19:00:00",
+      "endTime": "2026-10-07T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 253,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch bảo vệ đồ án tốt nghiệp chiều mai tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Bảo vệ đồ án tốt nghiệp",
+      "description": "Bảo vệ đồ án tốt nghiệp",
+      "startTime": "2026-10-03T19:30:00",
+      "endTime": "2026-10-03T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Bảo vệ đồ án tốt nghiệp từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 254,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành chiều mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-03T07:00:00",
+      "endTime": "2026-10-03T09:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 07:00 đến 09:00!"
+    }
+  },
+  {
+    "id": 255,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành ngày kia từ 8h đến 10h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-04T08:00:00",
+      "endTime": "2026-10-04T10:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 08:00 đến 10:00!"
+    }
+  },
+  {
+    "id": 256,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành thứ 4 tuần sau lúc 9h đến 11h30 trưa",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-07T09:00:00",
+      "endTime": "2026-10-07T11:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 09:00 đến 11:30!"
+    }
+  },
+  {
+    "id": 257,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành sáng mai chiều từ 14h đến 16h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-03T14:00:00",
+      "endTime": "2026-10-03T16:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 14:00 đến 16:00!"
+    }
+  },
+  {
+    "id": 258,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành tối nay chiều từ 15h30 kết thúc lúc 17h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-02T15:30:00",
+      "endTime": "2026-10-02T17:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 15:30 đến 17:00!"
+    }
+  },
+  {
+    "id": 259,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành ngày kia tối từ 19h đến 21h",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-04T19:00:00",
+      "endTime": "2026-10-04T21:00:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 19:00 đến 21:00!"
+    }
+  },
+  {
+    "id": 260,
+    "instruction": "Phân tích yêu cầu tạo lịch hẹn trong hệ thống Second Brain",
+    "input": "Hãy điền cho tôi lịch thi vấn đáp môn hệ điều hành thứ 2 tuần sau tối từ 19h30 kết thúc lúc 21h30",
+    "output": {
+      "actionType": "add_event",
+      "amount": null,
+      "category": "Important",
+      "note": null,
+      "walletName": null,
+      "title": "Thi vấn đáp môn hệ điều hành",
+      "description": "Thi vấn đáp môn hệ điều hành",
+      "startTime": "2026-10-05T19:30:00",
+      "endTime": "2026-10-05T21:30:00",
+      "priority": null,
+      "replyMessage": "Đã lên lịch Thi vấn đáp môn hệ điều hành từ 19:30 đến 21:30!"
+    }
+  },
+  {
+    "id": 261,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ nộp slide báo cáo đồ án tốt nghiệp việc này rất gấp",
     "output": {
       "actionType": "add_task",
       "amount": null,
       "category": null,
       "note": null,
       "walletName": null,
-      "title": "Nộp báo cáo thực tập trước 17h thứ 6",
+      "title": "Nộp slide báo cáo đồ án tốt nghiệp",
       "description": null,
       "startTime": null,
       "endTime": null,
       "priority": "High",
-      "replyMessage": "Đã thêm việc gấp: 'Nộp báo cáo thực tập trước 17h thứ 6' với mức ưu tiên Cao."
+      "replyMessage": "Đã lưu công việc Nộp slide báo cáo đồ án tốt nghiệp với mức ưu tiên High."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu tạo công việc hoặc lời nhắc của người dùng",
-    "input": "Cần dọn dẹp phòng ngủ và giặt chăn màn vào cuối tuần",
+    "id": 262,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ nộp slide báo cáo đồ án tốt nghiệp ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Nộp slide báo cáo đồ án tốt nghiệp",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Nộp slide báo cáo đồ án tốt nghiệp với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 263,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ nộp slide báo cáo đồ án tốt nghiệp khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Nộp slide báo cáo đồ án tốt nghiệp",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Nộp slide báo cáo đồ án tốt nghiệp với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 264,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ nộp slide báo cáo đồ án tốt nghiệp hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Nộp slide báo cáo đồ án tốt nghiệp",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Nộp slide báo cáo đồ án tốt nghiệp với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 265,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ nộp slide báo cáo đồ án tốt nghiệp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Nộp slide báo cáo đồ án tốt nghiệp",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Nộp slide báo cáo đồ án tốt nghiệp với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 266,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ mua quà sinh nhật cho bạn gái việc này rất gấp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Mua quà sinh nhật cho bạn gái",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Mua quà sinh nhật cho bạn gái với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 267,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ mua quà sinh nhật cho bạn gái ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Mua quà sinh nhật cho bạn gái",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Mua quà sinh nhật cho bạn gái với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 268,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ mua quà sinh nhật cho bạn gái khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Mua quà sinh nhật cho bạn gái",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Mua quà sinh nhật cho bạn gái với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 269,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ mua quà sinh nhật cho bạn gái hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Mua quà sinh nhật cho bạn gái",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Mua quà sinh nhật cho bạn gái với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 270,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ mua quà sinh nhật cho bạn gái",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Mua quà sinh nhật cho bạn gái",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Mua quà sinh nhật cho bạn gái với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 271,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ dọn dẹp phòng ngủ và giặt chăn màn việc này rất gấp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Dọn dẹp phòng ngủ và giặt chăn màn",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Dọn dẹp phòng ngủ và giặt chăn màn với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 272,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ dọn dẹp phòng ngủ và giặt chăn màn ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Dọn dẹp phòng ngủ và giặt chăn màn",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Dọn dẹp phòng ngủ và giặt chăn màn với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 273,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ dọn dẹp phòng ngủ và giặt chăn màn khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Dọn dẹp phòng ngủ và giặt chăn màn",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Dọn dẹp phòng ngủ và giặt chăn màn với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 274,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ dọn dẹp phòng ngủ và giặt chăn màn hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Dọn dẹp phòng ngủ và giặt chăn màn",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Dọn dẹp phòng ngủ và giặt chăn màn với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 275,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ dọn dẹp phòng ngủ và giặt chăn màn",
     "output": {
       "actionType": "add_task",
       "amount": null,
@@ -334,33 +4784,463 @@
       "startTime": null,
       "endTime": null,
       "priority": "Medium",
-      "replyMessage": "Đã lưu công việc 'Dọn dẹp phòng ngủ và giặt chăn màn' vào danh sách nhiệm vụ."
+      "replyMessage": "Đã lưu công việc Dọn dẹp phòng ngủ và giặt chăn màn với mức ưu tiên Medium."
     }
   },
   {
-    "instruction": "Phân tích yêu cầu tạo công việc hoặc lời nhắc của người dùng",
-    "input": "Nhắc tôi mua quà sinh nhật cho mẹ",
+    "id": 276,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ đọc xong 2 chương sách chuyên ngành việc này rất gấp",
     "output": {
       "actionType": "add_task",
       "amount": null,
       "category": null,
       "note": null,
       "walletName": null,
-      "title": "Mua quà sinh nhật cho mẹ",
+      "title": "Đọc xong 2 chương sách chuyên ngành",
       "description": null,
       "startTime": null,
       "endTime": null,
       "priority": "High",
-      "replyMessage": "Đã thêm lời nhắc quan trọng: 'Mua quà sinh nhật cho mẹ'."
+      "replyMessage": "Đã lưu công việc Đọc xong 2 chương sách chuyên ngành với mức ưu tiên High."
     }
   },
-
-  // ==========================================
-  // NHÓM 4: HỎI ĐÁP & ĐIỀU HƯỚNG WEB (CHAT & BOT FAQ)
-  // ==========================================
   {
-    "instruction": "Phản hồi câu hỏi về cách sử dụng Second Brain của người dùng",
-    "input": "Website này có những tính năng gì?",
+    "id": 277,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ đọc xong 2 chương sách chuyên ngành ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Đọc xong 2 chương sách chuyên ngành",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Đọc xong 2 chương sách chuyên ngành với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 278,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ đọc xong 2 chương sách chuyên ngành khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Đọc xong 2 chương sách chuyên ngành",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Đọc xong 2 chương sách chuyên ngành với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 279,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ đọc xong 2 chương sách chuyên ngành hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Đọc xong 2 chương sách chuyên ngành",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Đọc xong 2 chương sách chuyên ngành với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 280,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ đọc xong 2 chương sách chuyên ngành",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Đọc xong 2 chương sách chuyên ngành",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Đọc xong 2 chương sách chuyên ngành với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 281,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ sửa lỗi giao diện responsive mobile việc này rất gấp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Sửa lỗi giao diện responsive mobile",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Sửa lỗi giao diện responsive mobile với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 282,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ sửa lỗi giao diện responsive mobile ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Sửa lỗi giao diện responsive mobile",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Sửa lỗi giao diện responsive mobile với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 283,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ sửa lỗi giao diện responsive mobile khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Sửa lỗi giao diện responsive mobile",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Sửa lỗi giao diện responsive mobile với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 284,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ sửa lỗi giao diện responsive mobile hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Sửa lỗi giao diện responsive mobile",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Sửa lỗi giao diện responsive mobile với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 285,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ sửa lỗi giao diện responsive mobile",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Sửa lỗi giao diện responsive mobile",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Sửa lỗi giao diện responsive mobile với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 286,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ gửi email xác nhận danh sách thực tập sinh việc này rất gấp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Gửi email xác nhận danh sách thực tập sinh",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Gửi email xác nhận danh sách thực tập sinh với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 287,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ gửi email xác nhận danh sách thực tập sinh ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Gửi email xác nhận danh sách thực tập sinh",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Gửi email xác nhận danh sách thực tập sinh với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 288,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ gửi email xác nhận danh sách thực tập sinh khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Gửi email xác nhận danh sách thực tập sinh",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Gửi email xác nhận danh sách thực tập sinh với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 289,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ gửi email xác nhận danh sách thực tập sinh hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Gửi email xác nhận danh sách thực tập sinh",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Gửi email xác nhận danh sách thực tập sinh với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 290,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ gửi email xác nhận danh sách thực tập sinh",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Gửi email xác nhận danh sách thực tập sinh",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Gửi email xác nhận danh sách thực tập sinh với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 291,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ làm bài tập lớn môn kiến trúc phần mềm việc này rất gấp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Làm bài tập lớn môn kiến trúc phần mềm",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Làm bài tập lớn môn kiến trúc phần mềm với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 292,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ làm bài tập lớn môn kiến trúc phần mềm ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Làm bài tập lớn môn kiến trúc phần mềm",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Làm bài tập lớn môn kiến trúc phần mềm với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 293,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ làm bài tập lớn môn kiến trúc phần mềm khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Làm bài tập lớn môn kiến trúc phần mềm",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Làm bài tập lớn môn kiến trúc phần mềm với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 294,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ làm bài tập lớn môn kiến trúc phần mềm hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Làm bài tập lớn môn kiến trúc phần mềm",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Làm bài tập lớn môn kiến trúc phần mềm với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 295,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ làm bài tập lớn môn kiến trúc phần mềm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Làm bài tập lớn môn kiến trúc phần mềm",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Làm bài tập lớn môn kiến trúc phần mềm với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 296,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ chuẩn bị tài liệu thuyết trình thứ 2 việc này rất gấp",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Chuẩn bị tài liệu thuyết trình thứ 2",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Chuẩn bị tài liệu thuyết trình thứ 2 với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 297,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ chuẩn bị tài liệu thuyết trình thứ 2 ưu tiên cao cần làm ngay",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Chuẩn bị tài liệu thuyết trình thứ 2",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Chuẩn bị tài liệu thuyết trình thứ 2 với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 298,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ chuẩn bị tài liệu thuyết trình thứ 2 khi nào rảnh thì làm",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Chuẩn bị tài liệu thuyết trình thứ 2",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Low",
+      "replyMessage": "Đã lưu công việc Chuẩn bị tài liệu thuyết trình thứ 2 với mức ưu tiên Low."
+    }
+  },
+  {
+    "id": 299,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ chuẩn bị tài liệu thuyết trình thứ 2 hạn chót ngày mai",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Chuẩn bị tài liệu thuyết trình thứ 2",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "High",
+      "replyMessage": "Đã lưu công việc Chuẩn bị tài liệu thuyết trình thứ 2 với mức ưu tiên High."
+    }
+  },
+  {
+    "id": 300,
+    "instruction": "Phân tích yêu cầu ghi nhớ công việc (Task)",
+    "input": "Nhớ chuẩn bị tài liệu thuyết trình thứ 2",
+    "output": {
+      "actionType": "add_task",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": "Chuẩn bị tài liệu thuyết trình thứ 2",
+      "description": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": "Medium",
+      "replyMessage": "Đã lưu công việc Chuẩn bị tài liệu thuyết trình thứ 2 với mức ưu tiên Medium."
+    }
+  },
+  {
+    "id": 301,
+    "instruction": "Phản hồi câu hỏi hoặc chào hỏi của người dùng",
+    "input": "Website này có những tính năng gì vậy bot?",
     "output": {
       "actionType": "chat",
       "amount": null,
@@ -371,11 +5251,63 @@
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Second Brain của bạn gồm 5 tính năng chính:\n1. 'Hôm nay' (Daily Hub): Tổng quan tài sản, đồng hồ, lịch hẹn và việc cần làm.\n2. 'Ví tiền': Quản lý nhiều ví, số dư, hạn mức chi tiêu tháng và biểu đồ giao dịch.\n3. 'Lịch biểu' (WeekBoard): Theo dõi thời khóa biểu và lịch trình tuần theo dạng thẻ hoặc ma trận.\n4. 'Công việc': Quản lý Todo list và theo dõi thói quen hằng ngày.\n5. 'Ghi chú': Sổ tay lưu trữ kiến thức và ý tưởng.\nBạn chỉ cần nhắn tôi, tôi sẽ tự động trừ ví hoặc lên lịch ngay!"
+      "replyMessage": "Tôi là Trợ lý AI Second Brain. Tôi có thể tự động ghi chép chi tiêu, cập nhật số dư ví và sắp xếp lịch trình hằng ngày cho bạn!"
     }
   },
   {
-    "instruction": "Phản hồi chào hỏi của người dùng",
+    "id": 302,
+    "instruction": "Phản hồi câu hỏi hoặc chào hỏi của người dùng",
+    "input": "Hướng dẫn tôi cách dùng ví tiền",
+    "output": {
+      "actionType": "chat",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Tôi là Trợ lý AI Second Brain. Tôi có thể tự động ghi chép chi tiêu, cập nhật số dư ví và sắp xếp lịch trình hằng ngày cho bạn!"
+    }
+  },
+  {
+    "id": 303,
+    "instruction": "Phản hồi câu hỏi hoặc chào hỏi của người dùng",
+    "input": "Làm sao để thêm lịch học trên weekboard?",
+    "output": {
+      "actionType": "chat",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Tôi là Trợ lý AI Second Brain. Tôi có thể tự động ghi chép chi tiêu, cập nhật số dư ví và sắp xếp lịch trình hằng ngày cho bạn!"
+    }
+  },
+  {
+    "id": 304,
+    "instruction": "Phản hồi câu hỏi hoặc chào hỏi của người dùng",
+    "input": "Bạn có thể làm được những gì?",
+    "output": {
+      "actionType": "chat",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Tôi là Trợ lý AI Second Brain. Tôi có thể tự động ghi chép chi tiêu, cập nhật số dư ví và sắp xếp lịch trình hằng ngày cho bạn!"
+    }
+  },
+  {
+    "id": 305,
+    "instruction": "Phản hồi câu hỏi hoặc chào hỏi của người dùng",
     "input": "Xin chào bot",
     "output": {
       "actionType": "chat",
@@ -387,7 +5319,24 @@
       "startTime": null,
       "endTime": null,
       "priority": null,
-      "replyMessage": "Chào bạn! Tôi là trợ lý AI Second Brain. Bạn vừa có khoản chi nào cần ghi lại hoặc có lịch hẹn nào sắp tới không?"
+      "replyMessage": "Tôi là Trợ lý AI Second Brain. Tôi có thể tự động ghi chép chi tiêu, cập nhật số dư ví và sắp xếp lịch trình hằng ngày cho bạn!"
+    }
+  },
+  {
+    "id": 306,
+    "instruction": "Phản hồi câu hỏi hoặc chào hỏi của người dùng",
+    "input": "Chào bạn trợ lý AI",
+    "output": {
+      "actionType": "chat",
+      "amount": null,
+      "category": null,
+      "note": null,
+      "walletName": null,
+      "title": null,
+      "startTime": null,
+      "endTime": null,
+      "priority": null,
+      "replyMessage": "Tôi là Trợ lý AI Second Brain. Tôi có thể tự động ghi chép chi tiêu, cập nhật số dư ví và sắp xếp lịch trình hằng ngày cho bạn!"
     }
   }
 ]

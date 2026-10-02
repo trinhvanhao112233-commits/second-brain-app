@@ -33,89 +33,73 @@ namespace PersonalFinance.API.Services
             var apiKey = _config["Gemini:ApiKey"];
             var model = _config["Gemini:Model"] ?? "gemini-1.5-flash";
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (!string.IsNullOrWhiteSpace(apiKey))
             {
-                _logger.LogWarning("[GeminiAiParserService] Không tìm thấy Gemini:ApiKey trong appsettings.json. Tự động dùng bộ phân tích NLP nội bộ.");
-                return FallbackRuleBasedParser(message);
-            }
-
-            try
-            {
-                var prompt = BuildPrompt(message, userContextInfo);
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
-
-                var requestBody = new
+                try
                 {
-                    contents = new[]
+                    var prompt = BuildPrompt(message, userContextInfo);
+                    var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
+
+                    var requestBody = new
                     {
-                        new
+                        contents = new[]
                         {
-                            parts = new[]
+                            new
                             {
-                                new { text = prompt }
+                                parts = new[]
+                                {
+                                    new { text = prompt }
+                                }
                             }
+                        },
+                        generationConfig = new
+                        {
+                            temperature = 0.1,
+                            responseMimeType = "application/json"
                         }
-                    },
-                    generationConfig = new
-                    {
-                        temperature = 0.1,
-                        responseMimeType = "application/json"
-                    }
-                };
-
-                var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(url, content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorDetails = await response.Content.ReadAsStringAsync();
-                    _logger.LogError($"[Gemini API Error] {response.StatusCode}: {errorDetails}");
-                    return FallbackRuleBasedParser(message);
-                }
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(responseString);
-                var root = doc.RootElement;
-
-                var text = root
-                    .GetProperty("candidates")[0]
-                    .GetProperty("content")
-                    .GetProperty("parts")[0]
-                    .GetProperty("text")
-                    .GetString();
-
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    // Clean json if wrapped in ```json
-                    var cleanJson = text.Trim();
-                    if (cleanJson.StartsWith("```json"))
-                    {
-                        cleanJson = cleanJson.Substring(7);
-                    }
-                    if (cleanJson.StartsWith("```"))
-                    {
-                        cleanJson = cleanJson.Substring(3);
-                    }
-                    if (cleanJson.EndsWith("```"))
-                    {
-                        cleanJson = cleanJson.Substring(0, cleanJson.Length - 3);
-                    }
-
-                    var options = new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
                     };
 
-                    var parsedOutput = JsonSerializer.Deserialize<AiActionOutput>(cleanJson.Trim(), options);
-                    if (parsedOutput != null)
+                    var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                    var response = await _httpClient.PostAsync(url, content);
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        return parsedOutput;
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        using var doc = JsonDocument.Parse(responseString);
+                        var root = doc.RootElement;
+
+                        var text = root
+                            .GetProperty("candidates")[0]
+                            .GetProperty("content")
+                            .GetProperty("parts")[0]
+                            .GetProperty("text")
+                            .GetString();
+
+                        if (!string.IsNullOrWhiteSpace(text))
+                        {
+                            var cleanJson = text.Trim();
+                            if (cleanJson.StartsWith("```json")) cleanJson = cleanJson.Substring(7);
+                            if (cleanJson.StartsWith("```")) cleanJson = cleanJson.Substring(3);
+                            if (cleanJson.EndsWith("```")) cleanJson = cleanJson.Substring(0, cleanJson.Length - 3);
+
+                            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                            var parsedOutput = JsonSerializer.Deserialize<AiActionOutput>(cleanJson.Trim(), options);
+                            if (parsedOutput != null)
+                            {
+                                return parsedOutput;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var errorDetails = await response.Content.ReadAsStringAsync();
+                        _logger.LogError($"[Gemini API Error] {response.StatusCode}: {errorDetails}");
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "[GeminiAiParserService] Ngoại lệ khi gọi Gemini API. Đang dùng fallback NLP.");
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "[GeminiAiParserService] Ngoại lệ khi gọi Gemini API. Đang dùng fallback NLP.");
+                }
             }
 
             return FallbackRuleBasedParser(message);
@@ -136,24 +120,17 @@ Nhiệm vụ của bạn:
 Phân tích yêu cầu bằng ngôn ngữ tự nhiên tiếng Việt của người dùng và chuyển thành một JSON duy nhất phù hợp với schema sau:
 {{
   ""actionType"": ""add_expense"" | ""add_income"" | ""add_event"" | ""add_task"" | ""chat"",
-  ""amount"": number hoặc null (ví dụ 70000 nếu nói 70k, 150000 nếu nói 150k, 1.5 triệu là 1500000. Lưu ý số tiền luôn là số dương > 0),
-  ""category"": string hoặc null (Với chi tiêu: 'Ăn uống', 'Đi lại', 'Mua sắm', 'Hóa đơn', 'Giải trí', 'Y tế', hoặc 'Khác'. Với sự kiện: 'Personal', 'Work', 'Health', 'Important'),
-  ""note"": string hoặc null (Mô tả món tiền vừa chi/thu, ví dụ: 'Ăn sáng phở bò', 'Đi taxi Grab'),
-  ""walletName"": string hoặc null (Nếu người dùng nói rõ ví như 'ví chính', 'ví tiết kiệm' hoặc để null nếu dùng ví mặc định),
-  ""title"": string hoặc null (Tiêu đề sự kiện hoặc công việc, ví dụ: 'Họp team dự án', 'Đi khám nha khoa'),
+  ""amount"": number hoặc null (Lưu ý số tiền luôn là số dương > 0),
+  ""category"": string hoặc null (Với chi tiêu: 'Ăn uống', 'Đi lại', 'Mua sắm', 'Hóa đơn', 'Giải trí', 'Y tế', 'Khác'. Với sự kiện: 'Học tập', 'Họp', 'Work', 'Personal', 'Health', 'Important'),
+  ""note"": string hoặc null,
+  ""walletName"": string hoặc null,
+  ""title"": string hoặc null (Tiêu đề ngắn gọn, xúc tích của sự kiện hoặc công việc, ví dụ: 'Học môn thiết kế và phát triển', 'Họp team', bỏ qua các từ lệnh như 'hãy điền cho tôi', 'nhắc tôi'),
   ""description"": string hoặc null,
-  ""startTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null (Dành cho sự kiện lịch trình, tính toán từ ngữ cảnh như '9h sáng mai', 'chiều nay 15h'),
-  ""endTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null (mặc định cộng thêm 1 giờ sau startTime nếu không nói rõ),
-  ""priority"": ""High"" | ""Medium"" | ""Low"" (cho công việc task),
-  ""replyMessage"": string (Câu phản hồi ngắn gọn, thân thiện, xác nhận hành động cho người dùng bằng tiếng Việt)
+  ""startTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null (ví dụ bắt đầu lúc 7h sáng mai thì là yyyy-MM-ddT07:00:00),
+  ""endTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null (ví dụ kết thúc lúc 9h sáng thì là yyyy-MM-ddT09:00:00. ĐẶC BIỆT CHÚ Ý: nếu người dùng nói rõ giờ kết thúc thì phải lấy chính xác giờ kết thúc đó),
+  ""priority"": ""High"" | ""Medium"" | ""Low"",
+  ""replyMessage"": string (Câu phản hồi ngắn gọn, thân thiện, xác nhận cho người dùng bằng tiếng Việt)
 }}
-
-Quy tắc phân loại:
-1. 'Đã ăn sáng hết 70k', 'mua cafe 35k', 'đổ xăng 50k', 'chi 120k tiền đi chợ' -> actionType = 'add_expense'.
-2. 'Vừa nhận lương 15 triệu', 'được thưởng 500k', 'nạp vào ví 200k' -> actionType = 'add_income'.
-3. 'Chiều mai 14h có hẹn gặp khách hàng ở The Coffee House', 'ngày mai 9h họp team' -> actionType = 'add_event'. Tính toán đúng startTime và endTime.
-4. 'Nhớ mua tài liệu', 'cần nộp báo cáo trước thứ 6' -> actionType = 'add_task'.
-5. Các câu chào hỏi hoặc hỏi đáp thông thường -> actionType = 'chat'.
 
 Chỉ trả về JSON thuần, không kèm markdown hoặc giải thích bên ngoài.
 
@@ -171,7 +148,6 @@ Tin nhắn của người dùng:
             var lower = raw.ToLower();
 
             // 1. Kiểm tra Chi tiêu (Expense)
-            // Ví dụ: "Đã ăn sáng hết 70k", "chi 50k mua cafe", "ăn trưa 40.000đ"
             var isExpense = lower.Contains("ăn") || lower.Contains("uống") || lower.Contains("mua") ||
                             lower.Contains("hết") || lower.Contains("chi") || lower.Contains("tiêu") ||
                             lower.Contains("trả tiền") || lower.Contains("đổ xăng");
@@ -207,33 +183,93 @@ Tin nhắn của người dùng:
             }
 
             // 2. Kiểm tra Sự kiện lịch biểu
-            if (lower.Contains("hẹn") || lower.Contains("họp") || lower.Contains("lịch") || lower.Contains("đi khám") || lower.Contains("bay"))
+            if (lower.Contains("hẹn") || lower.Contains("họp") || lower.Contains("lịch") || lower.Contains("đi khám") || 
+                lower.Contains("học") || lower.Contains("bắt đầu") || lower.Contains("kết thúc") || lower.Contains("tiết"))
             {
                 var now = DateTime.Now;
                 var eventDate = now;
-                if (lower.Contains("mai")) eventDate = now.AddDays(1);
-                else if (lower.Contains("kia")) eventDate = now.AddDays(2);
-
-                var hour = 9;
-                var hourMatch = Regex.Match(lower, @"(\d{1,2})\s*(h|giờ)");
-                if (hourMatch.Success && int.TryParse(hourMatch.Groups[1].Value, out var parsedHour))
+                if (lower.Contains("sáng mai") || lower.Contains("ngày mai") || lower.Contains("chiều mai") || lower.Contains("tối mai"))
                 {
-                    if (lower.Contains("chiều") && parsedHour < 12) parsedHour += 12;
-                    if (lower.Contains("tối") && parsedHour < 12) parsedHour += 12;
-                    hour = parsedHour;
+                    eventDate = now.AddDays(1);
+                }
+                else if (lower.Contains("hôm nay") || lower.Contains("tối nay") || lower.Contains("chiều nay"))
+                {
+                    eventDate = now;
+                }
+                else if (lower.Contains("mai"))
+                {
+                    eventDate = now.AddDays(1);
+                }
+                else if (lower.Contains("kia"))
+                {
+                    eventDate = now.AddDays(2);
                 }
 
-                var start = new DateTime(eventDate.Year, eventDate.Month, eventDate.Day, hour, 0, 0);
-                var end = start.AddHours(1);
+                // Trích xuất giờ bắt đầu
+                int startHour = 8;
+                int startMinute = 0;
+                var startMatch = Regex.Match(lower, @"(bắt đầu\s*(từ)?|từ)\s*(\d{1,2})\s*(h|giờ|g)(\s*(\d{1,2})\s*(p|phút)?)?");
+                if (startMatch.Success && int.TryParse(startMatch.Groups[3].Value, out var sH))
+                {
+                    startHour = sH;
+                    if (!string.IsNullOrWhiteSpace(startMatch.Groups[6].Value) && int.TryParse(startMatch.Groups[6].Value, out var sM))
+                    {
+                        startMinute = sM;
+                    }
+                }
+                else
+                {
+                    var anyHourMatch = Regex.Match(lower, @"(\d{1,2})\s*(h|giờ|g)");
+                    if (anyHourMatch.Success && int.TryParse(anyHourMatch.Groups[1].Value, out var firstH))
+                    {
+                        startHour = firstH;
+                    }
+                }
+
+                if ((lower.Contains("chiều") || lower.Contains("tối")) && startHour < 12)
+                {
+                    startHour += 12;
+                }
+
+                // Trích xuất giờ kết thúc
+                int endHour = startHour + 1;
+                int endMinute = startMinute;
+                var endMatch = Regex.Match(lower, @"(kết thúc\s*(lúc|vào)?|đến|tới)\s*(\d{1,2})\s*(h|giờ|g)(\s*(\d{1,2})\s*(p|phút)?)?");
+                if (endMatch.Success && int.TryParse(endMatch.Groups[3].Value, out var eH))
+                {
+                    endHour = eH;
+                    if ((lower.Contains("chiều") || lower.Contains("tối")) && endHour < 12)
+                    {
+                        endHour += 12;
+                    }
+                    if (!string.IsNullOrWhiteSpace(endMatch.Groups[6].Value) && int.TryParse(endMatch.Groups[6].Value, out var eM))
+                    {
+                        endMinute = eM;
+                    }
+                }
+
+                var start = new DateTime(eventDate.Year, eventDate.Month, eventDate.Day, startHour, startMinute, 0);
+                var end = new DateTime(eventDate.Year, eventDate.Month, eventDate.Day, endHour, endMinute, 0);
+                if (end <= start)
+                {
+                    end = start.AddHours(1);
+                }
+
+                // Làm sạch tiêu đề sự kiện
+                var cleanTitle = Regex.Replace(raw, @"(?i)(hãy\s+điền\s+cho\s+tôi|nhắc\s+tôi|thêm\s+lịch|đặt\s+lịch)\s*", "").Trim();
+
+                var category = "Personal";
+                if (lower.Contains("học") || lower.Contains("thiết kế") || lower.Contains("môn")) category = "Học tập";
+                else if (lower.Contains("họp") || lower.Contains("công việc") || lower.Contains("dự án")) category = "Work";
 
                 return new AiActionOutput
                 {
                     ActionType = "add_event",
-                    Title = raw,
+                    Title = cleanTitle,
                     StartTime = start.ToString("yyyy-MM-ddTHH:mm:ss"),
                     EndTime = end.ToString("yyyy-MM-ddTHH:mm:ss"),
-                    Category = lower.Contains("họp") || lower.Contains("công việc") ? "Work" : "Personal",
-                    ReplyMessage = $"Đã tạo lịch hẹn: '{raw}' vào lúc {start:HH:mm dd/MM/yyyy}!"
+                    Category = category,
+                    ReplyMessage = $"Đã lên lịch '{cleanTitle}' từ {start:HH:mm} đến {end:HH:mm} ngày {start:dd/MM/yyyy}!"
                 };
             }
 

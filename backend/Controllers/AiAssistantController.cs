@@ -145,19 +145,25 @@ namespace PersonalFinance.API.Controllers
                 {
                     var title = !string.IsNullOrWhiteSpace(actionOutput.Title) ? actionOutput.Title : request.Message;
                     
-                    DateTime startTime = DateTime.UtcNow.AddHours(1);
+                    DateTime startTime = DateTime.Now.AddHours(1);
                     if (!string.IsNullOrWhiteSpace(actionOutput.StartTime) && 
                         DateTime.TryParse(actionOutput.StartTime, out var parsedStart))
                     {
-                        startTime = parsedStart.ToUniversalTime();
+                        startTime = parsedStart;
                     }
 
                     DateTime endTime = startTime.AddHours(1);
                     if (!string.IsNullOrWhiteSpace(actionOutput.EndTime) && 
                         DateTime.TryParse(actionOutput.EndTime, out var parsedEnd))
                     {
-                        endTime = parsedEnd.ToUniversalTime();
+                        endTime = parsedEnd;
                     }
+
+                    var category = !string.IsNullOrWhiteSpace(actionOutput.Category) ? actionOutput.Category : "Personal";
+                    var color = "#10b981";
+                    if (category == "Học tập") color = "#f97316";
+                    else if (category == "Work" || category == "Họp") color = "#3b82f6";
+                    else if (category == "Important") color = "#f43f5e";
 
                     var newEvent = new CalendarEvent
                     {
@@ -166,8 +172,8 @@ namespace PersonalFinance.API.Controllers
                         Description = actionOutput.Description ?? request.Message,
                         StartTime = startTime,
                         EndTime = endTime,
-                        Category = !string.IsNullOrWhiteSpace(actionOutput.Category) ? actionOutput.Category : "Personal",
-                        Color = actionOutput.Category == "Work" ? "#3b82f6" : "#10b981",
+                        Category = category,
+                        Color = color,
                         CreatedAt = DateTime.UtcNow
                     };
 

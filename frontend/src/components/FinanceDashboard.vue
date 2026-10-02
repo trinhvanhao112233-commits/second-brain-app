@@ -661,7 +661,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { apiFetch } from '../services/api';
 
 const API_BASE_URL = '/wallets';
@@ -1035,7 +1035,18 @@ const handleDepositSubmit = async () => {
   }
 };
 
+const handleDataUpdated = (e) => {
+  if (e.detail?.action === 'transaction') {
+    fetchWallets();
+  }
+};
+
 onMounted(() => {
   fetchWallets();
+  window.addEventListener('secondbrain-data-updated', handleDataUpdated);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('secondbrain-data-updated', handleDataUpdated);
 });
 </script>

@@ -55,6 +55,18 @@ Bạn có thể truy cập Swagger UI tại: `http://localhost:5000/swagger` đ�
 
 ---
 
+### 1.1 Cấu hình Trợ lý AI (Google Gemini API)
+Mở [appsettings.json](file:///f:/CODE%20WORK/C%C3%A1%20nh%C3%A2n/backend/appsettings.json) và dán API Key của bạn vào mục `Gemini`:
+```json
+"Gemini": {
+  "ApiKey": "YOUR_GEMINI_API_KEY",
+  "Model": "gemini-1.5-flash"
+}
+```
+*(Nếu chưa có API Key, hệ thống tự động kích hoạt bộ phân tích NLP nội bộ cực nhanh để nhận diện các câu tiếng Việt như "Đã ăn sáng hết 70k", "9h sáng mai họp", "cần nộp báo cáo").*
+
+---
+
 ### 2. Khởi chạy Frontend (Vue 3 + Vite)
 
 Mở một terminal khác tại thư mục `frontend`:

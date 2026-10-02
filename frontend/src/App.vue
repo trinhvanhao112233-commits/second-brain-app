@@ -175,6 +175,9 @@
       :is-open="showChangePasswordModal"
       @close="showChangePasswordModal = false"
     />
+
+    <!-- AI Assistant Floating Widget -->
+    <AiChatWidget @data-updated="handleAiDataUpdated" />
   </div>
 </template>
 
@@ -187,6 +190,7 @@ import TasksModule from './components/TasksModule.vue';
 import NotesModule from './components/NotesModule.vue';
 import AuthView from './components/AuthView.vue';
 import ChangePasswordModal from './components/ChangePasswordModal.vue';
+import AiChatWidget from './components/AiChatWidget.vue';
 import { apiFetch, getStoredUser, setStoredUser } from './services/api';
 
 const currentUser = ref(getStoredUser());
@@ -278,6 +282,18 @@ const fetchNotes = async () => {
     if (res.ok) notes.value = await res.json();
   } catch (err) {
     console.error(err);
+  }
+};
+
+const handleAiDataUpdated = (event) => {
+  if (event?.action === 'transaction') {
+    fetchWallets();
+  } else if (event?.action === 'event') {
+    fetchEvents();
+  } else if (event?.action === 'task') {
+    fetchTasks();
+  } else {
+    fetchAllData();
   }
 };
 

@@ -25,6 +25,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// 3. Đăng ký dịch vụ AI Parser (Gemini AI với NLP Fallback)
+builder.Services.AddHttpClient<PersonalFinance.API.Services.IAiParserService, PersonalFinance.API.Services.GeminiAiParserService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

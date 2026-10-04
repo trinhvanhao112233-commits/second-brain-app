@@ -34,7 +34,7 @@ namespace PersonalFinance.API.Services
                          ?? _config["Gemini:ApiKey"];
             var model = Environment.GetEnvironmentVariable("GEMINI_MODEL") 
                         ?? _config["Gemini:Model"] 
-                        ?? "gemini-1.5-flash";
+                        ?? "gemini-3.5-flash-lite";
 
             if (!string.IsNullOrWhiteSpace(apiKey))
             {

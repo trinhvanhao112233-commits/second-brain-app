@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+  <div class="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 flex flex-col items-end">
     <!-- CỬA SỔ CHAT WIDGET -->
     <transition
       enter-active-class="transition duration-300 ease-out transform"
@@ -168,10 +168,10 @@
     <!-- NÚT TRÒN TOGGLE CHAT (FLOATING ACTION BUTTON) -->
     <button
       @click="toggleChat"
-      class="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-[#005237] to-[#10b981] text-white shadow-xl shadow-emerald-950/60 hover:shadow-emerald-900/80 hover:scale-105 active:scale-95 transition-all duration-300 md-elevation-2"
+      class="group relative flex items-center justify-center p-3 md:px-4 md:py-3 rounded-full bg-gradient-to-r from-[#005237] to-[#10b981] text-white shadow-xl shadow-emerald-950/60 hover:shadow-emerald-900/80 hover:scale-105 active:scale-95 transition-all duration-300 md-elevation-2"
       title="Mở Trợ lý AI"
     >
-      <div class="relative">
+      <div class="relative flex items-center justify-center">
         <span class="material-symbols-rounded text-2xl transition-transform group-hover:rotate-12">
           {{ isOpen ? 'expand_more' : 'smart_toy' }}
         </span>
@@ -180,7 +180,7 @@
           class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#38e1a6] rounded-full animate-ping"
         ></span>
       </div>
-      <span class="font-bold text-xs tracking-wide">Trợ lý AI</span>
+      <span class="hidden md:inline font-bold text-xs tracking-wide ml-2">Trợ lý AI</span>
     </button>
   </div>
 </template>

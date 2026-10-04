@@ -130,52 +130,78 @@ namespace PersonalFinance.API.Controllers
 
                 case "add_event":
                 {
-                    var title = !string.IsNullOrWhiteSpace(actionOutput.Title) ? actionOutput.Title : request.Message;
-                    
-                    DateTime startTime = DateTime.Now.AddHours(1);
-                    if (!string.IsNullOrWhiteSpace(actionOutput.StartTime) && 
-                        DateTime.TryParse(actionOutput.StartTime, out var parsedStart))
+                    // Hỗ trợ trường hợp câu nói có nhiều sự kiện (ví dụ: 'chiều mai đi làm..., tối đi chơi...')
+                    var eventItems = new List<CalendarEventItemDTO>();
+                    if (actionOutput.Events != null && actionOutput.Events.Count > 0)
                     {
-                        startTime = parsedStart;
+                        eventItems = actionOutput.Events;
+                    }
+                    else
+                    {
+                        eventItems.Add(new CalendarEventItemDTO
+                        {
+                            Title = actionOutput.Title,
+                            Description = actionOutput.Description,
+                            StartTime = actionOutput.StartTime,
+                            EndTime = actionOutput.EndTime,
+                            Category = actionOutput.Category
+                        });
                     }
 
-                    DateTime endTime = startTime.AddHours(1);
-                    if (!string.IsNullOrWhiteSpace(actionOutput.EndTime) && 
-                        DateTime.TryParse(actionOutput.EndTime, out var parsedEnd))
+                    var createdEvents = new List<CalendarEvent>();
+                    foreach (var item in eventItems)
                     {
-                        endTime = parsedEnd;
+                        var title = !string.IsNullOrWhiteSpace(item.Title) ? item.Title : request.Message;
+                        
+                        DateTime startTime = DateTime.Now.AddHours(1);
+                        if (!string.IsNullOrWhiteSpace(item.StartTime) && 
+                            DateTime.TryParse(item.StartTime, out var parsedStart))
+                        {
+                            startTime = parsedStart;
+                        }
+
+                        DateTime endTime = startTime.AddHours(1);
+                        if (!string.IsNullOrWhiteSpace(item.EndTime) && 
+                            DateTime.TryParse(item.EndTime, out var parsedEnd))
+                        {
+                            endTime = parsedEnd;
+                        }
+
+                        var category = !string.IsNullOrWhiteSpace(item.Category) ? item.Category : "Personal";
+                        var color = "#10b981";
+                        if (category == "Học tập") color = "#f97316";
+                        else if (category == "Work" || category == "Họp") color = "#3b82f6";
+                        else if (category == "Important") color = "#f43f5e";
+
+                        var newEvent = new CalendarEvent
+                        {
+                            UserId = userId,
+                            Title = title,
+                            Description = item.Description ?? request.Message,
+                            StartTime = startTime,
+                            EndTime = endTime,
+                            Category = category,
+                            Color = color,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        _context.Events.Add(newEvent);
+                        createdEvents.Add(newEvent);
                     }
 
-                    var category = !string.IsNullOrWhiteSpace(actionOutput.Category) ? actionOutput.Category : "Personal";
-                    var color = "#10b981";
-                    if (category == "Học tập") color = "#f97316";
-                    else if (category == "Work" || category == "Họp") color = "#3b82f6";
-                    else if (category == "Important") color = "#f43f5e";
-
-                    var newEvent = new CalendarEvent
-                    {
-                        UserId = userId,
-                        Title = title,
-                        Description = actionOutput.Description ?? request.Message,
-                        StartTime = startTime,
-                        EndTime = endTime,
-                        Category = category,
-                        Color = color,
-                        CreatedAt = DateTime.UtcNow
-                    };
-
-                    _context.Events.Add(newEvent);
                     await _context.SaveChangesAsync();
 
                     var reply = string.IsNullOrWhiteSpace(actionOutput.ReplyMessage)
-                        ? $"Đã tạo lịch hẹn '{newEvent.Title}' vào lúc {startTime.ToLocalTime():HH:mm dd/MM/yyyy}!"
+                        ? (createdEvents.Count > 1 
+                            ? $"Đã tạo thành công {createdEvents.Count} lịch trình cho bạn!" 
+                            : $"Đã tạo lịch hẹn '{createdEvents[0].Title}' vào lúc {createdEvents[0].StartTime.ToLocalTime():HH:mm dd/MM/yyyy}!")
                         : actionOutput.ReplyMessage;
 
                     return Ok(new AiProcessResponse(
                         Success: true,
                         Reply: reply,
                         ActionExecuted: "event",
-                        Data: newEvent
+                        Data: createdEvents.Count == 1 ? createdEvents[0] : createdEvents
                     ));
                 }
 

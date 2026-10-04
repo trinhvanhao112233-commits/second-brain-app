@@ -122,9 +122,25 @@ Thông tin ngữ cảnh người dùng:
 CÁC NGUYÊN TẮC XỬ LÝ QUAN TRỌNG:
 
 1. QUY TẮC BÓC TÁCH LỊCH TRÌNH / CÔNG VIỆC ('add_event', 'add_task'):
-- Loại bỏ triệt để các từ mệnh lệnh (ví dụ: 'điền', 'hãy', 'nhắc', 'thêm cho tôi', 'tạo lịch'...) và đại từ nhân xưng ('tôi', 't', 'mình', 'tao'...).
-- 'title': Chỉ giữ lại tên sự kiện/công việc ngắn gọn và trọng tâm (Ví dụ: 'Điền lịch học vào 7-9 sáng cho t' -> title: 'Học'; 'Hãy điền cho tôi lịch học môn thiết kế và phát triển sáng mai...' -> title: 'Học môn thiết kế và phát triển').
-- 'startTime', 'endTime': Bóc tách chuẩn mốc giờ sang định dạng ISO 8601 (yyyy-MM-ddTHH:mm:ss) theo mốc ngày tương ứng (hôm nay, sáng mai, thứ mấy...). Nếu người dùng nói rõ giờ kết thúc thì phải lấy chính xác giờ kết thúc đó.
+- ĐẶC BIỆT CHÚ Ý: Nếu người dùng nêu NHIỀU sự kiện/lịch trình trong cùng một câu (ngăn cách bởi dấu phẩy ',', từ 'rồi', 'sau đó', 'và'... Ví dụ: 'Chiều mai tôi có lịch đi làm lúc 1h-6h, tối mai tôi có lịch đi chơi với người yêu lúc 7h-10h'):
+  + Bạn BẮT BUỘC phải tách ra từng sự kiện riêng biệt và đặt vào mảng 'events'.
+  + 'events': [
+      {{
+        ""title"": ""Đi làm"",
+        ""startTime"": ""2026-10-05T13:00:00"",
+        ""endTime"": ""2026-10-05T18:00:00"",
+        ""category"": ""Work""
+      }},
+      {{
+        ""title"": ""Đi chơi với người yêu"",
+        ""startTime"": ""2026-10-05T19:00:00"",
+        ""endTime"": ""2026-10-05T22:00:00"",
+        ""category"": ""Personal""
+      }}
+    ]
+- Loại bỏ triệt để các từ mệnh lệnh ('điền', 'hãy', 'nhắc', 'thêm cho tôi', 'tạo lịch'...) và đại từ nhân xưng ('tôi', 't', 'mình', 'tao'...).
+- 'title': Chỉ giữ lại tên sự kiện ngắn gọn, xúc tích (Ví dụ: 'Học', 'Đi làm', 'Đi chơi với người yêu').
+- 'startTime', 'endTime': Bóc tách chuẩn mốc giờ sang định dạng ISO 8601 (yyyy-MM-ddTHH:mm:ss) theo mốc ngày tương ứng.
 
 2. QUY TẮC TRỪ VÍ ĐỘNG (DÀNH CHO CHI TIÊU 'add_expense'):
 - ĐỌC DANH SÁCH VÍ THỰC TẾ TRONG 'Thông tin ngữ cảnh người dùng' Ở TRÊN.
@@ -144,11 +160,20 @@ CẤU TRÚC JSON TRẢ VỀ:
   ""category"": string hoặc null,
   ""note"": string hoặc null,
   ""walletName"": string hoặc null,
-  ""title"": string hoặc null,
+  ""title"": string hoặc null (nếu chỉ có 1 sự kiện),
   ""description"": string hoặc null,
   ""startTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null,
   ""endTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null,
   ""priority"": ""High"" | ""Medium"" | ""Low"",
+  ""events"": [
+    {{
+      ""title"": string,
+      ""description"": string hoặc null,
+      ""startTime"": string ISO 8601,
+      ""endTime"": string ISO 8601,
+      ""category"": string
+    }}
+  ] hoặc null (chỉ dùng khi có từ 2 sự kiện trở lên trong 1 câu),
   ""replyMessage"": string
 }}
 

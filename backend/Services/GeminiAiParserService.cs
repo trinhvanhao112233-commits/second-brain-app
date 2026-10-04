@@ -127,11 +127,14 @@ CÁC NGUYÊN TẮC XỬ LÝ QUAN TRỌNG:
 - 'startTime', 'endTime': Bóc tách chuẩn mốc giờ sang định dạng ISO 8601 (yyyy-MM-ddTHH:mm:ss) theo mốc ngày tương ứng (hôm nay, sáng mai, thứ mấy...). Nếu người dùng nói rõ giờ kết thúc thì phải lấy chính xác giờ kết thúc đó.
 
 2. QUY TẮC TRỪ VÍ TUYỆT ĐỐI (DÀNH CHO CHI TIÊU 'add_expense'):
-- Bạn chỉ được gán 'walletName' khi khoản chi tiêu khớp CHẶT CHẼ với định nghĩa của ví trong danh sách ví của người dùng:
-  + Ví 'Di chuyển': CHỈ ĐƯỢC DÙNG khi mô tả chi tiêu liên quan ĐÚNG ĐẾN việc đổ xăng, đi xe (taxi, grab, bus, be), vé gửi xe.
-  + Ví 'Tiền nhà': CHỈ ĐƯỢC DÙNG cho các khoản thuê nhà, tiền phòng, điện, nước.
-- Nếu chi tiêu (ví dụ: ăn uống, xem phim, cà phê, trà sữa, mua sắm...) KHÔNG khớp chặt chẽ với bất kỳ ví nào ở trên, bạn TUYỆT ĐỐI KHÔNG được tự ý gán bừa vào ví 'Di chuyển' hay 'Tiền nhà'.
-- Khi không có ví khớp: Hãy để 'walletName': null và gán 'replyMessage': 'Chưa đủ thông tin để trừ tiền (khoản chi này không khớp với các ví hiện có của bạn).'
+- Kiểm tra danh sách ví của người dùng được cung cấp trong 'Thông tin ngữ cảnh người dùng'.
+- Bạn chỉ được gán 'walletName' khi tên ví khớp chính xác hoặc có nghĩa tương đương mật thiết với khoản chi:
+  + Ví dụ: 'Tiền ăn' / 'Ăn uống' -> Chỉ dùng cho ăn, uống, cà phê, cơm, bún, phở, trà sữa...
+  + Ví dụ: 'Di chuyển' / 'Xăng xe' -> Chỉ dùng khi đổ xăng, đi xe (taxi, grab, bus, be), gửi xe.
+  + Ví dụ: 'Tiền nhà' -> Chỉ dùng cho thuê nhà, tiền phòng, điện, nước.
+- Nếu khoản chi tiêu KHÔNG khớp với bất kỳ ví nào trong danh sách ví của người dùng:
+  + Tuyệt đối KHÔNG tự ý gán bừa vào ví khác.
+  + Hãy để 'walletName': null và gán 'replyMessage': 'Chưa đủ thông tin để trừ tiền (khoản chi này không khớp với các ví hiện có của bạn).'
 
 CÁC VÍ DỤ MẪU (FEW-SHOT EXAMPLES):
 [Ví dụ 1]
@@ -159,18 +162,20 @@ Output:
 }}
 
 [Ví dụ 3]
-Người dùng: 'Đổ xăng xe máy hết 70k'
+Ngữ cảnh có ví ['Tiền ăn', 'Tiền nhà', 'Di chuyển']
+Người dùng: 'Tiền ăn hết 50k' hoặc 'Ăn trưa bún bò hết 50k'
 Output:
 {{
   ""actionType"": ""add_expense"",
-  ""amount"": 70000,
-  ""category"": ""Đi lại"",
-  ""note"": ""Đổ xăng xe máy"",
-  ""walletName"": ""Di chuyển"",
-  ""replyMessage"": ""Đã ghi nhận khoản chi đổ xăng 70.000đ vào ví Di chuyển.""
+  ""amount"": 50000,
+  ""category"": ""Ăn uống"",
+  ""note"": ""Tiền ăn"",
+  ""walletName"": ""Tiền ăn"",
+  ""replyMessage"": ""Đã ghi nhận khoản chi ăn uống 50.000đ vào ví Tiền ăn.""
 }}
 
 [Ví dụ 4]
+Ngữ cảnh chỉ có ví ['Tiền nhà', 'Di chuyển']
 Người dùng: 'Vừa ăn bát phở bò 45k'
 Output:
 {{
@@ -238,6 +243,11 @@ Tin nhắn của người dùng:
                          lower.Contains("tiền điện") || lower.Contains("tiền nước") || lower.Contains("điện") || lower.Contains("nước"))
                 {
                     matchedWallet = "Tiền nhà";
+                }
+                else if (lower.Contains("ăn") || lower.Contains("uống") || lower.Contains("cơm") || 
+                         lower.Contains("bún") || lower.Contains("phở") || lower.Contains("cafe") || lower.Contains("cà phê"))
+                {
+                    matchedWallet = "Tiền ăn";
                 }
 
                 if (string.IsNullOrWhiteSpace(matchedWallet))

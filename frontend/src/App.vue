@@ -215,10 +215,20 @@ const showChangePasswordModal = ref(false);
 const isNotificationEnabled = ref(false);
 const activeTab = ref('hub');
 
-const checkNotificationStatus = () => {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    isNotificationEnabled.value = true;
+const checkNotificationStatus = async () => {
+  try {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg) {
+        const sub = await reg.pushManager.getSubscription();
+        isNotificationEnabled.value = !!sub;
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Error checking push subscription:', e);
   }
+  isNotificationEnabled.value = false;
 };
 
 const toggleNotificationSubscription = async () => {

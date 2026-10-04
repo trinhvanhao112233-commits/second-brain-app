@@ -401,7 +401,9 @@ Tin nhắn của người dùng:
                 }
 
                 // Làm sạch tiêu đề sự kiện: loại bỏ đại từ nhân xưng, từ mệnh lệnh và mốc giờ
-                var cleanTitle = Regex.Replace(raw, @"(?i)(sáng mai|ngày mai|hôm nay|chiều mai|tối mai|tôi|t|mình|tao|hãy|điền|cho tôi|cho t|nhắc tôi|thêm lịch|đặt lịch|có lịch|lúc\s+\d+.*|\d+\s*[-–—]\s*\d+.*|\d+h.*)", "").Trim();
+                var cleanTitle = Regex.Replace(raw, @"(?i)\b(sáng mai|ngày mai|hôm nay|chiều mai|tối mai|tôi|mình|tao|hãy|điền|cho tôi|cho t|nhắc tôi|thêm lịch|đặt lịch|có lịch|t)\b", " ");
+                cleanTitle = Regex.Replace(cleanTitle, @"(?i)(lúc\s+\d+.*|\d+\s*[-–—]\s*\d+.*|\d+h.*|\d+\s*giờ.*)", " ");
+                cleanTitle = Regex.Replace(cleanTitle, @"\s+", " ").Trim();
                 
                 // Chuẩn hóa tên lịch
                 if (string.IsNullOrWhiteSpace(cleanTitle) || cleanTitle.Length < 3)

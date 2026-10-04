@@ -222,38 +222,27 @@ const checkNotificationStatus = () => {
 };
 
 const toggleNotificationSubscription = async () => {
-  if (isNotificationEnabled.value) {
-    // Nếu đã bật rồi, khi bấm vào chuông sẽ gửi thử ngay 1 thông báo kiểm tra
-    try {
-      const res = await apiFetch('/notification/test-push', { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        alert('🔔 Đã gửi 1 thông báo thử nghiệm tới thiết bị của bạn! Hãy kiểm tra thanh thông báo màn hình.');
-      } else {
-        alert(data.message || 'Không thể gửi thông báo thử nghiệm.');
-      }
-    } catch (e) {
-      alert('Lỗi kết nối tới máy chủ khi gửi thông báo test.');
-    }
-    return;
-  }
-
+  // Luôn thực hiện đăng ký / làm mới token thiết bị và test push
   const res = await registerPushNotification();
   if (res.success) {
     isNotificationEnabled.value = true;
-    alert('Đã bật thông báo thành công! Hệ thống sẽ gửi 1 thông báo kiểm tra ngay bây giờ.');
-    // Tự động kích hoạt test push ngay lập tức
     try {
-      await apiFetch('/notification/test-push', { method: 'POST' });
+      const testRes = await apiFetch('/notification/test-push', { method: 'POST' });
+      const data = await testRes.json();
+      if (testRes.ok) {
+        alert('🔔 Đã kích hoạt và gửi thông báo thử nghiệm thành công! Hãy kiểm tra banner thông báo trên màn hình của bạn.');
+      } else {
+        alert(data.message || 'Thiết bị đã đăng ký nhưng máy chủ chưa gửi được.');
+      }
     } catch (e) {
-      console.error(e);
+      alert('Đã kết nối thông báo nhưng xảy ra lỗi khi test push: ' + e.message);
     }
   } else if (res.reason === 'denied') {
-    alert('Bạn đã chặn thông báo trong cài đặt trình duyệt. Hãy vào Cài đặt trang web để cho phép (Allow Notification).');
+    alert('⚠️ Bạn đã chặn quyền thông báo trong trình duyệt. Vui lòng bấm vào biểu tượng cài đặt / ổ khóa cạnh tên miền web và chọn "Cho phép thông báo" (Allow Notifications).');
   } else if (res.reason === 'unsupported') {
-    alert('Trình duyệt hiện tại chưa hỗ trợ Web Push Notification.');
+    alert('⚠️ Trình duyệt này chưa hỗ trợ Web Push Notification. Nếu bạn dùng iPhone, hãy nhấn Chia sẻ -> "Thêm vào MH chính" (Add to Home Screen) rồi mở app từ màn hình chính.');
   } else {
-    alert('Có lỗi xảy ra khi kết nối máy chủ thông báo.');
+    alert('⚠️ Lỗi khi đăng ký thông báo: ' + (res.error?.message || res.reason || 'Không xác định'));
   }
 };
 

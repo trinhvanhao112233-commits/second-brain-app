@@ -249,6 +249,11 @@ Tin nhắn của người dùng:
                 {
                     matchedWallet = "Tiền ăn";
                 }
+                else if (lower.Contains("mua sắm") || lower.Contains("mua") || lower.Contains("tai nghe") || 
+                         lower.Contains("quần áo") || lower.Contains("giày") || lower.Contains("điện thoại") || lower.Contains("shopee"))
+                {
+                    matchedWallet = "Mua sắm";
+                }
 
                 if (string.IsNullOrWhiteSpace(matchedWallet))
                 {

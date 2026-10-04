@@ -30,8 +30,11 @@ namespace PersonalFinance.API.Services
 
         public async Task<AiActionOutput> ParseUserMessageAsync(string message, string userContextInfo)
         {
-            var apiKey = _config["Gemini:ApiKey"];
-            var model = _config["Gemini:Model"] ?? "gemini-1.5-flash";
+            var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") 
+                         ?? _config["Gemini:ApiKey"];
+            var model = Environment.GetEnvironmentVariable("GEMINI_MODEL") 
+                        ?? _config["Gemini:Model"] 
+                        ?? "gemini-1.5-flash";
 
             if (!string.IsNullOrWhiteSpace(apiKey))
             {

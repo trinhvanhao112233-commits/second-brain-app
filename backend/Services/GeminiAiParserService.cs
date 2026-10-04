@@ -116,20 +116,82 @@ Thời gian hiện tại: {currentTimeString}.
 Thông tin ngữ cảnh người dùng:
 {userContextInfo}
 
-Nhiệm vụ của bạn:
-Phân tích yêu cầu bằng ngôn ngữ tự nhiên tiếng Việt của người dùng và chuyển thành một JSON duy nhất phù hợp với schema sau:
+CÁC NGUYÊN TẮC XỬ LÝ QUAN TRỌNG:
+
+1. QUY TẮC BÓC TÁCH LỊCH TRÌNH / CÔNG VIỆC ('add_event', 'add_task'):
+- Loại bỏ triệt để các từ mệnh lệnh (ví dụ: 'điền', 'hãy', 'nhắc', 'thêm cho tôi', 'tạo lịch'...) và đại từ nhân xưng ('tôi', 't', 'mình', 'tao'...).
+- 'title': Chỉ giữ lại tên sự kiện/công việc ngắn gọn và trọng tâm (Ví dụ: 'Điền lịch học vào 7-9 sáng cho t' -> title: 'Học'; 'Hãy điền cho tôi lịch học môn thiết kế và phát triển sáng mai...' -> title: 'Học môn thiết kế và phát triển').
+- 'startTime', 'endTime': Bóc tách chuẩn mốc giờ sang định dạng ISO 8601 (yyyy-MM-ddTHH:mm:ss) theo mốc ngày tương ứng (hôm nay, sáng mai, thứ mấy...). Nếu người dùng nói rõ giờ kết thúc thì phải lấy chính xác giờ kết thúc đó.
+
+2. QUY TẮC TRỪ VÍ TUYỆT ĐỐI (DÀNH CHO CHI TIÊU 'add_expense'):
+- Bạn chỉ được gán 'walletName' khi khoản chi tiêu khớp CHẶT CHẼ với định nghĩa của ví trong danh sách ví của người dùng:
+  + Ví 'Di chuyển': CHỈ ĐƯỢC DÙNG khi mô tả chi tiêu liên quan ĐÚNG ĐẾN việc đổ xăng, đi xe (taxi, grab, bus, be), vé gửi xe.
+  + Ví 'Tiền nhà': CHỈ ĐƯỢC DÙNG cho các khoản thuê nhà, tiền phòng, điện, nước.
+- Nếu chi tiêu (ví dụ: ăn uống, xem phim, cà phê, trà sữa, mua sắm...) KHÔNG khớp chặt chẽ với bất kỳ ví nào ở trên, bạn TUYỆT ĐỐI KHÔNG được tự ý gán bừa vào ví 'Di chuyển' hay 'Tiền nhà'.
+- Khi không có ví khớp: Hãy để 'walletName': null và gán 'replyMessage': 'Chưa đủ thông tin để trừ tiền (khoản chi này không khớp với các ví hiện có của bạn).'
+
+CÁC VÍ DỤ MẪU (FEW-SHOT EXAMPLES):
+[Ví dụ 1]
+Người dùng: 'Điền lịch học vào 7-9 sáng cho t'
+Output:
+{{
+  ""actionType"": ""add_event"",
+  ""title"": ""Học"",
+  ""startTime"": ""2026-10-04T07:00:00"",
+  ""endTime"": ""2026-10-04T09:00:00"",
+  ""category"": ""Học tập"",
+  ""replyMessage"": ""Đã tạo lịch Học từ 07:00 đến 09:00.""
+}}
+
+[Ví dụ 2]
+Người dùng: 'Hãy điền cho tôi lịch học môn thiết kế và phát triển sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng'
+Output:
+{{
+  ""actionType"": ""add_event"",
+  ""title"": ""Học môn thiết kế và phát triển"",
+  ""startTime"": ""2026-10-05T07:00:00"",
+  ""endTime"": ""2026-10-05T09:00:00"",
+  ""category"": ""Học tập"",
+  ""replyMessage"": ""Đã thêm lịch Học môn thiết kế và phát triển vào 07:00 - 09:00 sáng mai.""
+}}
+
+[Ví dụ 3]
+Người dùng: 'Đổ xăng xe máy hết 70k'
+Output:
+{{
+  ""actionType"": ""add_expense"",
+  ""amount"": 70000,
+  ""category"": ""Đi lại"",
+  ""note"": ""Đổ xăng xe máy"",
+  ""walletName"": ""Di chuyển"",
+  ""replyMessage"": ""Đã ghi nhận khoản chi đổ xăng 70.000đ vào ví Di chuyển.""
+}}
+
+[Ví dụ 4]
+Người dùng: 'Vừa ăn bát phở bò 45k'
+Output:
+{{
+  ""actionType"": ""add_expense"",
+  ""amount"": 45000,
+  ""category"": ""Ăn uống"",
+  ""note"": ""Ăn bát phở bò"",
+  ""walletName"": null,
+  ""replyMessage"": ""Chưa đủ thông tin để trừ tiền (chưa có ví chi tiêu phù hợp cho khoản ăn uống).""
+}}
+
+CẤU TRÚC JSON TRẢ VỀ:
 {{
   ""actionType"": ""add_expense"" | ""add_income"" | ""add_event"" | ""add_task"" | ""chat"",
-  ""amount"": number hoặc null (Lưu ý số tiền luôn là số dương > 0),
-  ""category"": string hoặc null (Với chi tiêu: 'Ăn uống', 'Đi lại', 'Mua sắm', 'Hóa đơn', 'Giải trí', 'Y tế', 'Khác'. Với sự kiện: 'Học tập', 'Họp', 'Work', 'Personal', 'Health', 'Important'),
+  ""amount"": number hoặc null (số dương > 0),
+  ""category"": string hoặc null,
   ""note"": string hoặc null,
   ""walletName"": string hoặc null,
-  ""title"": string hoặc null (Tiêu đề ngắn gọn, xúc tích của sự kiện hoặc công việc, ví dụ: 'Học môn thiết kế và phát triển', 'Họp team', bỏ qua các từ lệnh như 'hãy điền cho tôi', 'nhắc tôi'),
+  ""title"": string hoặc null,
   ""description"": string hoặc null,
-  ""startTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null (ví dụ bắt đầu lúc 7h sáng mai thì là yyyy-MM-ddT07:00:00),
-  ""endTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null (ví dụ kết thúc lúc 9h sáng thì là yyyy-MM-ddT09:00:00. ĐẶC BIỆT CHÚ Ý: nếu người dùng nói rõ giờ kết thúc thì phải lấy chính xác giờ kết thúc đó),
+  ""startTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null,
+  ""endTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null,
   ""priority"": ""High"" | ""Medium"" | ""Low"",
-  ""replyMessage"": string (Câu phản hồi ngắn gọn, thân thiện, xác nhận cho người dùng bằng tiếng Việt)
+  ""replyMessage"": string
 }}
 
 Chỉ trả về JSON thuần, không kèm markdown hoặc giải thích bên ngoài.
@@ -150,7 +212,8 @@ Tin nhắn của người dùng:
             // 1. Kiểm tra Chi tiêu (Expense)
             var isExpense = lower.Contains("ăn") || lower.Contains("uống") || lower.Contains("mua") ||
                             lower.Contains("hết") || lower.Contains("chi") || lower.Contains("tiêu") ||
-                            lower.Contains("trả tiền") || lower.Contains("đổ xăng");
+                            lower.Contains("trả tiền") || lower.Contains("đổ xăng") || lower.Contains("tiền điện") ||
+                            lower.Contains("tiền nước") || lower.Contains("tiền nhà") || lower.Contains("tiền phòng");
 
             var isIncome = lower.Contains("nhận") || lower.Contains("lương") || lower.Contains("thưởng") ||
                            lower.Contains("nạp") || lower.Contains("thu nhập");
@@ -160,13 +223,41 @@ Tin nhắn của người dùng:
             if (isExpense && amount > 0)
             {
                 var category = DetectCategory(lower);
+                string? matchedWallet = null;
+
+                // Quy tắc ví nghiêm ngặt
+                if (lower.Contains("xăng") || lower.Contains("xe") || lower.Contains("grab") || 
+                    lower.Contains("taxi") || lower.Contains("bus") || lower.Contains("gửi xe"))
+                {
+                    matchedWallet = "Di chuyển";
+                }
+                else if (lower.Contains("thuê nhà") || lower.Contains("tiền nhà") || lower.Contains("tiền phòng") || 
+                         lower.Contains("tiền điện") || lower.Contains("tiền nước") || lower.Contains("điện") || lower.Contains("nước"))
+                {
+                    matchedWallet = "Tiền nhà";
+                }
+
+                if (string.IsNullOrWhiteSpace(matchedWallet))
+                {
+                    return new AiActionOutput
+                    {
+                        ActionType = "add_expense",
+                        Amount = amount,
+                        Category = category,
+                        Note = CleanNote(raw),
+                        WalletName = null,
+                        ReplyMessage = "Chưa đủ thông tin để trừ tiền (khoản chi này không khớp với các ví hiện có của bạn)."
+                    };
+                }
+
                 return new AiActionOutput
                 {
                     ActionType = "add_expense",
                     Amount = amount,
                     Category = category,
                     Note = CleanNote(raw),
-                    ReplyMessage = $"Đã ghi nhận khoản chi tiêu {amount:N0}đ ({category}) vào ví cho bạn!"
+                    WalletName = matchedWallet,
+                    ReplyMessage = $"Đã ghi nhận khoản chi tiêu {amount:N0}đ ({category}) vào ví {matchedWallet} cho bạn!"
                 };
             }
 

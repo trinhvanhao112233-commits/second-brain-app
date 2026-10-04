@@ -71,28 +71,15 @@ namespace PersonalFinance.API.Controllers
                             w.Name.ToLower().Contains(actionOutput.WalletName.ToLower()));
                     }
 
-                    if (targetWallet == null && request.DefaultWalletId.HasValue)
-                    {
-                        targetWallet = userWallets.FirstOrDefault(w => w.Id == request.DefaultWalletId.Value);
-                    }
-
+                    // Nếu là khoản chi tiêu mà không tìm thấy ví phù hợp (hoặc AI để null theo quy tắc nghiêm ngặt)
                     if (targetWallet == null)
                     {
-                        targetWallet = userWallets.FirstOrDefault();
-                    }
-
-                    // Nếu chưa có ví nào thì tự động tạo 1 ví mặc định
-                    if (targetWallet == null)
-                    {
-                        targetWallet = new Wallet
-                        {
-                            UserId = userId,
-                            Name = "Ví Chính",
-                            MonthlyBudget = 5000000m,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        _context.Wallets.Add(targetWallet);
-                        await _context.SaveChangesAsync();
+                        return Ok(new AiProcessResponse(
+                            Success: false,
+                            Reply: actionOutput.ReplyMessage ?? "Chưa đủ thông tin để trừ tiền (khoản chi này không khớp với các ví hiện có của bạn).",
+                            ActionExecuted: "none",
+                            Data: null
+                        ));
                     }
 
                     var isExpense = actionOutput.ActionType == "add_expense";

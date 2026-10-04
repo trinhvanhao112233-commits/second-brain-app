@@ -222,7 +222,19 @@ const checkNotificationStatus = () => {
 };
 
 const toggleNotificationSubscription = async () => {
-  // Luôn thực hiện đăng ký / làm mới token thiết bị và test push
+  // 1. Thử hiển thị Notification cục bộ ngay nếu trình duyệt đã cho phép
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      new Notification('🔔 Second Brain', {
+        body: 'Thử nghiệm thông báo thành công! Hệ thống đã kết nối với thiết bị của bạn.',
+        icon: '/favicon.ico'
+      });
+    } catch (e) {
+      // Một số thiết bị di động không cho gọi new Notification trực tiếp mà qua Service Worker
+    }
+  }
+
+  // 2. Đăng ký Web Push với Server
   const res = await registerPushNotification();
   if (res.success) {
     isNotificationEnabled.value = true;
@@ -235,15 +247,15 @@ const toggleNotificationSubscription = async () => {
         alert('🔔 Đã kích hoạt và gửi thông báo thử nghiệm thành công! Hãy kiểm tra thanh thông báo màn hình.');
       } else {
         const data = await testRes.json().catch(() => ({}));
-        alert(data.message || 'Đã lưu thiết bị thành công! Hệ thống sẽ tự động gửi thông báo khi đến giờ.');
+        alert(data.message || 'Đã lưu thiết bị thành công! Hệ thống sẽ tự động nhắc lịch trình cho bạn.');
       }
     } catch (e) {
-      alert('Đã kết nối thông báo thiết bị thành công! (Lưu ý: Bạn có thể cần vào Cài đặt iPhone -> Safari/Second Brain -> Bật Thông báo để xem banner).');
+      alert('Đã kết nối thông báo thiết bị thành công!');
     }
   } else if (res.reason === 'denied') {
     alert('⚠️ Bạn đã chặn quyền thông báo trong trình duyệt. Vui lòng bấm vào biểu tượng cài đặt / ổ khóa cạnh tên miền web và chọn "Cho phép thông báo" (Allow Notifications).');
   } else if (res.reason === 'unsupported') {
-    alert('⚠️ Trình duyệt này chưa hỗ trợ Web Push Notification. Nếu bạn dùng iPhone, hãy nhấn Chia sẻ -> "Thêm vào MH chính" (Add to Home Screen) rồi mở app từ màn hình chính.');
+    alert('⚠️ Trình duyệt này chưa hỗ trợ Web Push Notification.');
   } else {
     alert('⚠️ Lỗi khi đăng ký thông báo: ' + (res.error?.message || res.reason || 'Không xác định'));
   }

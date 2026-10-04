@@ -278,24 +278,51 @@ Tin nhắn của người dùng:
                     eventDate = now.AddDays(2);
                 }
 
-                // Trích xuất giờ bắt đầu
+                // Trích xuất giờ bắt đầu và kết thúc
                 int startHour = 8;
                 int startMinute = 0;
-                var startMatch = Regex.Match(lower, @"(bắt đầu\s*(từ)?|từ)\s*(\d{1,2})\s*(h|giờ|g)(\s*(\d{1,2})\s*(p|phút)?)?");
-                if (startMatch.Success && int.TryParse(startMatch.Groups[3].Value, out var sH))
+                int endHour = 9;
+                int endMinute = 0;
+
+                // 1. Kiểm tra dải giờ (ví dụ: '7h - 9h', '7 - 9h', '7h-9h', '7h đến 9h')
+                var rangeMatch = Regex.Match(lower, @"(\d{1,2})\s*(?:h|giờ|g)?\s*[-–—đến|tới]\s*(\d{1,2})\s*(?:h|giờ|g)?");
+                if (rangeMatch.Success && int.TryParse(rangeMatch.Groups[1].Value, out var rStart) && int.TryParse(rangeMatch.Groups[2].Value, out var rEnd))
                 {
-                    startHour = sH;
-                    if (!string.IsNullOrWhiteSpace(startMatch.Groups[6].Value) && int.TryParse(startMatch.Groups[6].Value, out var sM))
-                    {
-                        startMinute = sM;
-                    }
+                    startHour = rStart;
+                    endHour = rEnd;
                 }
                 else
                 {
-                    var anyHourMatch = Regex.Match(lower, @"(\d{1,2})\s*(h|giờ|g)");
-                    if (anyHourMatch.Success && int.TryParse(anyHourMatch.Groups[1].Value, out var firstH))
+                    // Trích xuất giờ bắt đầu đơn lẻ
+                    var startMatch = Regex.Match(lower, @"(bắt đầu\s*(từ)?|từ|lúc)\s*(\d{1,2})\s*(h|giờ|g)(\s*(\d{1,2})\s*(p|phút)?)?");
+                    if (startMatch.Success && int.TryParse(startMatch.Groups[3].Value, out var sH))
                     {
-                        startHour = firstH;
+                        startHour = sH;
+                        if (!string.IsNullOrWhiteSpace(startMatch.Groups[6].Value) && int.TryParse(startMatch.Groups[6].Value, out var sM))
+                        {
+                            startMinute = sM;
+                        }
+                    }
+                    else
+                    {
+                        var anyHourMatch = Regex.Match(lower, @"(\d{1,2})\s*(h|giờ|g)");
+                        if (anyHourMatch.Success && int.TryParse(anyHourMatch.Groups[1].Value, out var firstH))
+                        {
+                            startHour = firstH;
+                        }
+                    }
+
+                    // Trích xuất giờ kết thúc đơn lẻ
+                    endHour = startHour + 1;
+                    endMinute = startMinute;
+                    var endMatch = Regex.Match(lower, @"(kết thúc\s*(lúc|vào)?|đến|tới)\s*(\d{1,2})\s*(h|giờ|g)(\s*(\d{1,2})\s*(p|phút)?)?");
+                    if (endMatch.Success && int.TryParse(endMatch.Groups[3].Value, out var eH))
+                    {
+                        endHour = eH;
+                        if (!string.IsNullOrWhiteSpace(endMatch.Groups[6].Value) && int.TryParse(endMatch.Groups[6].Value, out var eM))
+                        {
+                            endMinute = eM;
+                        }
                     }
                 }
 
@@ -303,22 +330,9 @@ Tin nhắn của người dùng:
                 {
                     startHour += 12;
                 }
-
-                // Trích xuất giờ kết thúc
-                int endHour = startHour + 1;
-                int endMinute = startMinute;
-                var endMatch = Regex.Match(lower, @"(kết thúc\s*(lúc|vào)?|đến|tới)\s*(\d{1,2})\s*(h|giờ|g)(\s*(\d{1,2})\s*(p|phút)?)?");
-                if (endMatch.Success && int.TryParse(endMatch.Groups[3].Value, out var eH))
+                if ((lower.Contains("chiều") || lower.Contains("tối")) && endHour < 12)
                 {
-                    endHour = eH;
-                    if ((lower.Contains("chiều") || lower.Contains("tối")) && endHour < 12)
-                    {
-                        endHour += 12;
-                    }
-                    if (!string.IsNullOrWhiteSpace(endMatch.Groups[6].Value) && int.TryParse(endMatch.Groups[6].Value, out var eM))
-                    {
-                        endMinute = eM;
-                    }
+                    endHour += 12;
                 }
 
                 var start = new DateTime(eventDate.Year, eventDate.Month, eventDate.Day, startHour, startMinute, 0);
@@ -328,8 +342,19 @@ Tin nhắn của người dùng:
                     end = start.AddHours(1);
                 }
 
-                // Làm sạch tiêu đề sự kiện
-                var cleanTitle = Regex.Replace(raw, @"(?i)(hãy\s+điền\s+cho\s+tôi|nhắc\s+tôi|thêm\s+lịch|đặt\s+lịch)\s*", "").Trim();
+                // Làm sạch tiêu đề sự kiện: loại bỏ đại từ nhân xưng, từ mệnh lệnh và mốc giờ
+                var cleanTitle = Regex.Replace(raw, @"(?i)(sáng mai|ngày mai|hôm nay|chiều mai|tối mai|tôi|t|mình|tao|hãy|điền|cho tôi|cho t|nhắc tôi|thêm lịch|đặt lịch|có lịch|lúc\s+\d+.*|\d+\s*[-–—]\s*\d+.*|\d+h.*)", "").Trim();
+                
+                // Chuẩn hóa tên lịch
+                if (string.IsNullOrWhiteSpace(cleanTitle) || cleanTitle.Length < 3)
+                {
+                    cleanTitle = lower.Contains("học") ? "Lịch học" : (lower.Contains("họp") ? "Cuộc họp" : "Sự kiện");
+                }
+                else
+                {
+                    // Viết hoa chữ cái đầu
+                    cleanTitle = char.ToUpper(cleanTitle[0]) + cleanTitle.Substring(1);
+                }
 
                 var category = "Personal";
                 if (lower.Contains("học") || lower.Contains("thiết kế") || lower.Contains("môn")) category = "Học tập";

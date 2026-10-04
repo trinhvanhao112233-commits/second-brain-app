@@ -177,7 +177,7 @@ namespace PersonalFinance.API.Controllers
                         {
                             UserId = userId,
                             Title = title,
-                            Description = item.Description ?? request.Message,
+                            Description = !string.IsNullOrWhiteSpace(item.Description) ? item.Description : null,
                             StartTime = startTime,
                             EndTime = endTime,
                             Category = category,

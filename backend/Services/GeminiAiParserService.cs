@@ -140,6 +140,7 @@ CÁC NGUYÊN TẮC XỬ LÝ QUAN TRỌNG:
     ]
 - Loại bỏ triệt để các từ mệnh lệnh ('điền', 'hãy', 'nhắc', 'thêm cho tôi', 'tạo lịch'...) và đại từ nhân xưng ('tôi', 't', 'mình', 'tao'...).
 - 'title': Chỉ giữ lại tên sự kiện ngắn gọn, xúc tích (Ví dụ: 'Học', 'Đi làm', 'Đi chơi với người yêu').
+- 'description': MẶC ĐỊNH LUÔN ĐỂ null. Chỉ điền khi người dùng nói rõ 'ghi chú là...', 'mô tả là...'. Tuyệt đối không sao chép lại tin nhắn chat vào phần này.
 - 'startTime', 'endTime': Bóc tách chuẩn mốc giờ sang định dạng ISO 8601 (yyyy-MM-ddTHH:mm:ss) theo mốc ngày tương ứng.
 
 2. QUY TẮC TRỪ VÍ ĐỘNG (DÀNH CHO CHI TIÊU 'add_expense'):

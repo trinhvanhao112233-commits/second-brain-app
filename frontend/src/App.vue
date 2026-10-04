@@ -95,6 +95,14 @@
         </div>
         <div class="flex items-center gap-2">
           <button
+            @click="toggleNotificationSubscription"
+            :title="isNotificationEnabled ? 'Thông báo đẩy đang BẬT' : 'Bật thông báo nhắc lịch trước 1 tiếng'"
+            class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+            :class="isNotificationEnabled ? 'text-[#38e1a6] bg-[#005237]/40 border border-[#005237]' : 'bg-[#1c2029] border border-[#262a34] text-[#8b9198] hover:text-[#5dfec1]'"
+          >
+            <span class="material-symbols-rounded text-base">{{ isNotificationEnabled ? 'notifications_active' : 'notifications' }}</span>
+          </button>
+          <button
             @click="showChangePasswordModal = true"
             title="Đổi mật khẩu"
             class="w-8 h-8 rounded-xl bg-[#1c2029] border border-[#262a34] text-[#8b9198] hover:text-[#5dfec1] flex items-center justify-center"

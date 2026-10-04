@@ -283,8 +283,40 @@ Tin nhắn của người dùng:
 
             // 2. Kiểm tra Sự kiện lịch biểu
             if (lower.Contains("hẹn") || lower.Contains("họp") || lower.Contains("lịch") || lower.Contains("đi khám") || 
-                lower.Contains("học") || lower.Contains("bắt đầu") || lower.Contains("kết thúc") || lower.Contains("tiết"))
+                lower.Contains("học") || lower.Contains("bắt đầu") || lower.Contains("kết thúc") || lower.Contains("tiết") || lower.Contains("đi làm") || lower.Contains("đi chơi"))
             {
+                // Nếu câu có chứa nhiều sự kiện ngăn cách bởi dấu phẩy ',' hoặc 'rồi', 'sau đó'
+                var parts = raw.Split(new[] { ',', ';', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length > 1)
+                {
+                    var multiEvents = new List<CalendarEventItemDTO>();
+                    foreach (var part in parts)
+                    {
+                        var subOutput = FallbackRuleBasedParser(part.Trim(), userContextInfo);
+                        if (subOutput.ActionType == "add_event" && !string.IsNullOrWhiteSpace(subOutput.Title))
+                        {
+                            multiEvents.Add(new CalendarEventItemDTO
+                            {
+                                Title = subOutput.Title,
+                                StartTime = subOutput.StartTime,
+                                EndTime = subOutput.EndTime,
+                                Category = subOutput.Category,
+                                Description = null
+                            });
+                        }
+                    }
+
+                    if (multiEvents.Count > 1)
+                    {
+                        return new AiActionOutput
+                        {
+                            ActionType = "add_event",
+                            Events = multiEvents,
+                            ReplyMessage = $"Đã lên lịch thành công cho {multiEvents.Count} sự kiện: {string.Join(", ", multiEvents.Select(e => $"'{e.Title}'"))}!"
+                        };
+                    }
+                }
+
                 var now = DateTime.Now;
                 var eventDate = now;
                 if (lower.Contains("sáng mai") || lower.Contains("ngày mai") || lower.Contains("chiều mai") || lower.Contains("tối mai"))

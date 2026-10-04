@@ -32,10 +32,17 @@ export const registerPushNotification = async () => {
     const registration = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
 
-    // 3. Lấy VAPID Public Key từ backend
-    const keyRes = await apiFetch('/notification/vapid-public-key');
-    if (!keyRes.ok) throw new Error('Không thể lấy VAPID key');
-    const { publicKey } = await keyRes.json();
+    // 3. Lấy VAPID Public Key từ backend (có fallback key cứng)
+    let publicKey = 'BOOl107oDcMlc2_3Uj5hQ63qFVi2vRw0SEpborF1EZGfPAOtnwizjdckuhGylEoPjT_w4_uI50Qy3PWAS37PliI';
+    try {
+      const keyRes = await apiFetch('/notification/vapid-public-key');
+      if (keyRes.ok) {
+        const data = await keyRes.json();
+        if (data.publicKey) publicKey = data.publicKey;
+      }
+    } catch (e) {
+      console.warn('[WebPush] Không thể lấy key động từ backend, dùng fallback key:', e);
+    }
 
     // 4. Đăng ký Subscription với Push Server của trình duyệt
     let subscription = await registration.pushManager.getSubscription();

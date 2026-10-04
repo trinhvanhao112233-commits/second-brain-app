@@ -225,12 +225,20 @@ const toggleNotificationSubscription = async () => {
   // 1. Thử hiển thị Notification cục bộ ngay nếu trình duyệt đã cho phép
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
-      new Notification('🔔 Second Brain', {
-        body: 'Thử nghiệm thông báo thành công! Hệ thống đã kết nối với thiết bị của bạn.',
-        icon: '/favicon.ico'
-      });
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'LOCAL_NOTIFICATION',
+          title: '🔔 Second Brain',
+          body: 'Thử nghiệm thông báo thành công! Hệ thống đã kết nối với thiết bị của bạn.'
+        });
+      } else {
+        new Notification('🔔 Second Brain', {
+          body: 'Thử nghiệm thông báo thành công! Hệ thống đã kết nối với thiết bị của bạn.',
+          icon: '/favicon.ico'
+        });
+      }
     } catch (e) {
-      // Một số thiết bị di động không cho gọi new Notification trực tiếp mà qua Service Worker
+      // Bỏ qua lỗi hiển thị cục bộ trên một số thiết bị
     }
   }
 
@@ -257,7 +265,7 @@ const toggleNotificationSubscription = async () => {
   } else if (res.reason === 'unsupported') {
     alert('⚠️ Trình duyệt này chưa hỗ trợ Web Push Notification.');
   } else {
-    alert('⚠️ Lỗi khi đăng ký thông báo: ' + (res.error?.message || res.reason || 'Không xác định'));
+    alert('⚠️ Server đang khởi động lại hoặc không thể kết nối. Vui lòng thử lại sau vài giây! (' + (res.error?.message || res.reason || 'Lỗi kết nối') + ')');
   }
 };
 

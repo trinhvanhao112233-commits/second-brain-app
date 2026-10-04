@@ -33,6 +33,17 @@ self.addEventListener('push', function(event) {
   );
 });
 
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'LOCAL_NOTIFICATION') {
+    self.registration.showNotification(event.data.title || '🔔 Second Brain', {
+      body: event.data.body || 'Thông báo thử nghiệm',
+      icon: '/favicon.ico',
+      badge: '/favicon.ico',
+      vibrate: [200, 100, 200]
+    });
+  }
+});
+
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   const urlToOpen = (event.notification.data && event.notification.data.url) || '/calendar';

@@ -47,36 +47,63 @@ namespace PersonalFinance.API.Services
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-            var now = DateTime.UtcNow;
-            // Tìm sự kiện diễn ra trong vòng 50 - 65 phút tới mà chưa gửi nhắc nhở
-            var lowerWindow = now.AddMinutes(50);
-            var upperWindow = now.AddMinutes(65);
-
-            var upcomingEvents = await db.Events
-                .Where(e => !e.IsCompleted && !e.IsReminderSent && e.StartTime >= lowerWindow && e.StartTime <= upperWindow)
+            // Lấy tất cả sự kiện chưa hoàn thành và chưa gửi thông báo
+            var pendingEvents = await db.Events
+                .Where(e => !e.IsCompleted && !e.IsReminderSent)
                 .ToListAsync();
 
-            if (upcomingEvents.Count == 0) return;
+            if (pendingEvents.Count == 0) return;
 
-            foreach (var ev in upcomingEvents)
+            var utcNow = DateTime.UtcNow;
+            var vnNow = DateTime.UtcNow.AddHours(7); // Giờ chuẩn Việt Nam (GMT+7)
+
+            foreach (var ev in pendingEvents)
             {
                 if (!ev.UserId.HasValue) continue;
 
-                // Lấy danh sách đăng ký Push của User này
-                var userSubs = await db.PushSubscriptions
-                    .Where(s => s.UserId == ev.UserId.Value)
-                    .ToListAsync();
-
-                var localTime = ev.StartTime.ToLocalTime();
-                var title = "🔔 Nhắc nhở lịch trình sắp diễn ra!";
-                var message = $"Lịch '{ev.Title}' của bạn sẽ bắt đầu lúc {localTime:HH:mm} (còn khoảng 1 tiếng nữa)!";
-
-                foreach (var sub in userSubs)
+                // Xác định thời gian bắt đầu của sự kiện
+                // Nếu StartTime lưu dạng giờ địa phương (15:25), so sánh trực tiếp với vnNow.
+                // Nếu StartTime lưu dạng UTC (08:25), chênh lệch vẫn tính được chuẩn xác.
+                double minutesLeft = (ev.StartTime - vnNow).TotalMinutes;
+                
+                // Trường hợp nếu StartTime đã được lưu dưới dạng UTC
+                if (minutesLeft < -120 || minutesLeft > 1440)
                 {
-                    await notificationService.SendPushNotificationAsync(sub, title, message, "/calendar");
+                    var altMinutes = (ev.StartTime - utcNow).TotalMinutes;
+                    if (Math.Abs(altMinutes) < Math.Abs(minutesLeft))
+                    {
+                        minutesLeft = altMinutes;
+                    }
                 }
 
-                ev.IsReminderSent = true;
+                // Nếu sự kiện sắp diễn ra trong khoảng từ 0 đến 65 phút tới (ví dụ: trước 1 tiếng, trước 30p, hoặc vừa tạo lịch cận giờ)
+                if (minutesLeft >= 0 && minutesLeft <= 65)
+                {
+                    var userSubs = await db.PushSubscriptions
+                        .Where(s => s.UserId == ev.UserId.Value)
+                        .ToListAsync();
+
+                    var displayTime = ev.StartTime.ToString("HH:mm");
+                    var title = "🔔 Nhắc nhở: Lịch trình sắp bắt đầu!";
+                    string timePrompt = minutesLeft > 45 
+                        ? "còn khoảng 1 tiếng nữa" 
+                        : (minutesLeft > 15 ? $"còn khoảng {(int)minutesLeft} phút nữa" : "chuẩn bị diễn ra ngay bây giờ");
+                    var message = $"Lịch '{ev.Title}' của bạn lúc {displayTime} ({timePrompt})!";
+
+                    foreach (var sub in userSubs)
+                    {
+                        try
+                        {
+                            await notificationService.SendPushNotificationAsync(sub, title, message, "/calendar");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning($"[EventReminderBackgroundWorker] Lỗi gửi push cho user {ev.UserId}: {ex.Message}");
+                        }
+                    }
+
+                    ev.IsReminderSent = true;
+                }
             }
 
             await db.SaveChangesAsync();

@@ -222,12 +222,34 @@ const checkNotificationStatus = () => {
 };
 
 const toggleNotificationSubscription = async () => {
+  if (isNotificationEnabled.value) {
+    // Nếu đã bật rồi, khi bấm vào chuông sẽ gửi thử ngay 1 thông báo kiểm tra
+    try {
+      const res = await apiFetch('/notification/test-push', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        alert('🔔 Đã gửi 1 thông báo thử nghiệm tới thiết bị của bạn! Hãy kiểm tra thanh thông báo màn hình.');
+      } else {
+        alert(data.message || 'Không thể gửi thông báo thử nghiệm.');
+      }
+    } catch (e) {
+      alert('Lỗi kết nối tới máy chủ khi gửi thông báo test.');
+    }
+    return;
+  }
+
   const res = await registerPushNotification();
   if (res.success) {
     isNotificationEnabled.value = true;
-    alert('Đã bật thông báo thành công! Hệ thống sẽ tự động nhắc lịch trình của bạn trước 1 tiếng.');
+    alert('Đã bật thông báo thành công! Hệ thống sẽ gửi 1 thông báo kiểm tra ngay bây giờ.');
+    // Tự động kích hoạt test push ngay lập tức
+    try {
+      await apiFetch('/notification/test-push', { method: 'POST' });
+    } catch (e) {
+      console.error(e);
+    }
   } else if (res.reason === 'denied') {
-    alert('Bạn đã chặn thông báo trong trình duyệt. Vui lòng vào Cài đặt trang web để cho phép.');
+    alert('Bạn đã chặn thông báo trong cài đặt trình duyệt. Hãy vào Cài đặt trang web để cho phép (Allow Notification).');
   } else if (res.reason === 'unsupported') {
     alert('Trình duyệt hiện tại chưa hỗ trợ Web Push Notification.');
   } else {

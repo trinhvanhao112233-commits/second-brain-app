@@ -13,6 +13,7 @@ namespace PersonalFinance.API.Data
         public DbSet<CalendarEvent> Events => Set<CalendarEvent>();
         public DbSet<DailyTask> Tasks => Set<DailyTask>();
         public DbSet<Note> Notes => Set<Note>();
+        public DbSet<PushSubscriptionModel> PushSubscriptions => Set<PushSubscriptionModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -86,6 +87,17 @@ namespace PersonalFinance.API.Data
                 entity.Property(n => n.UserId).HasColumnType("varchar(36)");
                 entity.Property(n => n.Title).IsRequired().HasMaxLength(200);
                 entity.Property(n => n.Color).HasMaxLength(20);
+            });
+
+            // Cấu hình PushSubscriptionModel
+            modelBuilder.Entity<PushSubscriptionModel>(entity =>
+            {
+                entity.HasKey(s => s.Id);
+                entity.Property(s => s.Id).HasColumnType("varchar(36)");
+                entity.Property(s => s.UserId).HasColumnType("varchar(36)");
+                entity.Property(s => s.Endpoint).IsRequired().HasMaxLength(1000);
+                entity.Property(s => s.P256dh).IsRequired().HasMaxLength(200);
+                entity.Property(s => s.Auth).IsRequired().HasMaxLength(100);
             });
         }
     }

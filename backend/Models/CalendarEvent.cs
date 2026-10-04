@@ -13,6 +13,7 @@ namespace PersonalFinance.API.Models
         public string Category { get; set; } = "Personal"; // Work, Personal, Health, Important
         public string Color { get; set; } = "#10b981"; // HEX color code
         public bool IsCompleted { get; set; } = false;
+        public bool IsReminderSent { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

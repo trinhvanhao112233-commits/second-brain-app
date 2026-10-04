@@ -28,6 +28,10 @@ builder.Services.AddCors(options =>
 // 3. Đăng ký dịch vụ AI Parser (Gemini AI với NLP Fallback)
 builder.Services.AddHttpClient<PersonalFinance.API.Services.IAiParserService, PersonalFinance.API.Services.GeminiAiParserService>();
 
+// 4. Đăng ký dịch vụ Web Push Notification & Background Worker quét lịch trước 1 tiếng
+builder.Services.AddScoped<PersonalFinance.API.Services.INotificationService, PersonalFinance.API.Services.WebPushNotificationService>();
+builder.Services.AddHostedService<PersonalFinance.API.Services.EventReminderBackgroundWorker>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -71,8 +75,19 @@ try
         dbContext.Database.ExecuteSqlRaw(@"
             ALTER TABLE `Wallets` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;
             ALTER TABLE `Events` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;
+            ALTER TABLE `Events` ADD COLUMN IF NOT EXISTS `IsReminderSent` tinyint(1) NOT NULL DEFAULT 0;
             ALTER TABLE `Tasks` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;
             ALTER TABLE `Notes` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;
+
+            CREATE TABLE IF NOT EXISTS `PushSubscriptions` (
+                `Id` char(36) COLLATE utf8mb4_general_ci NOT NULL,
+                `UserId` char(36) COLLATE utf8mb4_general_ci NULL,
+                `Endpoint` text COLLATE utf8mb4_general_ci NOT NULL,
+                `P256dh` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+                `Auth` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+                `CreatedAt` datetime(6) NOT NULL,
+                PRIMARY KEY (`Id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
     }
     catch (Exception dbEx)

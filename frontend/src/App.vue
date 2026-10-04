@@ -29,6 +29,14 @@
           </div>
           <div class="flex items-center gap-1">
             <button
+              @click="toggleNotificationSubscription"
+              :title="isNotificationEnabled ? 'Thông báo đẩy đang BẬT' : 'Bật thông báo nhắc lịch trước 1 tiếng'"
+              class="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
+              :class="isNotificationEnabled ? 'text-[#38e1a6] bg-[#005237]/40' : 'text-[#8b9198] hover:text-[#5dfec1] hover:bg-[#262a34]'"
+            >
+              <span class="material-symbols-rounded text-base">{{ isNotificationEnabled ? 'notifications_active' : 'notifications' }}</span>
+            </button>
+            <button
               @click="showChangePasswordModal = true"
               title="Đổi mật khẩu"
               class="w-7 h-7 rounded-lg text-[#8b9198] hover:text-[#5dfec1] hover:bg-[#262a34] flex items-center justify-center transition-colors"
@@ -192,10 +200,32 @@ import AuthView from './components/AuthView.vue';
 import ChangePasswordModal from './components/ChangePasswordModal.vue';
 import AiChatWidget from './components/AiChatWidget.vue';
 import { apiFetch, getStoredUser, setStoredUser } from './services/api';
+import { registerPushNotification } from './services/pushNotification';
 
 const currentUser = ref(getStoredUser());
 const showChangePasswordModal = ref(false);
+const isNotificationEnabled = ref(false);
 const activeTab = ref('hub');
+
+const checkNotificationStatus = () => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    isNotificationEnabled.value = true;
+  }
+};
+
+const toggleNotificationSubscription = async () => {
+  const res = await registerPushNotification();
+  if (res.success) {
+    isNotificationEnabled.value = true;
+    alert('Đã bật thông báo thành công! Hệ thống sẽ tự động nhắc lịch trình của bạn trước 1 tiếng.');
+  } else if (res.reason === 'denied') {
+    alert('Bạn đã chặn thông báo trong trình duyệt. Vui lòng vào Cài đặt trang web để cho phép.');
+  } else if (res.reason === 'unsupported') {
+    alert('Trình duyệt hiện tại chưa hỗ trợ Web Push Notification.');
+  } else {
+    alert('Có lỗi xảy ra khi kết nối máy chủ thông báo.');
+  }
+};
 
 const navItems = [
   { id: 'hub', label: 'Hôm nay', iconSymbol: 'dashboard' },
@@ -308,5 +338,6 @@ const fetchAllData = () => {
 
 onMounted(() => {
   fetchAllData();
+  checkNotificationStatus();
 });
 </script>

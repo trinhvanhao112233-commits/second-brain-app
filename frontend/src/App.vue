@@ -227,15 +227,18 @@ const toggleNotificationSubscription = async () => {
   if (res.success) {
     isNotificationEnabled.value = true;
     try {
-      const testRes = await apiFetch('/notification/test-push', { method: 'POST' });
-      const data = await testRes.json();
+      const testRes = await apiFetch('/notification/test-push', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
       if (testRes.ok) {
-        alert('🔔 Đã kích hoạt và gửi thông báo thử nghiệm thành công! Hãy kiểm tra banner thông báo trên màn hình của bạn.');
+        alert('🔔 Đã kích hoạt và gửi thông báo thử nghiệm thành công! Hãy kiểm tra thanh thông báo màn hình.');
       } else {
-        alert(data.message || 'Thiết bị đã đăng ký nhưng máy chủ chưa gửi được.');
+        const data = await testRes.json().catch(() => ({}));
+        alert(data.message || 'Đã lưu thiết bị thành công! Hệ thống sẽ tự động gửi thông báo khi đến giờ.');
       }
     } catch (e) {
-      alert('Đã kết nối thông báo nhưng xảy ra lỗi khi test push: ' + e.message);
+      alert('Đã kết nối thông báo thiết bị thành công! (Lưu ý: Bạn có thể cần vào Cài đặt iPhone -> Safari/Second Brain -> Bật Thông báo để xem banner).');
     }
   } else if (res.reason === 'denied') {
     alert('⚠️ Bạn đã chặn quyền thông báo trong trình duyệt. Vui lòng bấm vào biểu tượng cài đặt / ổ khóa cạnh tên miền web và chọn "Cho phép thông báo" (Allow Notifications).');

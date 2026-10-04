@@ -40,8 +40,29 @@ namespace PersonalFinance.API.DTOs
         [JsonPropertyName("priority")]
         public string? Priority { get; set; }
 
+        [JsonPropertyName("events")]
+        public List<CalendarEventItemDTO>? Events { get; set; }
+
         [JsonPropertyName("replyMessage")]
         public string ReplyMessage { get; set; } = string.Empty;
+    }
+
+    public class CalendarEventItemDTO
+    {
+        [JsonPropertyName("title")]
+        public string? Title { get; set; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
+        [JsonPropertyName("startTime")]
+        public string? StartTime { get; set; }
+
+        [JsonPropertyName("endTime")]
+        public string? EndTime { get; set; }
+
+        [JsonPropertyName("category")]
+        public string? Category { get; set; }
     }
 
     public record AiProcessResponse(

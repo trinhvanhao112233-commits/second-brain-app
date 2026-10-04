@@ -105,7 +105,7 @@ namespace PersonalFinance.API.Services
                 }
             }
 
-            return FallbackRuleBasedParser(message);
+            return FallbackRuleBasedParser(message, userContextInfo);
         }
 
         private string BuildPrompt(string userMessage, string userContextInfo)
@@ -126,66 +126,16 @@ CÁC NGUYÊN TẮC XỬ LÝ QUAN TRỌNG:
 - 'title': Chỉ giữ lại tên sự kiện/công việc ngắn gọn và trọng tâm (Ví dụ: 'Điền lịch học vào 7-9 sáng cho t' -> title: 'Học'; 'Hãy điền cho tôi lịch học môn thiết kế và phát triển sáng mai...' -> title: 'Học môn thiết kế và phát triển').
 - 'startTime', 'endTime': Bóc tách chuẩn mốc giờ sang định dạng ISO 8601 (yyyy-MM-ddTHH:mm:ss) theo mốc ngày tương ứng (hôm nay, sáng mai, thứ mấy...). Nếu người dùng nói rõ giờ kết thúc thì phải lấy chính xác giờ kết thúc đó.
 
-2. QUY TẮC TRỪ VÍ TUYỆT ĐỐI (DÀNH CHO CHI TIÊU 'add_expense'):
-- Kiểm tra danh sách ví của người dùng được cung cấp trong 'Thông tin ngữ cảnh người dùng'.
-- Bạn chỉ được gán 'walletName' khi tên ví khớp chính xác hoặc có nghĩa tương đương mật thiết với khoản chi:
-  + Ví dụ: 'Tiền ăn' / 'Ăn uống' -> Chỉ dùng cho ăn, uống, cà phê, cơm, bún, phở, trà sữa...
-  + Ví dụ: 'Di chuyển' / 'Xăng xe' -> Chỉ dùng khi đổ xăng, đi xe (taxi, grab, bus, be), gửi xe.
-  + Ví dụ: 'Tiền nhà' -> Chỉ dùng cho thuê nhà, tiền phòng, điện, nước.
-- Nếu khoản chi tiêu KHÔNG khớp với bất kỳ ví nào trong danh sách ví của người dùng:
-  + Tuyệt đối KHÔNG tự ý gán bừa vào ví khác.
+2. QUY TẮC TRỪ VÍ ĐỘNG (DÀNH CHO CHI TIÊU 'add_expense'):
+- ĐỌC DANH SÁCH VÍ THỰC TẾ TRONG 'Thông tin ngữ cảnh người dùng' Ở TRÊN.
+- Tự động so khớp khoản chi với ví phù hợp nhất theo ngữ nghĩa:
+  + Khoản chi ăn uống, cơm, phở, bún, cafe, trà sữa -> Khớp vào ví nào có tên liên quan đến 'ăn', 'uống', 'food'...
+  + Khoản chi mua đồ, tai nghe, quần áo, shopee -> Khớp vào ví có tên liên quan đến 'mua', 'sắm', 'shopping'...
+  + Khoản chi xăng xe, đi lại, grab, taxi -> Khớp vào ví có tên liên quan đến 'di chuyển', 'xe', 'đi lại'...
+  + Khoản chi điện, nước, phòng trọ, thuê nhà -> Khớp vào ví có tên liên quan đến 'nhà', 'phòng', 'sinh hoạt'...
+- Nếu khoản chi KHÔNG liên quan đến bất kỳ ví nào người dùng đang có:
+  + Tuyệt đối KHÔNG gán bừa ví.
   + Hãy để 'walletName': null và gán 'replyMessage': 'Chưa đủ thông tin để trừ tiền (khoản chi này không khớp với các ví hiện có của bạn).'
-
-CÁC VÍ DỤ MẪU (FEW-SHOT EXAMPLES):
-[Ví dụ 1]
-Người dùng: 'Điền lịch học vào 7-9 sáng cho t'
-Output:
-{{
-  ""actionType"": ""add_event"",
-  ""title"": ""Học"",
-  ""startTime"": ""2026-10-04T07:00:00"",
-  ""endTime"": ""2026-10-04T09:00:00"",
-  ""category"": ""Học tập"",
-  ""replyMessage"": ""Đã tạo lịch Học từ 07:00 đến 09:00.""
-}}
-
-[Ví dụ 2]
-Người dùng: 'Hãy điền cho tôi lịch học môn thiết kế và phát triển sáng mai bắt đầu từ 7 giờ sáng kết thúc 9h sáng'
-Output:
-{{
-  ""actionType"": ""add_event"",
-  ""title"": ""Học môn thiết kế và phát triển"",
-  ""startTime"": ""2026-10-05T07:00:00"",
-  ""endTime"": ""2026-10-05T09:00:00"",
-  ""category"": ""Học tập"",
-  ""replyMessage"": ""Đã thêm lịch Học môn thiết kế và phát triển vào 07:00 - 09:00 sáng mai.""
-}}
-
-[Ví dụ 3]
-Ngữ cảnh có ví ['Tiền ăn', 'Tiền nhà', 'Di chuyển']
-Người dùng: 'Tiền ăn hết 50k' hoặc 'Ăn trưa bún bò hết 50k'
-Output:
-{{
-  ""actionType"": ""add_expense"",
-  ""amount"": 50000,
-  ""category"": ""Ăn uống"",
-  ""note"": ""Tiền ăn"",
-  ""walletName"": ""Tiền ăn"",
-  ""replyMessage"": ""Đã ghi nhận khoản chi ăn uống 50.000đ vào ví Tiền ăn.""
-}}
-
-[Ví dụ 4]
-Ngữ cảnh chỉ có ví ['Tiền nhà', 'Di chuyển']
-Người dùng: 'Vừa ăn bát phở bò 45k'
-Output:
-{{
-  ""actionType"": ""add_expense"",
-  ""amount"": 45000,
-  ""category"": ""Ăn uống"",
-  ""note"": ""Ăn bát phở bò"",
-  ""walletName"": null,
-  ""replyMessage"": ""Chưa đủ thông tin để trừ tiền (chưa có ví chi tiêu phù hợp cho khoản ăn uống).""
-}}
 
 CẤU TRÚC JSON TRẢ VỀ:
 {{
@@ -212,7 +162,7 @@ Tin nhắn của người dùng:
         /// <summary>
         /// Bộ phân tích cục bộ Regex NLP khi chưa có ApiKey hoặc khi mạng lỗi
         /// </summary>
-        public AiActionOutput FallbackRuleBasedParser(string message)
+        public AiActionOutput FallbackRuleBasedParser(string message, string userContextInfo = "")
         {
             var raw = message.Trim();
             var lower = raw.ToLower();
@@ -220,8 +170,7 @@ Tin nhắn của người dùng:
             // 1. Kiểm tra Chi tiêu (Expense)
             var isExpense = lower.Contains("ăn") || lower.Contains("uống") || lower.Contains("mua") ||
                             lower.Contains("hết") || lower.Contains("chi") || lower.Contains("tiêu") ||
-                            lower.Contains("trả tiền") || lower.Contains("đổ xăng") || lower.Contains("tiền điện") ||
-                            lower.Contains("tiền nước") || lower.Contains("tiền nhà") || lower.Contains("tiền phòng");
+                            lower.Contains("trả tiền") || lower.Contains("đổ xăng") || lower.Contains("tiền");
 
             var isIncome = lower.Contains("nhận") || lower.Contains("lương") || lower.Contains("thưởng") ||
                            lower.Contains("nạp") || lower.Contains("thu nhập");
@@ -233,26 +182,41 @@ Tin nhắn của người dùng:
                 var category = DetectCategory(lower);
                 string? matchedWallet = null;
 
-                // Quy tắc ví nghiêm ngặt
-                if (lower.Contains("xăng") || lower.Contains("xe") || lower.Contains("grab") || 
-                    lower.Contains("taxi") || lower.Contains("bus") || lower.Contains("gửi xe"))
+                // Tự động tìm ví có sẵn trong ngữ cảnh người dùng
+                var walletMatches = Regex.Matches(userContextInfo, @"'([^']+)'\s*\(ID:");
+                foreach (Match m in walletMatches)
                 {
-                    matchedWallet = "Di chuyển";
-                }
-                else if (lower.Contains("thuê nhà") || lower.Contains("tiền nhà") || lower.Contains("tiền phòng") || 
-                         lower.Contains("tiền điện") || lower.Contains("tiền nước") || lower.Contains("điện") || lower.Contains("nước"))
-                {
-                    matchedWallet = "Tiền nhà";
-                }
-                else if (lower.Contains("ăn") || lower.Contains("uống") || lower.Contains("cơm") || 
-                         lower.Contains("bún") || lower.Contains("phở") || lower.Contains("cafe") || lower.Contains("cà phê"))
-                {
-                    matchedWallet = "Tiền ăn";
-                }
-                else if (lower.Contains("mua sắm") || lower.Contains("mua") || lower.Contains("tai nghe") || 
-                         lower.Contains("quần áo") || lower.Contains("giày") || lower.Contains("điện thoại") || lower.Contains("shopee"))
-                {
-                    matchedWallet = "Mua sắm";
+                    var wName = m.Groups[1].Value;
+                    var wLower = wName.ToLower();
+
+                    // Nếu câu nói chứa trực tiếp tên ví
+                    if (lower.Contains(wLower))
+                    {
+                        matchedWallet = wName;
+                        break;
+                    }
+
+                    // Tự động suy luận theo ngữ nghĩa ví
+                    if (wLower.Contains("ăn") && (lower.Contains("ăn") || lower.Contains("uống") || lower.Contains("cơm") || lower.Contains("phở") || lower.Contains("bún") || lower.Contains("cafe") || lower.Contains("cà phê")))
+                    {
+                        matchedWallet = wName;
+                        break;
+                    }
+                    if ((wLower.Contains("mua") || wLower.Contains("sắm")) && (lower.Contains("mua") || lower.Contains("sắm") || lower.Contains("tai nghe") || lower.Contains("quần áo") || lower.Contains("shopee")))
+                    {
+                        matchedWallet = wName;
+                        break;
+                    }
+                    if ((wLower.Contains("di chuyển") || wLower.Contains("xe") || wLower.Contains("đi lại")) && (lower.Contains("xăng") || lower.Contains("xe") || lower.Contains("grab") || lower.Contains("taxi") || lower.Contains("bus") || lower.Contains("gửi xe")))
+                    {
+                        matchedWallet = wName;
+                        break;
+                    }
+                    if ((wLower.Contains("nhà") || wLower.Contains("phòng")) && (lower.Contains("thuê nhà") || lower.Contains("tiền nhà") || lower.Contains("điện") || lower.Contains("nước") || lower.Contains("phòng")))
+                    {
+                        matchedWallet = wName;
+                        break;
+                    }
                 }
 
                 if (string.IsNullOrWhiteSpace(matchedWallet))

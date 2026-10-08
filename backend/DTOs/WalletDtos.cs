@@ -8,12 +8,28 @@ namespace PersonalFinance.API.DTOs
         [Required(ErrorMessage = "Tên ví không được để trống")]
         [StringLength(100, MinimumLength = 1)]
         string Name,
-        decimal MonthlyBudget = 0m
+        decimal MonthlyBudget = 0m,
+        bool IsMaster = false
     );
 
     public record UpdateBudgetRequest(
         [Range(0, double.MaxValue, ErrorMessage = "Ngân sách phải lớn hơn hoặc bằng 0")]
         decimal MonthlyBudget
+    );
+
+    public record SetMasterWalletRequest(
+        bool IsMaster
+    );
+
+    public record TransferWalletRequest(
+        [Required]
+        Guid SourceWalletId,
+        [Required]
+        Guid TargetWalletId,
+        [Range(1, double.MaxValue, ErrorMessage = "Số tiền chuyển phải lớn hơn 0")]
+        decimal Amount,
+        string? Note,
+        DateTime? TransactionDate
     );
 
     public record WalletResponse(
@@ -22,6 +38,7 @@ namespace PersonalFinance.API.DTOs
         decimal Balance,
         decimal MonthlyBudget,
         decimal MonthlySpent,
+        bool IsMaster,
         DateTime CreatedAt
     );
 
@@ -30,7 +47,8 @@ namespace PersonalFinance.API.DTOs
         decimal Amount,
         string? Category,
         string? Note,
-        DateTime? TransactionDate
+        DateTime? TransactionDate,
+        bool DeductFromMaster = false // Nếu nạp tiền vào ví con, có thể trừ tiền tương ứng từ Ví Tổng
     );
 
     public record TransactionResponse(

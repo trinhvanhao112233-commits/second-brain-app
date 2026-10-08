@@ -57,7 +57,7 @@ namespace PersonalFinance.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("PersonalFinance.API.Models.DailyTask", b =>
@@ -87,7 +87,7 @@ namespace PersonalFinance.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("Tasks", (string)null);
                 });
 
             modelBuilder.Entity("PersonalFinance.API.Models.Note", b =>
@@ -118,7 +118,7 @@ namespace PersonalFinance.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notes");
+                    b.ToTable("Notes", (string)null);
                 });
 
             modelBuilder.Entity("PersonalFinance.API.Models.Transaction", b =>
@@ -153,7 +153,7 @@ namespace PersonalFinance.API.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("Transactions", (string)null);
                 });
 
             modelBuilder.Entity("PersonalFinance.API.Models.Wallet", b =>
@@ -176,7 +176,7 @@ namespace PersonalFinance.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Wallets");
+                    b.ToTable("Wallets", (string)null);
                 });
 
             modelBuilder.Entity("PersonalFinance.API.Models.Transaction", b =>

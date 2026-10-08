@@ -40,6 +40,7 @@ namespace PersonalFinance.API.Data
                 entity.Property(w => w.UserId).HasColumnType("varchar(36)");
                 entity.Property(w => w.Name).IsRequired().HasMaxLength(100);
                 entity.Property(w => w.MonthlyBudget).HasPrecision(18, 2);
+                entity.Property(w => w.IsMaster).HasDefaultValue(false);
             });
 
             // Cấu hình Transaction & Quan hệ 1 - N

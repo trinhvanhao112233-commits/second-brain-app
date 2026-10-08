@@ -74,6 +74,7 @@ try
 
         dbContext.Database.ExecuteSqlRaw(@"
             ALTER TABLE `Wallets` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;
+            ALTER TABLE `Wallets` ADD COLUMN IF NOT EXISTS `IsMaster` tinyint(1) NOT NULL DEFAULT 0;
             ALTER TABLE `Events` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;
             ALTER TABLE `Events` ADD COLUMN IF NOT EXISTS `IsReminderSent` tinyint(1) NOT NULL DEFAULT 0;
             ALTER TABLE `Tasks` ADD COLUMN IF NOT EXISTS `UserId` char(36) COLLATE utf8mb4_general_ci NULL;

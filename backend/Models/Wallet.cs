@@ -9,6 +9,7 @@ namespace PersonalFinance.API.Models
         public Guid? UserId { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal MonthlyBudget { get; set; } = 0m; // Ngân sách chi tiêu trong tháng
+        public bool IsMaster { get; set; } = false; // Ví tổng (ví nguồn để nạp tiền và phân bổ cho các ví con)
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation property 1 - N

@@ -39,7 +39,8 @@ namespace PersonalFinance.API.Controllers
             }
 
             var wallets = await query
-                .OrderByDescending(w => w.CreatedAt)
+                .OrderByDescending(w => w.IsMaster)
+                .ThenByDescending(w => w.CreatedAt)
                 .Select(w => new WalletResponse(
                     w.Id,
                     w.Name,
@@ -49,6 +50,7 @@ namespace PersonalFinance.API.Controllers
                     Math.Abs(w.Transactions
                         .Where(t => t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
                         .Sum(t => (decimal?)t.Amount) ?? 0m),
+                    w.IsMaster,
                     w.CreatedAt
                 ))
                 .ToListAsync();
@@ -58,7 +60,7 @@ namespace PersonalFinance.API.Controllers
 
         /// <summary>
         /// POST /api/wallets
-        /// Nhận JSON { "name": "Tên ví", "monthlyBudget": 5000000 } để tạo ví mới
+        /// Nhận JSON { "name": "Tên ví", "monthlyBudget": 5000000, "isMaster": true/false } để tạo ví mới
         /// </summary>
         [HttpPost]
         public async Task<ActionResult<WalletResponse>> CreateWallet(
@@ -68,19 +70,88 @@ namespace PersonalFinance.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // Nếu đặt làm ví tổng, hủy ví tổng cũ của user này
+            if (request.IsMaster)
+            {
+                var existingMasters = await _context.Wallets
+                    .Where(w => w.UserId == userId && w.IsMaster)
+                    .ToListAsync();
+                foreach (var em in existingMasters)
+                {
+                    em.IsMaster = false;
+                }
+            }
+
             var wallet = new Wallet
             {
                 UserId = userId,
                 Name = request.Name.Trim(),
                 MonthlyBudget = request.MonthlyBudget >= 0 ? request.MonthlyBudget : 0m,
+                IsMaster = request.IsMaster,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Wallets.Add(wallet);
             await _context.SaveChangesAsync();
 
-            var response = new WalletResponse(wallet.Id, wallet.Name, 0m, wallet.MonthlyBudget, 0m, wallet.CreatedAt);
+            var response = new WalletResponse(wallet.Id, wallet.Name, 0m, wallet.MonthlyBudget, 0m, wallet.IsMaster, wallet.CreatedAt);
             return CreatedAtAction(nameof(GetWallets), new { id = wallet.Id }, response);
+        }
+
+        /// <summary>
+        /// PUT /api/wallets/{id}/master
+        /// Đặt hoặc hủy quyền Ví Tổng cho một ví
+        /// </summary>
+        [HttpPut("{id:guid}/master")]
+        public async Task<ActionResult<WalletResponse>> SetMasterWallet(
+            Guid id,
+            [FromHeader(Name = "X-User-Id")] Guid? userId,
+            [FromBody] SetMasterWalletRequest request)
+        {
+            var wallet = await _context.Wallets.FindAsync(id);
+            if (wallet == null)
+                return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
+
+            if (request.IsMaster)
+            {
+                // Hủy master của các ví khác của cùng user
+                var otherMasters = await _context.Wallets
+                    .Where(w => w.UserId == userId && w.Id != id && w.IsMaster)
+                    .ToListAsync();
+                foreach (var om in otherMasters)
+                {
+                    om.IsMaster = false;
+                }
+                wallet.IsMaster = true;
+            }
+            else
+            {
+                wallet.IsMaster = false;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var now = DateTime.UtcNow;
+            var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var endOfMonth = startOfMonth.AddMonths(1);
+
+            var currentBalance = await _context.Transactions
+                .Where(t => t.WalletId == id)
+                .SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+            var monthlySpent = Math.Abs(await _context.Transactions
+                .Where(t => t.WalletId == id && t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
+                .SumAsync(t => (decimal?)t.Amount) ?? 0m);
+
+            return Ok(new WalletResponse(
+                wallet.Id,
+                wallet.Name,
+                currentBalance,
+                wallet.MonthlyBudget,
+                monthlySpent,
+                wallet.IsMaster,
+                wallet.CreatedAt
+            ));
         }
 
         /// <summary>
@@ -115,8 +186,73 @@ namespace PersonalFinance.API.Controllers
                 currentBalance,
                 wallet.MonthlyBudget,
                 monthlySpent,
+                wallet.IsMaster,
                 wallet.CreatedAt
             ));
+        }
+
+        /// <summary>
+        /// POST /api/wallets/transfer
+        /// Chuyển tiền từ Ví này sang Ví khác (ví dụ: Phân bổ từ Ví Tổng sang Ví Con)
+        /// </summary>
+        [HttpPost("transfer")]
+        public async Task<IActionResult> TransferFunds(
+            [FromHeader(Name = "X-User-Id")] Guid? userId,
+            [FromBody] TransferWalletRequest request)
+        {
+            if (request.SourceWalletId == request.TargetWalletId)
+                return BadRequest(new { message = "Ví nguồn và ví đích không được trùng nhau." });
+
+            if (request.Amount <= 0)
+                return BadRequest(new { message = "Số tiền chuyển phải lớn hơn 0." });
+
+            var sourceWallet = await _context.Wallets.FindAsync(request.SourceWalletId);
+            var targetWallet = await _context.Wallets.FindAsync(request.TargetWalletId);
+
+            if (sourceWallet == null || targetWallet == null)
+                return NotFound(new { message = "Không tìm thấy ví nguồn hoặc ví đích." });
+
+            // Kiểm tra số dư ví nguồn
+            var sourceBalance = await _context.Transactions
+                .Where(t => t.WalletId == request.SourceWalletId)
+                .SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+            if (sourceBalance < request.Amount)
+            {
+                return BadRequest(new { 
+                    message = $"Số dư ví '{sourceWallet.Name}' không đủ ({sourceBalance:N0} VNĐ < {request.Amount:N0} VNĐ)." 
+                });
+            }
+
+            var txDate = request.TransactionDate ?? DateTime.UtcNow;
+            var note = string.IsNullOrWhiteSpace(request.Note) ? "Chuyển tiền giữa các ví" : request.Note.Trim();
+
+            // Trừ tiền ví nguồn
+            var outTx = new Transaction
+            {
+                WalletId = request.SourceWalletId,
+                Amount = -Math.Abs(request.Amount),
+                Category = "Chuyển tiền đi",
+                Note = $"Chuyển sang [{targetWallet.Name}]: {note}",
+                TransactionDate = txDate,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Cộng tiền vào ví đích
+            var inTx = new Transaction
+            {
+                WalletId = request.TargetWalletId,
+                Amount = Math.Abs(request.Amount),
+                Category = "Nạp tiền từ ví khác",
+                Note = $"Nhận từ [{sourceWallet.Name}]: {note}",
+                TransactionDate = txDate,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Transactions.AddRange(outTx, inTx);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Chuyển tiền thành công!", sourceWalletId = sourceWallet.Id, targetWalletId = targetWallet.Id, amount = request.Amount });
         }
 
         /// <summary>
@@ -169,11 +305,13 @@ namespace PersonalFinance.API.Controllers
 
         /// <summary>
         /// POST /api/wallets/{id}/transactions
-        /// Ghi nhận giao dịch (chi tiêu hoặc nạp tiền) với Số tiền, Danh mục, Ghi chú, Ngày giao dịch
+        /// Ghi nhận giao dịch (chi tiêu hoặc nạp tiền) với Số tiền, Danh mục, Ghi chú, Ngày giao dịch.
+        /// Hỗ trợ DeductFromMaster: Khi nạp vào ví con, tự động trích tiền từ Ví Tổng nếu chọn.
         /// </summary>
         [HttpPost("{id:guid}/transactions")]
         public async Task<ActionResult<TransactionResponse>> CreateTransaction(
-            Guid id, 
+            Guid id,
+            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] CreateTransactionRequest request)
         {
             if (request.Amount == 0)
@@ -184,6 +322,41 @@ namespace PersonalFinance.API.Controllers
                 return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
 
             var transactionDate = request.TransactionDate ?? DateTime.UtcNow;
+
+            // Nếu nạp tiền (Amount > 0) vào ví con và có yêu cầu DeductFromMaster
+            if (request.Amount > 0 && request.DeductFromMaster && !wallet.IsMaster)
+            {
+                var masterWallet = await _context.Wallets
+                    .FirstOrDefaultAsync(w => w.UserId == userId && w.IsMaster);
+
+                if (masterWallet == null)
+                {
+                    return BadRequest(new { message = "Chưa thiết lập Ví Tổng để trích tiền!" });
+                }
+
+                var masterBalance = await _context.Transactions
+                    .Where(t => t.WalletId == masterWallet.Id)
+                    .SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+                if (masterBalance < request.Amount)
+                {
+                    return BadRequest(new { 
+                        message = $"Số dư Ví Tổng '{masterWallet.Name}' không đủ để trích ({masterBalance:N0} VNĐ < {request.Amount:N0} VNĐ)." 
+                    });
+                }
+
+                // Ghi nhận trừ tiền ở Ví Tổng
+                var masterOutTx = new Transaction
+                {
+                    WalletId = masterWallet.Id,
+                    Amount = -Math.Abs(request.Amount),
+                    Category = "Phân bổ ví con",
+                    Note = $"Trích nạp cho [{wallet.Name}]: {(string.IsNullOrWhiteSpace(request.Note) ? "Nạp tiền" : request.Note)}",
+                    TransactionDate = transactionDate,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Transactions.Add(masterOutTx);
+            }
 
             var transaction = new Transaction
             {

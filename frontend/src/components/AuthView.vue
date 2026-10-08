@@ -61,8 +61,8 @@
         <!-- Full Name (Only in Register mode) -->
         <div v-if="isRegisterMode">
           <label class="block text-xs font-bold text-[#c1c7ce] mb-1.5">Họ và tên</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-3 text-[#8b9198] material-symbols-rounded text-lg">person</span>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 inset-y-0 flex items-center pointer-events-none text-[#8b9198] material-symbols-rounded text-lg">person</span>
             <input
               v-model="form.fullName"
               type="text"
@@ -75,8 +75,8 @@
         <!-- Username -->
         <div>
           <label class="block text-xs font-bold text-[#c1c7ce] mb-1.5">Tên đăng nhập</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-3 text-[#8b9198] material-symbols-rounded text-lg">badge</span>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 inset-y-0 flex items-center pointer-events-none text-[#8b9198] material-symbols-rounded text-lg">badge</span>
             <input
               v-model="form.username"
               type="text"
@@ -91,8 +91,8 @@
         <!-- Password -->
         <div>
           <label class="block text-xs font-bold text-[#c1c7ce] mb-1.5">Mật khẩu</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-3 text-[#8b9198] material-symbols-rounded text-lg">lock</span>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 inset-y-0 flex items-center pointer-events-none text-[#8b9198] material-symbols-rounded text-lg">lock</span>
             <input
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
@@ -104,7 +104,7 @@
             <button
               type="button"
               @click="showPassword = !showPassword"
-              class="absolute right-3.5 top-2.5 text-[#8b9198] hover:text-white"
+              class="absolute right-3.5 inset-y-0 flex items-center text-[#8b9198] hover:text-white"
             >
               <span class="material-symbols-rounded text-lg">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
             </button>
@@ -114,8 +114,8 @@
         <!-- Confirm Password (Only in Register mode) -->
         <div v-if="isRegisterMode">
           <label class="block text-xs font-bold text-[#c1c7ce] mb-1.5">Xác nhận mật khẩu</label>
-          <div class="relative">
-            <span class="absolute left-3.5 top-3 text-[#8b9198] material-symbols-rounded text-lg">lock_reset</span>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 inset-y-0 flex items-center pointer-events-none text-[#8b9198] material-symbols-rounded text-lg">lock_reset</span>
             <input
               v-model="form.confirmPassword"
               :type="showPassword ? 'text' : 'password'"

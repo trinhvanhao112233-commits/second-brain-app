@@ -15,14 +15,14 @@
       <!-- Action Buttons & Search -->
       <div class="flex items-center gap-3">
         <!-- Search bar -->
-        <div class="relative">
+        <div class="relative flex items-center">
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Tìm ghi chú..."
             class="px-3.5 py-1.5 pl-8 bg-[#1c2029] border border-[#262a34] rounded-full text-xs text-white placeholder-[#8b9198] focus:outline-none focus:border-[#38e1a6] w-36 sm:w-48 transition-all"
           />
-          <span class="material-symbols-rounded text-base text-[#8b9198] absolute left-2.5 top-1.5 pointer-events-none">search</span>
+          <span class="material-symbols-rounded text-base text-[#8b9198] absolute left-2.5 inset-y-0 flex items-center pointer-events-none">search</span>
         </div>
 
         <button

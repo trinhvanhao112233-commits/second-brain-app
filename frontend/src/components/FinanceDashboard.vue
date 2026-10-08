@@ -13,7 +13,17 @@
       </div>
 
       <!-- Quick Action Buttons -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
+        <button
+          type="button"
+          @click="openTransferModal()"
+          class="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#005237] hover:bg-[#006947] border border-[#38e1a6]/40 text-[#5dfec1] font-bold text-xs transition-all active:scale-95 shadow-sm"
+          title="Phân bổ tiền từ Ví Tổng sang các ví con hoặc luân chuyển giữa các ví"
+        >
+          <span class="material-symbols-rounded text-base">swap_horiz</span>
+          <span>Phân Bổ / Chuyển Tiền</span>
+        </button>
+
         <button
           type="button"
           @click="openAddExpenseModal()"
@@ -161,19 +171,43 @@
         <article
           v-for="wallet in wallets"
           :key="wallet.id"
-          class="bg-[#171c24] border border-[#262a34] hover:border-[#41474d] rounded-2xl p-5 md-elevation-1 transition-all flex flex-col justify-between"
+          class="bg-[#171c24] border rounded-2xl p-5 md-elevation-1 transition-all flex flex-col justify-between relative overflow-hidden"
+          :class="wallet.isMaster ? 'border-amber-500/50 bg-gradient-to-b from-[#221f18] to-[#171c24]' : 'border-[#262a34] hover:border-[#41474d]'"
         >
+          <!-- Master Wallet Ribbon/Badge -->
+          <div
+            v-if="wallet.isMaster"
+            class="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-amber-600 text-[#241300] text-[10px] font-black uppercase tracking-wider px-3 py-0.5 rounded-bl-xl flex items-center gap-1 shadow-md"
+          >
+            <span class="material-symbols-rounded text-xs">workspace_premium</span>
+            <span>VÍ TỔNG</span>
+          </div>
+
           <!-- Top Wallet Card -->
           <div>
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-[#1c2029] text-[#5dfec1] flex items-center justify-center border border-[#262a34]">
-                  <span class="material-symbols-rounded text-base">savings</span>
+                <div
+                  class="w-8 h-8 rounded-xl flex items-center justify-center border"
+                  :class="wallet.isMaster ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-[#1c2029] text-[#5dfec1] border-[#262a34]'"
+                >
+                  <span class="material-symbols-rounded text-base">{{ wallet.isMaster ? 'stars' : 'savings' }}</span>
                 </div>
-                <h4 class="font-bold text-base text-white truncate">{{ wallet.name }}</h4>
+                <h4 class="font-bold text-base text-white truncate max-w-[140px]">{{ wallet.name }}</h4>
               </div>
 
-              <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-1.5" :class="{ 'pr-14': wallet.isMaster }">
+                <!-- Nút Đặt làm Ví Tổng / Hủy Ví Tổng -->
+                <button
+                  type="button"
+                  @click.stop="handleToggleMaster(wallet)"
+                  class="w-7 h-7 rounded-lg border flex items-center justify-center transition-colors"
+                  :class="wallet.isMaster ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30' : 'bg-[#1c2029] text-[#8b9198] border-[#262a34] hover:text-amber-400 hover:border-amber-500/30'"
+                  :title="wallet.isMaster ? 'Ví này hiện là Ví Tổng (Click để hủy)' : 'Đặt ví này làm Ví Tổng'"
+                >
+                  <span class="material-symbols-rounded text-sm">stars</span>
+                </button>
+
                 <!-- Nút chỉnh sửa hạn mức -->
                 <button
                   type="button"
@@ -199,8 +233,13 @@
 
             <!-- Balance Number -->
             <div class="mt-3">
-              <span class="text-[10px] text-[#8b9198] uppercase tracking-wider font-semibold">Số dư khả dụng</span>
-              <div class="text-2xl font-black text-[#38e1a6] font-mono mt-0.5">
+              <span class="text-[10px] uppercase tracking-wider font-semibold" :class="wallet.isMaster ? 'text-amber-300' : 'text-[#8b9198]'">
+                {{ wallet.isMaster ? 'Số dư Ví Tổng' : 'Số dư khả dụng' }}
+              </span>
+              <div
+                class="text-2xl font-black font-mono mt-0.5"
+                :class="wallet.isMaster ? 'text-amber-400' : 'text-[#38e1a6]'"
+              >
                 {{ formatVND(wallet.balance) }}
               </div>
             </div>
@@ -233,10 +272,11 @@
             <button
               type="button"
               @click="openTransactionModal(wallet, 'deposit')"
-              class="flex items-center justify-center gap-1 py-2 px-3 rounded-xl bg-[#005237] hover:bg-[#006947] text-[#5dfec1] text-xs font-bold transition-all"
+              class="flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs font-bold transition-all"
+              :class="wallet.isMaster ? 'bg-amber-500 hover:bg-amber-400 text-stone-900 font-extrabold' : 'bg-[#005237] hover:bg-[#006947] text-[#5dfec1]'"
             >
               <span class="material-symbols-rounded text-sm">add</span>
-              <span>Nạp tiền</span>
+              <span>{{ wallet.isMaster ? 'Nạp Ví Tổng' : 'Nạp tiền' }}</span>
             </button>
           </div>
         </article>
@@ -257,26 +297,88 @@
 
     <!-- 3. LỊCH SỬ CHI TIÊU & GIAO DỊCH (MD3 TABLE / LIST) -->
     <section class="bg-[#171c24] border border-[#262a34] rounded-2xl p-5 md-elevation-1 space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#262a34]">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#262a34]">
         <div class="flex items-center gap-2">
           <span class="material-symbols-rounded text-[#38e1a6] text-lg">receipt_long</span>
-          <h3 class="text-sm font-bold uppercase tracking-wider text-white">Lịch Sử Giao Dịch</h3>
-          <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#1c2029] text-[#cee9da]">
-            {{ filteredTransactions.length }}
-          </span>
+          <div>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-white">Lịch Sử Giao Dịch</h3>
+            <span class="text-[11px] text-[#8b9198]">
+              Hiển thị: <strong class="text-[#cee9da]">{{ filteredTransactions.length }}</strong> giao dịch
+            </span>
+          </div>
         </div>
 
-        <!-- Filter Danh Mục -->
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-[#8b9198]">Danh mục:</span>
-          <select
-            v-model="categoryFilter"
-            class="bg-[#1c2029] border border-[#41474d] text-xs text-[#e1e2ec] font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:border-[#38e1a6]"
+        <!-- Filter Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Quick Range Tabs -->
+          <div class="flex items-center bg-[#1c2029] p-1 rounded-xl border border-[#262a34]">
+            <button
+              v-for="period in [
+                { id: 'today', label: 'Hôm nay' },
+                { id: 'single_date', label: 'Theo ngày' },
+                { id: 'all', label: 'Tất cả' }
+              ]"
+              :key="period.id"
+              type="button"
+              @click="dateFilterMode = period.id"
+              class="px-2.5 py-1 text-xs font-semibold rounded-lg transition-all"
+              :class="dateFilterMode === period.id 
+                ? 'bg-[#005237] text-[#5dfec1] shadow-sm' 
+                : 'text-[#8b9198] hover:text-[#e1e2ec]'"
+            >
+              {{ period.label }}
+            </button>
+          </div>
+
+          <!-- Specific Date Picker (khi chọn single_date) -->
+          <div v-if="dateFilterMode === 'single_date'" class="flex items-center gap-1.5 bg-[#1c2029] px-2 py-1 rounded-xl border border-[#41474d]">
+            <span class="material-symbols-rounded text-sm text-[#38e1a6]">event</span>
+            <input
+              v-model="customDateFilter"
+              type="date"
+              class="bg-transparent text-xs text-white focus:outline-none"
+            />
+          </div>
+
+          <!-- Filter Danh Mục -->
+          <div class="flex items-center gap-1.5">
+            <select
+              v-model="categoryFilter"
+              class="bg-[#1c2029] border border-[#41474d] text-xs text-[#e1e2ec] font-semibold rounded-xl px-3 py-1.5 focus:outline-none focus:border-[#38e1a6]"
+            >
+              <option value="ALL">Tất cả danh mục</option>
+              <option v-for="cat in expenseCategories" :key="cat" :value="cat">{{ cat }}</option>
+              <option value="Nạp tiền">Nạp tiền</option>
+              <option value="Chuyển tiền đi">Chuyển tiền đi</option>
+              <option value="Nạp tiền từ ví khác">Nạp từ ví khác</option>
+              <option value="Phân bổ ví con">Phân bổ ví con</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thống kê nhanh trong khoảng thời gian đang lọc (Ngày / Toàn thời gian) -->
+      <div class="grid grid-cols-3 gap-3 p-3 rounded-xl bg-[#1c2029]/80 border border-[#262a34]">
+        <div class="text-left">
+          <span class="text-[10px] uppercase font-bold text-[#8b9198] block">Tổng nạp trong kỳ</span>
+          <span class="text-xs sm:text-sm font-black font-mono text-[#38e1a6]">
+            +{{ formatVND(periodStats.income) }}
+          </span>
+        </div>
+        <div class="text-left border-x border-[#262a34] px-3">
+          <span class="text-[10px] uppercase font-bold text-[#8b9198] block">Tổng chi trong kỳ</span>
+          <span class="text-xs sm:text-sm font-black font-mono text-[#ffb4ab]">
+            -{{ formatVND(periodStats.expense) }}
+          </span>
+        </div>
+        <div class="text-left">
+          <span class="text-[10px] uppercase font-bold text-[#8b9198] block">Chênh lệch ròng</span>
+          <span
+            class="text-xs sm:text-sm font-black font-mono"
+            :class="periodStats.net >= 0 ? 'text-[#5dfec1]' : 'text-rose-400'"
           >
-            <option value="ALL">Tất cả danh mục</option>
-            <option v-for="cat in expenseCategories" :key="cat" :value="cat">{{ cat }}</option>
-            <option value="Nạp tiền">Nạp tiền</option>
-          </select>
+            {{ periodStats.net >= 0 ? '+' : '' }}{{ formatVND(periodStats.net) }}
+          </span>
         </div>
       </div>
 
@@ -385,7 +487,7 @@
               <span class="material-symbols-rounded text-sm text-[#38e1a6]">payments</span>
               Tổng ngân sách trong tháng (VNĐ)
             </label>
-            <div class="relative">
+            <div class="relative flex items-center">
               <input
                 v-model.number="budgetForm.monthlyBudget"
                 type="number"
@@ -395,7 +497,7 @@
                 placeholder="5000000"
                 class="w-full px-4 py-3 bg-[#171c24] border border-[#41474d] rounded-2xl text-white font-mono text-lg font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
               />
-              <span class="absolute right-4 top-3 text-xs font-bold text-[#8b9198]">VNĐ</span>
+              <span class="absolute right-4 inset-y-0 flex items-center text-xs font-bold text-[#8b9198] pointer-events-none">VNĐ</span>
             </div>
           </div>
 
@@ -471,7 +573,7 @@
           <!-- 2. Số tiền -->
           <div>
             <label class="block text-xs font-semibold text-[#c1c7ce] mb-1">Số tiền chi (VNĐ)</label>
-            <div class="relative">
+            <div class="relative flex items-center">
               <input
                 v-model.number="expenseForm.amount"
                 type="number"
@@ -481,7 +583,7 @@
                 placeholder="50000"
                 class="w-full px-4 py-2.5 bg-[#171c24] border border-[#41474d] rounded-xl text-white font-mono text-base font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
               />
-              <span class="absolute right-4 top-2.5 text-xs font-bold text-[#8b9198]">VNĐ</span>
+              <span class="absolute right-4 inset-y-0 flex items-center text-xs font-bold text-[#8b9198] pointer-events-none">VNĐ</span>
             </div>
           </div>
 
@@ -577,6 +679,19 @@
             />
           </div>
 
+          <!-- Checkbox Đặt làm Ví Tổng -->
+          <label class="flex items-center gap-2 cursor-pointer p-2.5 rounded-xl bg-[#171c24] border border-[#262a34]">
+            <input
+              v-model="newWalletIsMaster"
+              type="checkbox"
+              class="w-4 h-4 rounded text-amber-500 focus:ring-0 bg-[#1c2029] border-[#41474d]"
+            />
+            <div class="text-xs">
+              <span class="font-bold text-amber-300 block">Đặt làm Ví Tổng</span>
+              <span class="text-[11px] text-[#8b9198]">Ví nguồn nhận thu nhập chính & cấp tiền cho các ví con</span>
+            </div>
+          </label>
+
           <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#262a34]">
             <button
               type="button"
@@ -601,11 +716,16 @@
     <div v-if="activeTxWallet" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
       <div class="w-full max-w-sm bg-[#1c2029] border border-[#262a34] rounded-[28px] p-6 md-elevation-3 transition-all">
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-2xl bg-[#005237] text-[#5dfec1] flex items-center justify-center">
-            <span class="material-symbols-rounded text-xl">add</span>
+          <div
+            class="w-10 h-10 rounded-2xl flex items-center justify-center"
+            :class="activeTxWallet.isMaster ? 'bg-amber-500/20 text-amber-400' : 'bg-[#005237] text-[#5dfec1]'"
+          >
+            <span class="material-symbols-rounded text-xl">{{ activeTxWallet.isMaster ? 'stars' : 'add' }}</span>
           </div>
           <div>
-            <h3 class="text-base font-bold text-white truncate">Nạp tiền vào "{{ activeTxWallet.name }}"</h3>
+            <h3 class="text-base font-bold text-white truncate">
+              Nạp tiền vào "{{ activeTxWallet.name }}"
+            </h3>
             <p class="text-xs text-[#8b9198]">
               Số dư hiện tại: <span class="text-white font-mono">{{ formatVND(activeTxWallet.balance) }}</span>
             </p>
@@ -613,7 +733,7 @@
         </div>
 
         <form @submit.prevent="handleDepositSubmit" class="mt-4 space-y-3">
-          <div class="relative">
+          <div class="relative flex items-center">
             <input
               v-model.number="txAmountInput"
               type="number"
@@ -623,7 +743,7 @@
               placeholder="0"
               class="w-full px-4 py-2.5 bg-[#171c24] border border-[#41474d] rounded-xl text-white font-mono text-lg font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
             />
-            <span class="absolute right-4 top-2.5 text-xs font-bold text-[#8b9198]">VNĐ</span>
+            <span class="absolute right-4 inset-y-0 flex items-center text-xs font-bold text-[#8b9198] pointer-events-none">VNĐ</span>
           </div>
 
           <div class="grid grid-cols-4 gap-1.5">
@@ -636,6 +756,23 @@
             >
               {{ formatQuick(amt) }}
             </button>
+          </div>
+
+          <!-- Tùy chọn trích từ Ví Tổng khi nạp vào ví con -->
+          <div v-if="!activeTxWallet.isMaster && masterWallet" class="p-2.5 rounded-xl bg-[#171c24] border border-[#262a34]">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                v-model="deductFromMasterOption"
+                type="checkbox"
+                class="w-4 h-4 rounded text-[#38e1a6] focus:ring-0 bg-[#1c2029] border-[#41474d]"
+              />
+              <div class="text-xs leading-tight">
+                <span class="font-bold text-[#e1e2ec] block">Trích tiền từ Ví Tổng "{{ masterWallet.name }}"</span>
+                <span class="text-[11px] text-[#8b9198]">
+                  Số dư Ví Tổng: <strong class="text-amber-400 font-mono">{{ formatVND(masterWallet.balance) }}</strong>
+                </span>
+              </div>
+            </label>
           </div>
 
           <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#262a34]">
@@ -652,6 +789,116 @@
               class="px-5 py-2 bg-[#38e1a6] hover:bg-[#5dfec1] text-[#003824] rounded-full text-xs font-bold transition-all disabled:opacity-40"
             >
               {{ isSubmitting ? 'Đang nạp...' : 'Xác nhận Nạp' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 5: PHÂN BỔ / CHUYỂN TIỀN GIỮA CÁC VÍ ==================== -->
+    <div v-if="showTransferModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+      <div class="w-full max-w-md bg-[#1c2029] border border-[#262a34] rounded-[28px] p-6 md-elevation-3 transition-all">
+        <div class="flex items-center gap-3.5 mb-2">
+          <div class="w-11 h-11 rounded-2xl bg-[#005237] text-[#5dfec1] flex items-center justify-center">
+            <span class="material-symbols-rounded text-2xl">swap_horiz</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Phân Bổ & Chuyển Tiền</h3>
+            <p class="text-xs text-[#8b9198]">Cấp tiền từ Ví Tổng sang ví con hoặc giữa các ví</p>
+          </div>
+        </div>
+
+        <form @submit.prevent="handleTransferSubmit" class="mt-4 space-y-3.5">
+          <!-- Ví nguồn -->
+          <div>
+            <label class="block text-xs font-semibold text-[#c1c7ce] mb-1">Từ ví nguồn</label>
+            <select
+              v-model="transferForm.sourceWalletId"
+              required
+              class="w-full px-4 py-2 bg-[#171c24] border border-[#41474d] rounded-xl text-white text-xs focus:outline-none focus:border-[#38e1a6]"
+            >
+              <option value="" disabled>-- Chọn ví nguồn --</option>
+              <option v-for="w in wallets" :key="w.id" :value="w.id">
+                {{ w.isMaster ? '⭐ [VÍ TỔNG] ' : '' }}{{ w.name }} (Số dư: {{ formatVND(w.balance) }})
+              </option>
+            </select>
+          </div>
+
+          <!-- Ví đích -->
+          <div>
+            <label class="block text-xs font-semibold text-[#c1c7ce] mb-1">Chuyển sang ví đích</label>
+            <select
+              v-model="transferForm.targetWalletId"
+              required
+              class="w-full px-4 py-2 bg-[#171c24] border border-[#41474d] rounded-xl text-white text-xs focus:outline-none focus:border-[#38e1a6]"
+            >
+              <option value="" disabled>-- Chọn ví đích --</option>
+              <option
+                v-for="w in wallets.filter(w => w.id !== transferForm.sourceWalletId)"
+                :key="w.id"
+                :value="w.id"
+              >
+                {{ w.isMaster ? '⭐ [VÍ TỔNG] ' : '' }}{{ w.name }} (Số dư: {{ formatVND(w.balance) }})
+              </option>
+            </select>
+          </div>
+
+          <!-- Số tiền chuyển -->
+          <div>
+            <label class="block text-xs font-semibold text-[#c1c7ce] mb-1">Số tiền chuyển (VNĐ)</label>
+            <div class="relative flex items-center">
+              <input
+                v-model.number="transferForm.amount"
+                type="number"
+                min="1"
+                step="any"
+                required
+                placeholder="1000000"
+                class="w-full px-4 py-2.5 bg-[#171c24] border border-[#41474d] rounded-xl text-white font-mono text-base font-bold placeholder-slate-600 focus:outline-none focus:border-[#38e1a6]"
+              />
+              <span class="absolute right-4 inset-y-0 flex items-center text-xs font-bold text-[#8b9198] pointer-events-none">VNĐ</span>
+            </div>
+          </div>
+
+          <!-- Gợi ý nhanh -->
+          <div class="grid grid-cols-4 gap-1.5">
+            <button
+              v-for="amt in [200000, 500000, 1000000, 2000000]"
+              :key="amt"
+              type="button"
+              @click="transferForm.amount = amt"
+              class="py-1 px-1 bg-[#262a34] hover:bg-[#31353f] text-[11px] font-semibold text-[#c1c7ce] rounded-lg text-center transition-all"
+            >
+              {{ formatQuick(amt) }}
+            </button>
+          </div>
+
+          <!-- Ghi chú chuyển tiền -->
+          <div>
+            <label class="block text-xs font-semibold text-[#c1c7ce] mb-1">Ghi chú phân bổ</label>
+            <input
+              v-model="transferForm.note"
+              type="text"
+              placeholder="Ví dụ: Cấp tiền ăn uống tuần 1, nạp ví con..."
+              class="w-full px-4 py-2 bg-[#171c24] border border-[#41474d] rounded-xl text-white text-xs focus:outline-none focus:border-[#38e1a6]"
+            />
+          </div>
+
+          <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-[#262a34]">
+            <button
+              type="button"
+              @click="showTransferModal = false"
+              class="px-4 py-2 rounded-full text-xs font-semibold text-[#c1c7ce] hover:bg-[#262a34]"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              :disabled="isSubmitting || !transferForm.amount || transferForm.amount <= 0 || !transferForm.sourceWalletId || !transferForm.targetWalletId"
+              class="px-5 py-2 bg-[#38e1a6] hover:bg-[#5dfec1] text-[#003824] rounded-full text-xs font-bold transition-all disabled:opacity-40 flex items-center gap-1.5"
+            >
+              <span class="material-symbols-rounded text-base">check</span>
+              <span>{{ isSubmitting ? 'Đang chuyển...' : 'Xác Nhận Phân Bổ' }}</span>
             </button>
           </div>
         </form>
@@ -721,11 +968,26 @@ const expenseForm = ref({
 const showAddWalletModal = ref(false);
 const newWalletName = ref('');
 const newWalletBudget = ref(0);
+const newWalletIsMaster = ref(false);
 
 // Modal Nạp tiền
 const activeTxWallet = ref(null);
 const txAmountInput = ref(null);
+const deductFromMasterOption = ref(true); // Mặc định bật trích tiền từ ví tổng nếu nạp ví con
 const quickAmounts = [100000, 200000, 500000, 2000000];
+
+// Modal Phân Bổ / Chuyển Tiền
+const showTransferModal = ref(false);
+const transferForm = ref({
+  sourceWalletId: '',
+  targetWalletId: '',
+  amount: null,
+  note: '',
+});
+
+// Lọc thời gian theo Ngày
+const dateFilterMode = ref('all'); // 'all', 'today', 'single_date'
+const customDateFilter = ref(new Date().toISOString().split('T')[0]);
 
 // Formats
 const formatVND = (value) => {
@@ -770,6 +1032,10 @@ const getBudgetBadgeClass = (percentage) => {
 };
 
 // Computed Overview
+const masterWallet = computed(() => {
+  return wallets.value.find(w => w.isMaster) || null;
+});
+
 const selectedWallet = computed(() => {
   if (selectedWalletFilterId.value === 'ALL') return null;
   return wallets.value.find(w => w.id === selectedWalletFilterId.value) || null;
@@ -810,17 +1076,19 @@ const currentOverview = computed(() => {
 
 const getWalletName = (walletId) => {
   const w = wallets.value.find(x => x.id === walletId);
-  return w ? w.name : 'Chung';
+  return w ? (w.isMaster ? `⭐ ${w.name}` : w.name) : 'Chung';
 };
 
 // Transactions Lọc
 const filteredTransactions = computed(() => {
   let list = allTransactions.value;
 
+  // Lọc theo ví
   if (selectedWalletFilterId.value !== 'ALL') {
     list = list.filter(t => t.walletId === selectedWalletFilterId.value);
   }
 
+  // Lọc theo danh mục
   if (categoryFilter.value !== 'ALL') {
     if (categoryFilter.value === 'Nạp tiền') {
       list = list.filter(t => t.amount > 0);
@@ -829,7 +1097,42 @@ const filteredTransactions = computed(() => {
     }
   }
 
+  // Lọc theo ngày
+  if (dateFilterMode.value === 'today') {
+    const todayStr = new Date().toISOString().split('T')[0];
+    list = list.filter(t => {
+      const d = (t.transactionDate || t.createdAt || '').split('T')[0];
+      return d === todayStr;
+    });
+  } else if (dateFilterMode.value === 'single_date' && customDateFilter.value) {
+    list = list.filter(t => {
+      const d = (t.transactionDate || t.createdAt || '').split('T')[0];
+      return d === customDateFilter.value;
+    });
+  }
+
   return list;
+});
+
+// Thống kê theo khoảng thời gian đang lọc
+const periodStats = computed(() => {
+  let income = 0;
+  let expense = 0;
+
+  for (const t of filteredTransactions.value) {
+    const val = Number(t.amount) || 0;
+    if (val > 0) {
+      income += val;
+    } else {
+      expense += Math.abs(val);
+    }
+  }
+
+  return {
+    income,
+    expense,
+    net: income - expense,
+  };
 });
 
 // API Calls
@@ -948,6 +1251,91 @@ const handleCreateExpense = async () => {
   }
 };
 
+const handleToggleMaster = async (wallet) => {
+  if (!wallet) return;
+  const newStatus = !wallet.isMaster;
+  const confirmMsg = newStatus
+    ? `Đặt "${wallet.name}" làm Ví Tổng (nhận lương/thu nhập và cấp tiền cho các ví con)?`
+    : `Hủy trạng thái Ví Tổng của "${wallet.name}"?`;
+
+  if (!window.confirm(confirmMsg)) return;
+
+  isSubmitting.value = true;
+  try {
+    const res = await apiFetch(`${API_BASE_URL}/${wallet.id}/master`, {
+      method: 'PUT',
+      body: JSON.stringify({ isMaster: newStatus }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.message || `Lỗi server (${res.status})`);
+    }
+
+    await fetchWallets();
+  } catch (err) {
+    console.error('Lỗi đổi trạng thái ví tổng:', err);
+    alert(`Không thể thay đổi: ${err.message || 'Lỗi không xác định'}`);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const openTransferModal = () => {
+  const master = wallets.value.find(w => w.isMaster);
+  const firstChild = wallets.value.find(w => !w.isMaster) || (wallets.value.length > 1 ? wallets.value[1] : null);
+
+  transferForm.value = {
+    sourceWalletId: master ? master.id : (wallets.value[0]?.id || ''),
+    targetWalletId: firstChild ? firstChild.id : (wallets.value[1]?.id || ''),
+    amount: null,
+    note: '',
+  };
+  showTransferModal.value = true;
+};
+
+const handleTransferSubmit = async () => {
+  if (!transferForm.value.sourceWalletId || !transferForm.value.targetWalletId) {
+    alert('Vui lòng chọn ví nguồn và ví đích.');
+    return;
+  }
+  if (!transferForm.value.amount || transferForm.value.amount <= 0) {
+    alert('Số tiền chuyển phải lớn hơn 0.');
+    return;
+  }
+  if (transferForm.value.sourceWalletId === transferForm.value.targetWalletId) {
+    alert('Ví nguồn và ví đích không được trùng nhau.');
+    return;
+  }
+
+  isSubmitting.value = true;
+  try {
+    const res = await apiFetch(`${API_BASE_URL}/transfer`, {
+      method: 'POST',
+      body: JSON.stringify({
+        sourceWalletId: transferForm.value.sourceWalletId,
+        targetWalletId: transferForm.value.targetWalletId,
+        amount: Number(transferForm.value.amount),
+        note: transferForm.value.note || '',
+        transactionDate: new Date().toISOString(),
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.message || `Lỗi (${res.status})`);
+    }
+
+    await fetchWallets();
+    showTransferModal.value = false;
+  } catch (err) {
+    console.error('Lỗi chuyển tiền:', err);
+    alert(`Không thể chuyển tiền: ${err.message || 'Lỗi không xác định'}`);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
 const handleCreateWallet = async () => {
   if (!newWalletName.value.trim()) return;
 
@@ -957,7 +1345,8 @@ const handleCreateWallet = async () => {
       method: 'POST',
       body: JSON.stringify({
         name: newWalletName.value.trim(),
-        monthlyBudget: Number(newWalletBudget.value) || 0
+        monthlyBudget: Number(newWalletBudget.value) || 0,
+        isMaster: newWalletIsMaster.value,
       }),
     });
 
@@ -967,7 +1356,9 @@ const handleCreateWallet = async () => {
 
     newWalletName.value = '';
     newWalletBudget.value = 0;
+    newWalletIsMaster.value = false;
     showAddWalletModal.value = false;
+    await fetchWallets();
   } catch (err) {
     console.error(err);
     alert('Đã xảy ra lỗi khi tạo ví mới.');
@@ -1004,6 +1395,7 @@ const handleDeleteWallet = async (wallet) => {
 const openTransactionModal = (wallet) => {
   activeTxWallet.value = wallet;
   txAmountInput.value = null;
+  deductFromMasterOption.value = !wallet.isMaster && !!masterWallet.value;
 };
 
 const handleDepositSubmit = async () => {
@@ -1011,25 +1403,28 @@ const handleDepositSubmit = async () => {
 
   isSubmitting.value = true;
   try {
+    const shouldDeduct = !activeTxWallet.value.isMaster && deductFromMasterOption.value;
     const res = await apiFetch(`${API_BASE_URL}/${activeTxWallet.value.id}/transactions`, {
       method: 'POST',
       body: JSON.stringify({
         amount: Number(txAmountInput.value),
         category: 'Nạp tiền',
-        note: 'Nạp tiền vào ví',
-        transactionDate: new Date().toISOString()
+        note: shouldDeduct ? `Nạp tiền (trích từ ${masterWallet.value?.name || 'Ví Tổng'})` : 'Nạp tiền vào ví',
+        transactionDate: new Date().toISOString(),
+        deductFromMaster: shouldDeduct,
       }),
     });
 
-    if (!res.ok) throw new Error('Không thể nạp tiền');
-    const newTx = await res.json();
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.message || 'Không thể nạp tiền');
+    }
 
-    allTransactions.value.unshift(newTx);
     await fetchWallets();
     activeTxWallet.value = null;
   } catch (err) {
     console.error(err);
-    alert('Đã xảy ra lỗi khi nạp tiền.');
+    alert(`Lỗi khi nạp tiền: ${err.message || 'Lỗi không xác định'}`);
   } finally {
     isSubmitting.value = false;
   }

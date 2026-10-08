@@ -156,13 +156,74 @@
     </section>
 
     <!-- 2. DANH SÁCH CÁC VÍ TIỀN (MD3 CARDS) -->
-    <section class="space-y-3">
+    <section class="space-y-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="material-symbols-rounded text-[#38e1a6] text-lg">credit_card</span>
           <h3 class="text-sm font-bold uppercase tracking-wider text-white">Danh Sách Ví Tiền</h3>
         </div>
         <span class="text-xs text-[#8b9198]">{{ wallets.length }} ví đang hoạt động</span>
+      </div>
+
+      <!-- Banner Ví Tổng (Master Wallet Spotlight) -->
+      <div
+        v-if="masterWallet"
+        class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#2a2310] via-[#1f1b13] to-[#171c24] border border-amber-500/50 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4"
+      >
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0 shadow-inner">
+            <span class="material-symbols-rounded text-2xl">workspace_premium</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-stone-900">
+                Ví Tổng Trung Tâm
+              </span>
+              <h4 class="text-base sm:text-lg font-bold text-white">{{ masterWallet.name }}</h4>
+            </div>
+            <p class="text-xs text-[#a0a5ad] mt-0.5">
+              Ví nguồn nhận thu nhập/lương tháng và cấp phát tiền cho các ví con
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4 self-end md:self-auto">
+          <div class="text-right">
+            <span class="text-[10px] uppercase font-bold text-amber-300 block">Số dư Ví Tổng</span>
+            <span class="text-xl sm:text-2xl font-black font-mono text-amber-400">
+              {{ formatVND(masterWallet.balance) }}
+            </span>
+          </div>
+          <button
+            type="button"
+            @click="openTransactionModal(masterWallet, 'deposit')"
+            class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-900 font-extrabold text-xs transition-all active:scale-95 flex items-center gap-1.5 shadow-md shrink-0"
+          >
+            <span class="material-symbols-rounded text-base">add_card</span>
+            <span>Nạp Vào Ví Tổng</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Gợi ý nếu tài khoản chưa chỉ định Ví Tổng nào -->
+      <div
+        v-else-if="wallets.length > 0"
+        class="p-4 rounded-2xl bg-[#1c2029] border border-dashed border-amber-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+      >
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-rounded text-amber-400 text-2xl shrink-0">info</span>
+          <div>
+            <strong class="text-amber-300 block">Bạn chưa thiết lập Ví Tổng!</strong>
+            <span class="text-[#8b9198]">Hãy chọn 1 ví làm Ví Tổng để nạp lương vào đó và trích tiền sang các ví nhỏ.</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          @click="handleToggleMaster(wallets[0])"
+          class="px-3.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold shrink-0 self-start sm:self-auto"
+        >
+          Đặt "{{ wallets[0].name }}" làm Ví Tổng ⭐
+        </button>
       </div>
 
       <!-- Grid Cards -->
@@ -273,10 +334,10 @@
               type="button"
               @click="openTransactionModal(wallet, 'deposit')"
               class="flex items-center justify-center gap-1 py-2 px-3 rounded-xl text-xs font-bold transition-all"
-              :class="wallet.isMaster ? 'bg-amber-500 hover:bg-amber-400 text-stone-900 font-extrabold' : 'bg-[#005237] hover:bg-[#006947] text-[#5dfec1]'"
+              :class="wallet.isMaster ? 'bg-amber-500 hover:bg-amber-400 text-stone-900 font-extrabold shadow-sm' : 'bg-[#005237] hover:bg-[#006947] text-[#5dfec1]'"
             >
-              <span class="material-symbols-rounded text-sm">add</span>
-              <span>{{ wallet.isMaster ? 'Nạp Ví Tổng' : 'Nạp tiền' }}</span>
+              <span class="material-symbols-rounded text-sm">{{ wallet.isMaster ? 'add_card' : 'call_received' }}</span>
+              <span>{{ wallet.isMaster ? 'Nạp Ví Tổng' : (masterWallet ? 'Nạp Từ Ví Tổng' : 'Nạp tiền') }}</span>
             </button>
           </div>
         </article>

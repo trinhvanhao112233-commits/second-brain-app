@@ -41,6 +41,16 @@
           <span class="material-symbols-rounded text-base">track_changes</span>
           <span>Hạn Mức Ngân Sách</span>
         </button>
+
+        <button
+          type="button"
+          @click="confirmResetAllData()"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#1c2029] hover:bg-[#ffb4ab]/10 border border-[#41474d] hover:border-[#ffb4ab]/40 text-[#8b9198] hover:text-[#ffb4ab] font-medium text-xs transition-all active:scale-95"
+          title="Xóa trắng toàn bộ ví tiền và lịch sử giao dịch để cài đặt lại từ đầu"
+        >
+          <span class="material-symbols-rounded text-base">restart_alt</span>
+          <span>Reset Dữ Liệu Ví</span>
+        </button>
       </div>
     </header>
 
@@ -1492,6 +1502,34 @@ const handleDepositSubmit = async () => {
   } catch (err) {
     console.error(err);
     alert(`Lỗi khi nạp tiền: ${err.message || 'Lỗi không xác định'}`);
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const confirmResetAllData = async () => {
+  const confirmed = window.confirm(
+    'CẢNH BÁO: Thao tác này sẽ xóa sạch toàn bộ các ví tiền và tất cả lịch sử giao dịch để bạn thiết lập lại từ đầu.\n\nTài khoản đăng nhập, công việc và ghi chú sẽ được giữ nguyên.\n\nBạn có chắc chắn muốn reset không?'
+  );
+  if (!confirmed) return;
+
+  try {
+    isSubmitting.value = true;
+    const res = await apiFetch('/wallets/reset-all', {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.message || 'Không thể reset dữ liệu');
+    }
+
+    alert('Đã xóa sạch toàn bộ ví và giao dịch! Trang sẽ tự động tải lại.');
+    await fetchWallets();
+    window.location.reload();
+  } catch (err) {
+    console.error(err);
+    alert(`Lỗi khi reset: ${err.message || 'Lỗi không xác định'}`);
   } finally {
     isSubmitting.value = false;
   }

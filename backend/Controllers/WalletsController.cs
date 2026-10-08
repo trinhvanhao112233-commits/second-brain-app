@@ -387,5 +387,49 @@ namespace PersonalFinance.API.Controllers
                 transaction.CreatedAt
             ));
         }
+
+        /// <summary>
+        /// DELETE /api/wallets/reset-all
+        /// Xóa sạch dữ liệu tài chính (Toàn bộ giao dịch và các ví tiền)
+        /// </summary>
+        [HttpDelete("reset-all")]
+        public async Task<IActionResult> ResetAllFinancialData([FromHeader(Name = "X-User-Id")] Guid? userId)
+        {
+            try
+            {
+                if (userId.HasValue)
+                {
+                    var userWalletIds = await _context.Wallets
+                        .Where(w => w.UserId == userId.Value)
+                        .Select(w => w.Id)
+                        .ToListAsync();
+
+                    var userTransactions = await _context.Transactions
+                        .Where(t => userWalletIds.Contains(t.WalletId))
+                        .ToListAsync();
+
+                    _context.Transactions.RemoveRange(userTransactions);
+
+                    var userWallets = await _context.Wallets
+                        .Where(w => w.UserId == userId.Value)
+                        .ToListAsync();
+
+                    _context.Wallets.RemoveRange(userWallets);
+                }
+                else
+                {
+                    // Nếu không có header userId thì xóa toàn bộ giao dịch và ví
+                    _context.Transactions.RemoveRange(_context.Transactions);
+                    _context.Wallets.RemoveRange(_context.Wallets);
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Đã xóa toàn bộ dữ liệu ví và giao dịch thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi khi xóa dữ liệu: {ex.Message}" });
+            }
+        }
     }
 }

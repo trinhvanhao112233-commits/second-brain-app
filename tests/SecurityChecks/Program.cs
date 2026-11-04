@@ -33,4 +33,9 @@ var bob = Guid.NewGuid(); Login(bob);
 Check(db.Wallets.ToQueryString().Contains(bob.ToString()) && !db.Wallets.ToQueryString().Contains(alice.Id.ToString()), "Owner filter changes per request, not cached model");
 foreach (var type in typeof(AuthController).Assembly.GetTypes().Where(x => !x.IsAbstract && x.IsSubclassOf(typeof(OwnedController)) && x != typeof(AuthController)))
     Check(type.GetCustomAttributes(typeof(AuthorizeAttribute),true).Length > 0, $"{type.Name} requires authentication");
+foreach (var entity in db.Model.GetEntityTypes())
+    foreach (var property in entity.GetProperties().Where(p => (Nullable.GetUnderlyingType(p.ClrType) ?? p.ClrType) == typeof(Guid))) {
+        var mapping = property.GetRelationalTypeMapping();
+        Check(mapping.GetDataReaderMethod().Name == "GetGuid", $"{entity.ClrType.Name}.{property.Name} reads Guid directly instead of GetString");
+    }
 Console.WriteLine($"{checks} checks passed. No database connection or production data used.");

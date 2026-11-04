@@ -374,7 +374,7 @@
                     v-for="(debt, idx) in stage.debts"
                     :key="debt.id"
                     class="px-3.5 py-2.5 rounded-2xl bg-white border flex items-center justify-between gap-2 text-xs shadow-sm transition-all"
-                    :class="debt.isCompleted ? 'opacity-50 border-slate-200 bg-slate-50' : 'border-rose-200/90'"
+                    :class="debt.isCompleted ? 'border-slate-200 bg-slate-50' : 'border-rose-200/90'"
                   >
                     <div class="flex items-center gap-2.5 min-w-0">
                       <button
@@ -403,9 +403,11 @@
                     </div>
 
                     <div class="flex items-center gap-1 shrink-0">
-                      <span class="font-mono font-extrabold text-rose-600 mr-1">
-                        -{{ formatShortK(Math.max(0, (Number(debt.totalAmount) || 0) - (Number(debt.paidAmount) || 0))) }}
-                      </span>
+                      <div class="text-right mr-1">
+                        <span class="font-mono font-extrabold" :class="debt.isCompleted ? 'text-emerald-700' : 'text-rose-600'">{{ formatVND(debt.totalAmount) }}</span>
+                        <div class="text-[10px] text-emerald-700">Đã trả: {{ formatVND(paidAmountFor(debt)) }}</div>
+                        <div v-if="!debt.isCompleted" class="text-[10px] text-slate-500">Còn: {{ formatVND(Math.max(0, Number(debt.totalAmount) - paidAmountFor(debt))) }}</div>
+                      </div>
                       <button type="button" @click="openEditModal(debt)" class="text-slate-400 hover:text-indigo-600 p-1">
                         <span class="material-symbols-rounded text-sm">edit</span>
                       </button>
@@ -519,7 +521,7 @@
           v-for="(item, index) in prioritizedDebts"
           :key="'m_' + item.id"
           class="p-4 rounded-2xl border bg-slate-50/60 space-y-3 transition-all"
-          :class="item.isCompleted ? 'opacity-50 border-slate-200' : 'border-slate-200'"
+          :class="item.isCompleted ? 'border-emerald-200' : 'border-slate-200'"
         >
           <div class="flex items-start justify-between gap-2">
             <div class="flex items-center gap-2.5 min-w-0">
@@ -549,12 +551,14 @@
             </div>
 
             <div class="text-right shrink-0">
-              <div class="font-mono font-black text-sm text-rose-600">
-                {{ formatVND(item.remainingAmount) }}
+              <div class="text-[10px] text-slate-500">Tổng khoản nợ</div>
+              <div class="font-mono font-black text-sm" :class="item.isCompleted ? 'text-emerald-700' : 'text-rose-600'">
+                {{ formatVND(item.totalAmount) }}
               </div>
-              <div class="text-[10px] font-mono text-slate-400">
-                ({{ formatShortK(item.remainingAmount) }})
+              <div class="text-[11px] text-emerald-700">
+                Đã trả: {{ formatVND(item.displayPaidAmount) }}
               </div>
+              <div class="text-[11px] text-slate-500">Còn phải trả: {{ formatVND(item.remainingAmount) }}</div>
             </div>
           </div>
 
@@ -631,7 +635,7 @@
               v-for="(item, index) in prioritizedDebts"
               :key="item.id"
               class="hover:bg-slate-50/80 transition-colors"
-              :class="{ 'opacity-50 bg-slate-50': item.isCompleted }"
+              :class="{ 'bg-slate-50': item.isCompleted }"
             >
               <td class="py-3.5 px-4 whitespace-nowrap">
                 <div class="flex items-center gap-2">
@@ -677,12 +681,14 @@
               </td>
 
               <td class="py-3.5 px-4 text-right whitespace-nowrap">
-                <div class="font-mono font-black text-sm text-rose-600">
-                  {{ formatVND(item.remainingAmount) }}
+                <div class="text-[10px] text-slate-500">Tổng khoản nợ</div>
+                <div class="font-mono font-black text-sm" :class="item.isCompleted ? 'text-emerald-700' : 'text-rose-600'">
+                  {{ formatVND(item.totalAmount) }}
                 </div>
-                <div class="text-[11px] font-mono text-slate-400">
-                  ({{ formatShortK(item.remainingAmount) }})
+                <div class="text-[11px] text-emerald-700">
+                  Đã trả: {{ formatVND(item.displayPaidAmount) }}
                 </div>
+                <div class="text-[11px] text-slate-500">Còn phải trả: {{ formatVND(item.remainingAmount) }}</div>
               </td>
 
               <td class="py-3.5 px-4">
@@ -1033,6 +1039,10 @@ const debtRecords = computed(() => monthRecords.value.filter(r => r.recordType =
 const borrowMoreRecords = computed(() => monthRecords.value.filter(r => r.recordType === 'BORROW_MORE'));
 
 const unpaidDebtsCount = computed(() => debtRecords.value.filter(d => !d.isCompleted).length);
+const paidAmountFor = item => {
+  const total = Math.max(0, Number(item.totalAmount) || 0);
+  return item.isCompleted ? total : Math.min(total, Math.max(0, Number(item.paidAmount) || 0));
+};
 
 const summaryStats = computed(() => {
   const totalIncome = incomeRecords.value.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
@@ -1155,6 +1165,7 @@ const prioritizedDebts = computed(() => {
 
     return {
       ...d,
+      displayPaidAmount: paidAmountFor(d),
       remainingAmount,
       canPayWithIncome,
       runningBalanceAfter: availablePool,

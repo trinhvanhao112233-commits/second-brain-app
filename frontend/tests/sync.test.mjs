@@ -187,6 +187,9 @@ test('Paid button updates canonical debt from a computed display row, persists a
     assert.equal(planner.state.prioritizedDebts.length,0);
     assert.equal((await api.syncDebtsBidirectional())[0].isCompleted,true);
     planner.state.debtListFilter='ALL';
+    assert.equal(planner.state.prioritizedDebts[0].totalAmount,1000);
+    assert.equal(planner.state.prioritizedDebts[0].displayPaidAmount,1000);
+    assert.equal(planner.state.prioritizedDebts[0].remainingAmount,0);
     await planner.state.toggleComplete(planner.state.prioritizedDebts[0]);
     assert.equal(planner.state.records[0].isCompleted,false);
     assert.equal(writes.at(-1).isCompleted,false);

@@ -30,7 +30,7 @@
     </header>
 
     <!-- Quick Stats Grid (MD3 Cards) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- 1. Finance Card Summary -->
       <div
         @click="$emit('switch-tab', 'finance')"
@@ -48,6 +48,26 @@
         <div class="text-xs text-[#8b9198] mt-3 pt-2.5 border-t border-[#262a34] flex items-center justify-between">
           <span>{{ walletsCount }} ví hoạt động</span>
           <span class="material-symbols-rounded text-sm text-[#38e1a6]">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- 2. Debts & Cashflow Timeline Summary -->
+      <div
+        @click="$emit('switch-tab', 'debts')"
+        class="cursor-pointer group p-5 rounded-2xl bg-[#171c24] border border-[#262a34] hover:border-rose-400 md-elevation-1 hover:md-elevation-2 transition-all duration-200 flex flex-col justify-between"
+      >
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-bold text-[#8b9198] uppercase tracking-wider">Tiền Nợ & Mốc Trả</span>
+            <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <span class="material-symbols-rounded text-lg">receipt_long</span>
+            </div>
+          </div>
+          <div class="text-lg font-extrabold text-rose-600">Chia mốc 1-10 • 10-21</div>
+        </div>
+        <div class="text-xs text-[#8b9198] mt-3 pt-2.5 border-t border-[#262a34] flex items-center justify-between">
+          <span>Tính ưu tiên trả & vay bù</span>
+          <span class="material-symbols-rounded text-sm text-rose-600">arrow_forward</span>
         </div>
       </div>
 

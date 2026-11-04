@@ -89,6 +89,23 @@ try
                 `CreatedAt` datetime(6) NOT NULL,
                 PRIMARY KEY (`Id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+            CREATE TABLE IF NOT EXISTS `DebtRecords` (
+                `Id` char(36) COLLATE utf8mb4_general_ci NOT NULL,
+                `UserId` char(36) COLLATE utf8mb4_general_ci NULL,
+                `Title` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
+                `RecordType` varchar(30) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'DEBT',
+                `TotalAmount` decimal(18,2) NOT NULL DEFAULT 0,
+                `PaidAmount` decimal(18,2) NOT NULL DEFAULT 0,
+                `BreakdownNote` varchar(500) CHARACTER SET utf8mb4 NULL,
+                `DueDate` datetime(6) NOT NULL,
+                `PeriodLabel` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '1-10',
+                `PriorityLevel` int NOT NULL DEFAULT 2,
+                `IsCompleted` tinyint(1) NOT NULL DEFAULT 0,
+                `CategoryTag` varchar(100) CHARACTER SET utf8mb4 NULL,
+                `CreatedAt` datetime(6) NOT NULL,
+                PRIMARY KEY (`Id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
     }
     catch (Exception dbEx)

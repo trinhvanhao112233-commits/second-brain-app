@@ -181,7 +181,7 @@
                 </span>
 
                 <!-- Time range -->
-                <span class="text-xs font-mono font-bold text-[#e1e2ec] bg-black/20 px-2 py-0.5 rounded-md">
+                <span class="text-xs font-mono font-bold text-[#e1e2ec] bg-white/80 border border-slate-200 px-2 py-0.5 rounded-md">
                   {{ formatTime(evt.startTime) }} - {{ formatTime(evt.endTime) }}
                 </span>
 
@@ -436,7 +436,7 @@
                       <span class="text-[10px] font-mono text-[#5dfec1] font-bold">
                         {{ formatTime(e.startTime) }} - {{ formatTime(e.endTime) }}
                       </span>
-                      <span class="text-[9px] px-1.5 py-0.2 rounded font-medium bg-black/40 text-[#c1c7ce]">
+                      <span class="text-[9px] px-1.5 py-0.2 rounded font-medium bg-white/80 border border-slate-200 text-[#c1c7ce]">
                         {{ e.category || 'Lịch' }}
                       </span>
                     </div>
@@ -701,17 +701,17 @@ const selectedDayEvents = computed(() => {
 
 // Helpers cho giao diện màu sắc dạng pastel / bảng biểu
 const getCardBg = (category, hex) => {
-  if (hex) return hex + '1a'; // 10% opacity
-  if (category === 'Họp') return '#f43f5e1a';
-  if (category === 'Học tập') return '#f973161a';
-  return '#10b9811a';
+  if (hex) return hex + '18';
+  if (category === 'Họp') return '#f43f5e18';
+  if (category === 'Học tập') return '#f9731618';
+  return '#10b98118';
 };
 
 const getCardBorder = (category, hex) => {
-  if (hex) return hex + '55';
-  if (category === 'Họp') return '#f43f5e55';
-  if (category === 'Học tập') return '#f9731655';
-  return '#10b98155';
+  if (hex) return hex + '66';
+  if (category === 'Họp') return '#f43f5e66';
+  if (category === 'Học tập') return '#f9731666';
+  return '#10b98166';
 };
 
 const getBadgeHex = (category, hex) => {

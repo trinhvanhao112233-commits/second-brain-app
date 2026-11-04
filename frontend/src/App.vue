@@ -139,6 +139,11 @@
         <FinanceDashboard />
       </div>
 
+      <!-- VIEW TAB 2B: TIỀN NỢ & DÒNG TIỀN THEO MỐC (DEBTS) -->
+      <div v-show="activeTab === 'debts'">
+        <DebtPlannerModule />
+      </div>
+
       <!-- VIEW TAB 3: LỊCH BIỂU (CALENDAR) -->
       <div v-show="activeTab === 'calendar'">
         <CalendarModule
@@ -201,6 +206,7 @@
 import { ref, computed, onMounted } from 'vue';
 import DailyHub from './components/DailyHub.vue';
 import FinanceDashboard from './components/FinanceDashboard.vue';
+import DebtPlannerModule from './components/DebtPlannerModule.vue';
 import CalendarModule from './components/CalendarModule.vue';
 import TasksModule from './components/TasksModule.vue';
 import NotesModule from './components/NotesModule.vue';
@@ -281,8 +287,9 @@ const toggleNotificationSubscription = async () => {
 
 const navItems = [
   { id: 'hub', label: 'Hôm nay', iconSymbol: 'dashboard' },
-  { id: 'calendar', label: 'Lịch biểu', iconSymbol: 'calendar_month' },
+  { id: 'debts', label: 'Tiền nợ & Mốc trả', iconSymbol: 'receipt_long' },
   { id: 'finance', label: 'Ví tiền', iconSymbol: 'account_balance_wallet' },
+  { id: 'calendar', label: 'Lịch biểu', iconSymbol: 'calendar_month' },
   { id: 'tasks', label: 'Công việc', iconSymbol: 'check_circle' },
   { id: 'notes', label: 'Ghi chú', iconSymbol: 'edit_note' },
 ];

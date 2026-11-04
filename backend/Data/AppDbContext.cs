@@ -14,6 +14,7 @@ namespace PersonalFinance.API.Data
         public DbSet<DailyTask> Tasks => Set<DailyTask>();
         public DbSet<Note> Notes => Set<Note>();
         public DbSet<PushSubscriptionModel> PushSubscriptions => Set<PushSubscriptionModel>();
+        public DbSet<DebtRecord> DebtRecords => Set<DebtRecord>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,6 +100,21 @@ namespace PersonalFinance.API.Data
                 entity.Property(s => s.Endpoint).IsRequired().HasMaxLength(1000);
                 entity.Property(s => s.P256dh).IsRequired().HasMaxLength(200);
                 entity.Property(s => s.Auth).IsRequired().HasMaxLength(100);
+            });
+
+            // Cấu hình DebtRecord
+            modelBuilder.Entity<DebtRecord>(entity =>
+            {
+                entity.HasKey(d => d.Id);
+                entity.Property(d => d.Id).HasColumnType("varchar(36)");
+                entity.Property(d => d.UserId).HasColumnType("varchar(36)");
+                entity.Property(d => d.Title).IsRequired().HasMaxLength(200);
+                entity.Property(d => d.RecordType).IsRequired().HasMaxLength(30);
+                entity.Property(d => d.TotalAmount).HasPrecision(18, 2);
+                entity.Property(d => d.PaidAmount).HasPrecision(18, 2);
+                entity.Property(d => d.BreakdownNote).HasMaxLength(500);
+                entity.Property(d => d.PeriodLabel).HasMaxLength(50);
+                entity.Property(d => d.CategoryTag).HasMaxLength(100);
             });
         }
     }

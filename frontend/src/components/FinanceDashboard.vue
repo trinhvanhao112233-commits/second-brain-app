@@ -178,20 +178,20 @@
       <!-- Banner Ví Tổng (Master Wallet Spotlight) -->
       <div
         v-if="masterWallet"
-        class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#2a2310] via-[#1f1b13] to-[#171c24] border border-amber-500/50 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4"
+        class="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
       >
         <div class="flex items-center gap-3.5">
-          <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center shrink-0 shadow-inner">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
             <span class="material-symbols-rounded text-2xl">workspace_premium</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-stone-900">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white">
                 Ví Tổng Trung Tâm
               </span>
-              <h4 class="text-base sm:text-lg font-bold text-white">{{ masterWallet.name }}</h4>
+              <h4 class="text-base sm:text-lg font-bold text-slate-900">{{ masterWallet.name }}</h4>
             </div>
-            <p class="text-xs text-[#a0a5ad] mt-0.5">
+            <p class="text-xs text-slate-600 mt-0.5">
               Ví nguồn nhận thu nhập/lương tháng và cấp phát tiền cho các ví con
             </p>
           </div>
@@ -199,15 +199,15 @@
 
         <div class="flex items-center gap-4 self-end md:self-auto">
           <div class="text-right">
-            <span class="text-[10px] uppercase font-bold text-amber-300 block">Số dư Ví Tổng</span>
-            <span class="text-xl sm:text-2xl font-black font-mono text-amber-400">
+            <span class="text-[10px] uppercase font-bold text-amber-800 block">Số dư Ví Tổng</span>
+            <span class="text-xl sm:text-2xl font-black font-mono text-amber-700">
               {{ formatVND(masterWallet.balance) }}
             </span>
           </div>
           <button
             type="button"
             @click="openTransactionModal(masterWallet, 'deposit')"
-            class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-900 font-extrabold text-xs transition-all active:scale-95 flex items-center gap-1.5 shadow-md shrink-0"
+            class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-xs transition-all active:scale-95 flex items-center gap-1.5 shadow-sm shrink-0"
           >
             <span class="material-symbols-rounded text-base">add_card</span>
             <span>Nạp Vào Ví Tổng</span>
@@ -243,12 +243,12 @@
           v-for="wallet in wallets"
           :key="wallet.id"
           class="bg-[#171c24] border rounded-2xl p-5 md-elevation-1 transition-all flex flex-col justify-between relative overflow-hidden"
-          :class="wallet.isMaster ? 'border-amber-500/50 bg-gradient-to-b from-[#221f18] to-[#171c24]' : 'border-[#262a34] hover:border-[#41474d]'"
+          :class="wallet.isMaster ? 'border-amber-400 bg-amber-50/30' : 'border-[#262a34] hover:border-[#41474d]'"
         >
           <!-- Master Wallet Ribbon/Badge -->
           <div
             v-if="wallet.isMaster"
-            class="absolute top-0 right-0 bg-gradient-to-l from-amber-500 to-amber-600 text-[#241300] text-[10px] font-black uppercase tracking-wider px-3 py-0.5 rounded-bl-xl flex items-center gap-1 shadow-md"
+            class="absolute top-0 right-0 bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-0.5 rounded-bl-xl flex items-center gap-1 shadow-sm"
           >
             <span class="material-symbols-rounded text-xs">workspace_premium</span>
             <span>VÍ TỔNG</span>
@@ -304,12 +304,12 @@
 
             <!-- Balance Number -->
             <div class="mt-3">
-              <span class="text-[10px] uppercase tracking-wider font-semibold" :class="wallet.isMaster ? 'text-amber-300' : 'text-[#8b9198]'">
+              <span class="text-[10px] uppercase tracking-wider font-semibold" :class="wallet.isMaster ? 'text-amber-800' : 'text-[#8b9198]'">
                 {{ wallet.isMaster ? 'Số dư Ví Tổng' : 'Số dư khả dụng' }}
               </span>
               <div
                 class="text-2xl font-black font-mono mt-0.5"
-                :class="wallet.isMaster ? 'text-amber-400' : 'text-[#38e1a6]'"
+                :class="wallet.isMaster ? 'text-amber-700' : 'text-[#38e1a6]'"
               >
                 {{ formatVND(wallet.balance) }}
               </div>

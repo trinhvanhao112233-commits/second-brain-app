@@ -20,7 +20,18 @@
       </div>
 
       <!-- Action Buttons (Đã bỏ nút mẫu theo yêu cầu) -->
-      <div class="flex items-center gap-2.5 flex-wrap">
+      <div class="flex items-center gap-2 flex-wrap">
+        <button
+          type="button"
+          @click="fetchDebts(true)"
+          :disabled="isSyncing"
+          class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 text-xs font-bold transition-all active:scale-95"
+          title="Đồng bộ dữ liệu giữa Máy tính và Điện thoại"
+        >
+          <span class="material-symbols-rounded text-base" :class="{ 'animate-spin text-indigo-600': isSyncing }">sync</span>
+          <span>{{ isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ Đám mây' }}</span>
+        </button>
+
         <button
           type="button"
           @click="openModal('INCOME')"
@@ -1181,24 +1192,84 @@ const getModalTitle = (type) => {
   return 'Thêm Khoản Vay Thêm Ở Ngoài';
 };
 
-// API Sync
-const fetchDebts = async () => {
+// Kiểm tra xem ID có phải chuẩn UUID (Guid) hay không
+const isValidUuid = (str) => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
+};
+
+const isSyncing = ref(false);
+
+// Tạo payload sạch (không gửi id dạng local_... để tránh lỗi 400 Bad Request trên C# Guid)
+const toCleanPayload = (item) => {
+  const payload = {
+    title: item.title,
+    recordType: item.recordType || 'DEBT',
+    totalAmount: Number(item.totalAmount) || 0,
+    paidAmount: Number(item.paidAmount) || 0,
+    breakdownNote: item.breakdownNote || '',
+    dueDate: item.dueDate || new Date().toISOString(),
+    periodLabel: item.periodLabel || '1-10',
+    priorityLevel: Number(item.priorityLevel) || 2,
+    isCompleted: Boolean(item.isCompleted),
+    categoryTag: item.categoryTag || 'Khác',
+  };
+  if (isValidUuid(item.id)) {
+    payload.id = item.id;
+  }
+  return payload;
+};
+
+// Đồng bộ 2 chiều giữa LocalStorage (Máy tính) và Cloud Database (Điện thoại)
+const fetchDebts = async (showAlert = false) => {
+  isSyncing.value = true;
   try {
+    const localList = loadLocal();
     const res = await apiFetch(API_URL);
+
     if (res.ok) {
       const serverData = await res.json();
-      if (Array.isArray(serverData) && serverData.length > 0) {
-        records.value = serverData;
-        saveLocal(serverData);
-      } else if (records.value.length > 0) {
-        // Đồng bộ các khoản đã lưu offline lên database
-        for (const r of records.value) {
-          apiFetch(API_URL, { method: 'POST', body: JSON.stringify(r) }).catch(() => {});
+      const serverList = Array.isArray(serverData) ? serverData : [];
+
+      // Tìm các khoản đã nhập trên máy này (LocalStorage) nhưng chưa có trên Cloud Database
+      const unsyncedLocalItems = localList.filter(localItem => {
+        const existsById = serverList.some(s => String(s.id).toLowerCase() === String(localItem.id).toLowerCase());
+        const existsByContent = serverList.some(
+          s =>
+            s.title === localItem.title &&
+            Number(s.totalAmount) === Number(localItem.totalAmount) &&
+            s.recordType === localItem.recordType &&
+            s.periodLabel === localItem.periodLabel
+        );
+        return !existsById && !existsByContent;
+      });
+
+      // Tự động đẩy các khoản chưa đồng bộ lên Cloud Database
+      const newlyUploaded = [];
+      for (const item of unsyncedLocalItems) {
+        try {
+          const postRes = await apiFetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(toCleanPayload(item)),
+          });
+          if (postRes.ok) {
+            const savedOnServer = await postRes.json();
+            newlyUploaded.push(savedOnServer);
+          } else {
+            newlyUploaded.push(item);
+          }
+        } catch (e) {
+          newlyUploaded.push(item);
         }
       }
+
+      const merged = [...newlyUploaded, ...serverList];
+      records.value = merged;
+      saveLocal(merged);
     }
   } catch (err) {
     console.warn('Lỗi kết nối máy chủ, đang dùng dữ liệu lưu cục bộ:', err);
+  } finally {
+    isSyncing.value = false;
   }
 };
 
@@ -1278,8 +1349,12 @@ const handleSave = async () => {
     const rawExpression = String(amountRawInput.value || '').trim();
     const hasMath = rawExpression.includes('+');
 
+    const tempId = isEditing.value && form.value.id
+      ? form.value.id
+      : (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'debt_' + Date.now());
+
     const itemToSave = {
-      id: isEditing.value && form.value.id ? form.value.id : (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'debt_' + Date.now()),
+      id: tempId,
       title: title,
       recordType: form.value.recordType,
       totalAmount: amount,
@@ -1293,7 +1368,7 @@ const handleSave = async () => {
       createdAt: new Date().toISOString(),
     };
 
-    // 1. CẬP NHẬT TỨC THÌ VÀO GIAO DIỆN & LOCALSTORAGE (KHÔNG PHỤ THUỘC MẠNG/API)
+    // 1. CẬP NHẬT TỨC THÌ VÀO GIAO DIỆN & LOCALSTORAGE
     if (isEditing.value) {
       const idx = records.value.findIndex(x => x.id === itemToSave.id);
       if (idx !== -1) {
@@ -1304,22 +1379,27 @@ const handleSave = async () => {
     } else {
       records.value.unshift(itemToSave);
     }
-    
-    // Ghi đè vào LocalStorage
+
     saveLocal(records.value);
     showModal.value = false;
 
-    // 2. GỬI LÊN SERVER API
-    apiFetch(isEditing.value ? `${API_URL}/${itemToSave.id}` : API_URL, {
-      method: isEditing.value ? 'PUT' : 'POST',
-      body: JSON.stringify(itemToSave),
-    }).catch(err => {
-      console.warn('API background sync warning:', err);
+    // 2. GỬI LÊN SERVER API (Không gửi id sai định dạng Guid)
+    const canPut = isEditing.value && isValidUuid(itemToSave.id);
+    const res = await apiFetch(canPut ? `${API_URL}/${itemToSave.id}` : API_URL, {
+      method: canPut ? 'PUT' : 'POST',
+      body: JSON.stringify(toCleanPayload(itemToSave)),
     });
 
+    if (res.ok) {
+      const savedOnServer = await res.json();
+      const idx = records.value.findIndex(x => x.id === tempId);
+      if (idx !== -1 && savedOnServer && savedOnServer.id) {
+        records.value[idx] = savedOnServer;
+        saveLocal(records.value);
+      }
+    }
   } catch (err) {
-    console.error('Lỗi lưu khoản nợ:', err);
-    alert('Có lỗi xảy ra: ' + (err.message || 'Vui lòng thử lại'));
+    console.warn('API background sync warning:', err);
   } finally {
     isSubmitting.value = false;
   }

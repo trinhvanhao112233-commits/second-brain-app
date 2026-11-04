@@ -1,8 +1,6 @@
 // API Client helper that automatically attaches X-User-Id header if logged in
-const API_BASE = import.meta.env.VITE_API_URL || 
-  (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
-    ? 'https://second-brain-app-21j2.onrender.com/api'
-    : 'http://localhost:5000/api');
+// Luôn kết nối tới Cloud API (Render + TiDB Cloud) để dữ liệu trên Máy tính và Điện thoại đồng bộ 100%
+const API_BASE = import.meta.env.VITE_API_URL || 'https://second-brain-app-21j2.onrender.com/api';
 
 export const getStoredUser = () => {
   try {
@@ -26,17 +24,19 @@ export const apiFetch = async (endpoint, options = {}) => {
   const user = getStoredUser();
   const headers = {
     'Content-Type': 'application/json',
-    ...(options.headers || {})
+    ...(options.headers || {}),
   };
 
   if (user && user.id) {
     headers['X-User-Id'] = user.id;
   }
 
-  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  const url = endpoint.startsWith('http')
+    ? endpoint
+    : `${API_BASE}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
 
   return fetch(url, {
     ...options,
-    headers
+    headers,
   });
 };

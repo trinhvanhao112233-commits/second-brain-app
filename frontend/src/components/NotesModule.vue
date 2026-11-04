@@ -372,7 +372,19 @@ const handleSubmit = async () => {
 
   const url = isEditing.value ? `${API_BASE_URL}/${itemToSave.id}` : API_BASE_URL;
   const method = isEditing.value ? 'PUT' : 'POST';
-  apiFetch(url, { method, body: JSON.stringify(itemToSave) }).catch(() => {});
+  apiFetch(url, { method, body: JSON.stringify(itemToSave) })
+    .then(async res => {
+      if (res.ok) {
+        const saved = await res.json();
+        const idx = localNotes.value.findIndex(n => n.id === itemToSave.id);
+        if (idx !== -1 && saved && saved.id) {
+          localNotes.value[idx] = saved;
+          saveNotesToStorage(localNotes.value);
+          emit('refresh-notes');
+        }
+      }
+    })
+    .catch(() => {});
 };
 
 const deleteNote = async (id) => {

@@ -906,7 +906,19 @@ const handleSaveEvent = async () => {
 
   const url = isEditing.value ? `${API_BASE_URL}/${itemToSave.id}` : API_BASE_URL;
   const method = isEditing.value ? 'PUT' : 'POST';
-  apiFetch(url, { method, body: JSON.stringify(itemToSave) }).catch(() => {});
+  apiFetch(url, { method, body: JSON.stringify(itemToSave) })
+    .then(async res => {
+      if (res.ok) {
+        const saved = await res.json();
+        const idx = localEvents.value.findIndex(e => e.id === itemToSave.id);
+        if (idx !== -1 && saved && saved.id) {
+          localEvents.value[idx] = saved;
+          saveLocalEvents(localEvents.value);
+          emit('refresh-events');
+        }
+      }
+    })
+    .catch(() => {});
 };
 
 const toggleComplete = async (evt) => {

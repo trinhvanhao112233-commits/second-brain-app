@@ -426,16 +426,66 @@ const fetchWallets = async () => {
   } catch (err) {}
 };
 
+const isValidUuid = (str) => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(str || ''));
+};
+
 const fetchDebts = async () => {
   syncDebtsFromStorage();
   try {
+    const localList = loadJson('second_brain_debts_v1', []);
     const res = await apiFetch('/debts');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        debts.value = data;
-        saveJson('second_brain_debts_v1', data);
+      const serverList = Array.isArray(data) ? data : [];
+
+      const unsyncedLocal = localList.filter(localItem => {
+        const existsById = serverList.some(s => String(s.id).toLowerCase() === String(localItem.id).toLowerCase());
+        const existsByContent = serverList.some(
+          s =>
+            s.title === localItem.title &&
+            Number(s.totalAmount) === Number(localItem.totalAmount) &&
+            s.recordType === localItem.recordType &&
+            s.periodLabel === localItem.periodLabel
+        );
+        return !existsById && !existsByContent;
+      });
+
+      const newlyUploaded = [];
+      for (const item of unsyncedLocal) {
+        try {
+          const payload = {
+            title: item.title,
+            recordType: item.recordType || 'DEBT',
+            totalAmount: Number(item.totalAmount) || 0,
+            paidAmount: Number(item.paidAmount) || 0,
+            breakdownNote: item.breakdownNote || '',
+            dueDate: item.dueDate || new Date().toISOString(),
+            periodLabel: item.periodLabel || '1-10',
+            priorityLevel: Number(item.priorityLevel) || 2,
+            isCompleted: Boolean(item.isCompleted),
+            categoryTag: item.categoryTag || 'Khác',
+          };
+          if (isValidUuid(item.id)) payload.id = item.id;
+
+          const postRes = await apiFetch('/debts', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+          });
+          if (postRes.ok) {
+            newlyUploaded.push(await postRes.json());
+          } else {
+            newlyUploaded.push(item);
+          }
+        } catch (e) {
+          newlyUploaded.push(item);
+        }
       }
+
+      const merged = [...newlyUploaded, ...serverList];
+      debts.value = merged;
+      saveJson('second_brain_debts_v1', merged);
+      window.dispatchEvent(new CustomEvent('secondbrain-debts-synced'));
     }
   } catch (err) {}
 };

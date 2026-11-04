@@ -675,7 +675,19 @@ const handleSaveTask = async () => {
 
   const url = isEditing.value ? `${API_BASE_URL}/${payload.id}` : API_BASE_URL;
   const method = isEditing.value ? 'PUT' : 'POST';
-  apiFetch(url, { method, body: JSON.stringify(payload) }).catch(() => {});
+  apiFetch(url, { method, body: JSON.stringify(payload) })
+    .then(async res => {
+      if (res.ok) {
+        const saved = await res.json();
+        const idx = localTasks.value.findIndex(x => x.id === payload.id);
+        if (idx !== -1 && saved && saved.id) {
+          localTasks.value[idx] = saved;
+          saveTasksToStorage(localTasks.value);
+          emit('refresh-tasks');
+        }
+      }
+    })
+    .catch(() => {});
 };
 
 const toggleTaskLocal = async (task) => {

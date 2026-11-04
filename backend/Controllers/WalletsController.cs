@@ -389,6 +389,22 @@ namespace PersonalFinance.API.Controllers
         }
 
         /// <summary>
+        /// DELETE /api/wallets/transactions/{txId}
+        /// Xóa một giao dịch cụ thể
+        /// </summary>
+        [HttpDelete("transactions/{txId:guid}")]
+        public async Task<IActionResult> DeleteTransaction(Guid txId)
+        {
+            var tx = await _context.Transactions.FindAsync(txId);
+            if (tx == null)
+                return NotFound(new { message = "Không tìm thấy giao dịch." });
+
+            _context.Transactions.Remove(tx);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        /// <summary>
         /// DELETE /api/wallets/reset-all
         /// Xóa sạch dữ liệu tài chính (Toàn bộ giao dịch và các ví tiền)
         /// </summary>

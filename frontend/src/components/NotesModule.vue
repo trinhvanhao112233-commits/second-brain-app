@@ -231,6 +231,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { apiFetch } from '../services/api';
+import { VAULT_NOTE_TITLE } from '../services/cloudSync';
 
 const props = defineProps({
   notes: { type: Array, default: () => [] },
@@ -243,7 +244,8 @@ const NOTES_STORAGE_KEY = 'second_brain_notes_v1';
 const loadSavedNotes = () => {
   try {
     const raw = localStorage.getItem(NOTES_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const list = raw ? JSON.parse(raw) : [];
+    return list.filter(n => n.title !== VAULT_NOTE_TITLE);
   } catch (e) {
     return [];
   }
@@ -251,17 +253,17 @@ const loadSavedNotes = () => {
 
 const saveNotesToStorage = (list) => {
   try {
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(list));
+    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(list.filter(n => n.title !== VAULT_NOTE_TITLE)));
   } catch (e) {}
 };
 
-const localNotes = ref(props.notes.length > 0 ? [...props.notes] : loadSavedNotes());
+const localNotes = ref(props.notes.length > 0 ? props.notes.filter(n => n.title !== VAULT_NOTE_TITLE) : loadSavedNotes());
 
 watch(
   () => props.notes,
   (newVal) => {
-    if (Array.isArray(newVal) && newVal.length > 0) {
-      localNotes.value = [...newVal];
+    if (Array.isArray(newVal)) {
+      localNotes.value = newVal.filter(n => n.title !== VAULT_NOTE_TITLE);
       saveNotesToStorage(localNotes.value);
     }
   },

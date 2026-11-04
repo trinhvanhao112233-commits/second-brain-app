@@ -1,30 +1,43 @@
 <template>
   <div class="space-y-5">
-    <!-- ==================== 1. WELCOME & LIVE CLOCK BANNER ==================== -->
-    <header class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="space-y-1">
+    <!-- ==================== 1. HERO WELCOME & FINANCIAL OVERVIEW ==================== -->
+    <header class="card-luxury p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative overflow-hidden">
+      <div class="space-y-1.5 relative z-10">
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/80">
             {{ greeting }}
           </span>
-          <span class="text-xs text-slate-500 capitalize font-medium">{{ currentDateStr }}</span>
+          <span class="text-xs text-slate-500 capitalize font-semibold">{{ currentDateStr }}</span>
         </div>
         <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-          {{ user ? `Xin chào, ${user.fullName || user.username}` : 'Tổng Quan Hôm Nay' }}
+          {{ user ? `Xin chào, ${user.fullName || user.username}` : 'Trung Tâm Điều Hành Hôm Nay' }}
         </h1>
-        <p class="text-xs text-slate-500">Theo dõi nhanh tài chính, khoản nợ đến hạn, lịch trình và công việc trong ngày</p>
+        <p class="text-xs text-slate-500">
+          Theo dõi dòng tiền, các mốc trả nợ 1-10 • 10-21 • 21-31, lịch tuần và công việc đồng bộ tức thì giữa máy tính & điện thoại
+        </p>
       </div>
 
-      <!-- Digital Clock -->
-      <div class="bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-2xl flex items-center gap-3 self-start sm:self-auto">
-        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
-          <span class="material-symbols-rounded text-xl">schedule</span>
-        </div>
-        <div>
-          <span class="font-mono text-xl sm:text-2xl font-black text-slate-900 tracking-wider block leading-none">
-            {{ currentTimeStr }}
-          </span>
-          <span class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mt-0.5 block">Giờ hiện tại</span>
+      <!-- Right: Live Clock + Quick Sync -->
+      <div class="flex items-center gap-2.5 self-start lg:self-auto relative z-10">
+        <button
+          @click="$emit('refresh-all')"
+          class="px-3.5 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200/80 text-xs font-extrabold flex items-center gap-1.5 transition-all"
+          title="Đồng bộ dữ liệu ngay lập tức"
+        >
+          <span class="material-symbols-rounded text-base">cloud_sync</span>
+          <span>Đồng bộ</span>
+        </button>
+
+        <div class="bg-slate-900 text-white px-4 py-2.5 rounded-2xl flex items-center gap-3 shadow-sm">
+          <div class="w-8 h-8 rounded-xl bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 flex items-center justify-center shrink-0">
+            <span class="material-symbols-rounded text-lg">schedule</span>
+          </div>
+          <div>
+            <span class="font-mono text-lg sm:text-xl font-black tracking-wider block leading-none">
+              {{ currentTimeStr }}
+            </span>
+            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold mt-0.5 block">Giờ hiện tại</span>
+          </div>
         </div>
       </div>
     </header>
@@ -34,11 +47,11 @@
       <!-- 1. Ví tiền & Định mức ngày -->
       <div
         @click="$emit('switch-tab', 'finance')"
-        class="cursor-pointer group p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-emerald-400 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+        class="card-luxury cursor-pointer group p-4 sm:p-5 hover:border-emerald-400 transition-all flex flex-col justify-between"
       >
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Số Dư Ví</span>
+            <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Số Dư Ví</span>
             <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <span class="material-symbols-rounded text-lg">account_balance_wallet</span>
             </div>
@@ -48,7 +61,7 @@
           </div>
         </div>
         <div class="text-[11px] text-slate-500 mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-          <span class="truncate">Mức tiêu: <strong class="text-slate-700">{{ formatShortK(dailySafeSpend) }}/ngày</strong></span>
+          <span class="truncate">An toàn: <strong class="text-slate-700">{{ formatShortK(dailySafeSpend) }}/ngày</strong></span>
           <span class="material-symbols-rounded text-sm text-emerald-600 shrink-0">arrow_forward</span>
         </div>
       </div>
@@ -56,11 +69,11 @@
       <!-- 2. Tiền nợ & Mốc trả -->
       <div
         @click="$emit('switch-tab', 'debts')"
-        class="cursor-pointer group p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-rose-400 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+        class="card-luxury cursor-pointer group p-4 sm:p-5 hover:border-rose-400 transition-all flex flex-col justify-between"
       >
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nợ Cần Trả</span>
+            <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Nợ Phải Trả</span>
             <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
               <span class="material-symbols-rounded text-lg">receipt_long</span>
             </div>
@@ -70,7 +83,7 @@
           </div>
         </div>
         <div class="text-[11px] text-slate-500 mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-          <span class="truncate">{{ unpaidDebts.length }} khoản chưa trả</span>
+          <span class="truncate">{{ unpaidDebts.length }} khoản chưa tất toán</span>
           <span class="material-symbols-rounded text-sm text-rose-600 shrink-0">arrow_forward</span>
         </div>
       </div>
@@ -78,11 +91,11 @@
       <!-- 3. Việc cần làm -->
       <div
         @click="$emit('switch-tab', 'tasks')"
-        class="cursor-pointer group p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-amber-400 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+        class="card-luxury cursor-pointer group p-4 sm:p-5 hover:border-amber-400 transition-all flex flex-col justify-between"
       >
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Việc Cần Làm</span>
+            <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Việc Cần Làm</span>
             <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <span class="material-symbols-rounded text-lg">checklist</span>
             </div>
@@ -101,11 +114,11 @@
       <!-- 4. Lịch hôm nay -->
       <div
         @click="$emit('switch-tab', 'calendar')"
-        class="cursor-pointer group p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 hover:border-indigo-400 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+        class="card-luxury cursor-pointer group p-4 sm:p-5 hover:border-indigo-400 transition-all flex flex-col justify-between"
       >
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Lịch Hôm Nay</span>
+            <span class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Lịch Hôm Nay</span>
             <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
               <span class="material-symbols-rounded text-lg">calendar_month</span>
             </div>
@@ -122,10 +135,10 @@
       </div>
     </div>
 
-    <!-- ==================== 3. ƯU TIÊN TRẢ NỢ TIẾP THEO (NẾU CÓ KHOẢN NỢ CHƯA TRẢ) ==================== -->
+    <!-- ==================== 3. ƯU TIÊN TRẢ NỢ TIẾP THEO ==================== -->
     <section
       v-if="topPriorityDebts.length > 0"
-      class="bg-white border border-rose-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3"
+      class="card-luxury border-rose-200 p-4 sm:p-5 space-y-3"
     >
       <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
         <div class="flex items-center gap-2">
@@ -172,7 +185,7 @@
     <!-- ==================== 4. CỘT ĐÔI: LỊCH HÔM NAY & NHIỆM VỤ ƯU TIÊN ==================== -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <!-- Cột Trái: Lịch trình hôm nay -->
-      <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+      <section class="card-luxury p-4 sm:p-5 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
             <div class="flex items-center gap-2">
@@ -216,7 +229,7 @@
       </section>
 
       <!-- Cột Phải: Công việc cần làm -->
-      <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
+      <section class="card-luxury p-4 sm:p-5 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
             <div class="flex items-center gap-2">
@@ -273,7 +286,7 @@ const props = defineProps({
   notes: { type: Array, default: () => [] },
 });
 
-defineEmits(['switch-tab', 'toggle-task']);
+defineEmits(['switch-tab', 'toggle-task', 'refresh-all']);
 
 const now = ref(new Date());
 let timer = null;

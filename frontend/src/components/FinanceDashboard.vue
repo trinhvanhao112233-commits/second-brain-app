@@ -449,6 +449,8 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { apiFetch } from '../services/api';
 
+const emit = defineEmits(['wallets-updated']);
+
 const API_BASE_URL = '/wallets';
 const WALLETS_STORAGE_KEY = 'second_brain_wallets_v1';
 const TX_STORAGE_KEY = 'second_brain_tx_v1';
@@ -466,6 +468,8 @@ const loadLocalWallets = () => {
 const saveLocalWallets = (list) => {
   try {
     localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(list));
+    emit('wallets-updated');
+    window.dispatchEvent(new CustomEvent('secondbrain-data-updated', { detail: { action: 'wallet' } }));
   } catch (e) {}
 };
 
@@ -481,6 +485,7 @@ const loadLocalTx = () => {
 const saveLocalTx = (list) => {
   try {
     localStorage.setItem(TX_STORAGE_KEY, JSON.stringify(list));
+    emit('wallets-updated');
   } catch (e) {}
 };
 

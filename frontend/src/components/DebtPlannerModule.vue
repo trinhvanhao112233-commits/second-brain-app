@@ -475,8 +475,104 @@
         <p class="text-xs text-slate-500 mt-1">Bấm nút "+ Nhập Khoản Nợ" ở góc trên để thêm khoản nợ cần theo dõi.</p>
       </div>
 
-      <!-- Table -->
-      <div v-else class="overflow-x-auto">
+      <!-- Mobile Card View (Tối ưu cho Điện Thoại - Không cần cuộn ngang) -->
+      <div v-else class="space-y-3 md:hidden">
+        <div
+          v-for="(item, index) in prioritizedDebts"
+          :key="'m_' + item.id"
+          class="p-4 rounded-2xl border bg-slate-50/60 space-y-3 transition-all"
+          :class="item.isCompleted ? 'opacity-50 border-slate-200' : 'border-slate-200'"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span
+                class="w-7 h-7 rounded-lg font-mono font-black text-xs flex items-center justify-center shrink-0"
+                :class="index === 0 && !item.isCompleted
+                  ? 'bg-rose-600 text-white shadow-sm'
+                  : index === 1 && !item.isCompleted
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white text-slate-700 border border-slate-200'"
+              >
+                #{{ index + 1 }}
+              </span>
+              <div class="min-w-0">
+                <div class="font-bold text-slate-900 text-sm truncate" :class="{ 'line-through': item.isCompleted }">
+                  {{ item.title }}
+                </div>
+                <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-md font-mono font-bold text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    Mốc {{ item.periodLabel }}
+                  </span>
+                  <span class="text-[11px] font-medium" :class="getDueCountdownColor(item.dueDate, item.isCompleted)">
+                    {{ getDueCountdownText(item.dueDate, item.isCompleted) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-right shrink-0">
+              <div class="font-mono font-black text-sm text-rose-600">
+                {{ formatVND(item.remainingAmount) }}
+              </div>
+              <div class="text-[10px] font-mono text-slate-400">
+                ({{ formatShortK(item.remainingAmount) }})
+              </div>
+            </div>
+          </div>
+
+          <div v-if="item.breakdownNote" class="text-xs text-slate-600 font-mono bg-white px-3 py-1.5 rounded-xl border border-slate-200/80">
+            Chi tiết: {{ item.breakdownNote }}
+          </div>
+
+          <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80">
+            <span
+              v-if="item.isCompleted"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"
+            >
+              ✓ Đã thanh toán
+            </span>
+            <span
+              v-else-if="item.canPayWithIncome"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"
+            >
+              ✓ Đủ tiền trả (Dư {{ formatShortK(item.runningBalanceAfter) }})
+            </span>
+            <span
+              v-else
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200"
+            >
+              ⚠️ Thiếu {{ formatShortK(item.shortfallAmount) }}
+            </span>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button
+                @click="toggleComplete(item)"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-all"
+                :class="item.isCompleted 
+                  ? 'bg-white text-slate-600 border-slate-200' 
+                  : 'bg-emerald-600 text-white border-emerald-600'"
+              >
+                {{ item.isCompleted ? 'Hoàn tác' : 'Đã trả' }}
+              </button>
+              <button
+                @click="openEditModal(item)"
+                class="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-indigo-600"
+              >
+                <span class="material-symbols-rounded text-base">edit</span>
+              </button>
+              <button
+                @click="deleteItem(item.id)"
+                class="p-1.5 rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-rose-600"
+              >
+                <span class="material-symbols-rounded text-base">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop Table View -->
+      <div v-if="prioritizedDebts.length > 0" class="hidden md:block overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -609,9 +705,9 @@
       </div>
     </section>
 
-    <!-- ==================== MODAL THÊM / SỬA (ĐÃ BỎ TOÀN BỘ CÁC VÍ DỤ CỨNG) ==================== -->
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/50 backdrop-blur-sm">
-      <div class="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-xl transition-all">
+    <!-- ==================== MODAL THÊM / SỬA (TỐI ƯU MOBILE BOTTOM SHEET) ==================== -->
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:px-4 bg-slate-900/50 backdrop-blur-sm">
+      <div class="w-full max-w-lg max-h-[92vh] overflow-y-auto bg-white border border-slate-200 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-xl transition-all">
         <div class="flex items-center justify-between pb-4 border-b border-slate-100">
           <div class="flex items-center gap-3">
             <div
@@ -789,6 +885,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { apiFetch } from '../services/api';
 
+const emit = defineEmits(['debts-updated']);
+
 const API_URL = '/debts';
 const STORAGE_KEY = 'second_brain_debts_v1';
 
@@ -805,6 +903,8 @@ const loadLocal = () => {
 const saveLocal = (data) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    emit('debts-updated');
+    window.dispatchEvent(new CustomEvent('secondbrain-data-updated', { detail: { action: 'debt' } }));
   } catch (e) {}
 };
 

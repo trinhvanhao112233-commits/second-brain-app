@@ -19,19 +19,8 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- Action Buttons (Đã bỏ nút mẫu theo yêu cầu) -->
       <div class="flex items-center gap-2.5 flex-wrap">
-        <button
-          type="button"
-          @click="seedSampleFromImage"
-          :disabled="isSubmitting"
-          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold transition-all active:scale-95"
-          title="Nạp nhanh các khoản mẫu như trong ảnh: Shopee easy, Shopee spay, Nợ Giang, MoMo, Đi làm, Tiền học..."
-        >
-          <span class="material-symbols-rounded text-base">auto_fix_high</span>
-          <span>Nạp Mẫu Từ Ảnh</span>
-        </button>
-
         <button
           type="button"
           @click="openModal('INCOME')"
@@ -54,7 +43,6 @@
           type="button"
           @click="openModal('BORROW_MORE')"
           class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition-all active:scale-95 shadow-sm"
-          title="Ghi nhận khoản đi vay thêm ở ngoài để bù vào đợt thiếu tiền"
         >
           <span class="material-symbols-rounded text-base">handshake</span>
           <span>+ Vay Thêm (Ở Ngoài)</span>
@@ -62,9 +50,9 @@
       </div>
     </header>
 
-    <!-- ==================== 2. KPI SUMMARY CARDS (4 Ô TỔNG HỢP RÕ RÀNG) ==================== -->
+    <!-- ==================== 2. KPI SUMMARY CARDS ==================== -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Card 1: Tổng Tiền Vào Dự Kiến -->
+      <!-- Card 1: Tổng Tiền Vào -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tổng Tiền Vào (Thu)</span>
@@ -81,7 +69,7 @@
           </div>
         </div>
         <div class="text-xs text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
-          <span>Đi làm, tiền học, tiền ăn...</span>
+          <span>Nguồn thu dự kiến</span>
           <span class="font-semibold text-emerald-700">{{ incomeRecords.length }} khoản</span>
         </div>
       </div>
@@ -174,7 +162,7 @@
           <div class="text-[11px] font-medium" :class="summaryStats.netBalanceAfterBorrow >= 0 ? 'text-emerald-600' : 'text-rose-600'">
             {{ summaryStats.netBalanceAfterBorrow >= 0 
               ? `Sau khi trả hết nợ, bạn dư ${formatShortK(summaryStats.netBalanceAfterBorrow)}` 
-              : `Thiếu ${formatShortK(Math.abs(summaryStats.netBalanceAfterBorrow))} -> Bấm 'Vay thêm' bên dưới` }}
+              : `Thiếu ${formatShortK(Math.abs(summaryStats.netBalanceAfterBorrow))} -> Cần vay ngoài bù đắp` }}
           </div>
         </div>
 
@@ -185,17 +173,17 @@
             class="w-full py-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center justify-center gap-1 shadow-sm transition-all"
           >
             <span class="material-symbols-rounded text-sm">add_card</span>
-            <span>Tạo khoản Vay Thêm {{ formatShortK(Math.abs(summaryStats.netBalanceAfterBorrow)) }} ngay</span>
+            <span>Tạo khoản Vay Thêm {{ formatShortK(Math.abs(summaryStats.netBalanceAfterBorrow)) }}</span>
           </button>
           <div v-else class="text-xs text-emerald-700 font-semibold flex items-center gap-1">
             <span class="material-symbols-rounded text-sm">check_circle</span>
-            <span>Dòng tiền an toàn!</span>
+            <span>Dòng tiền an toàn</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ==================== 3. BẢNG CHIA MỐC THỜI GIAN (GIỐNG HỆT TRONG ẢNH: 1-10, 10-21, 21-31) ==================== -->
+    <!-- ==================== 3. BẢNG CHIA MỐC THỜI GIAN (1-10, 10-21, 21-31) ==================== -->
     <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
         <div>
@@ -206,7 +194,7 @@
             </h3>
           </div>
           <p class="text-xs text-slate-500 mt-0.5">
-            Vì tiền vào và nợ phải trả nằm ở các ngày khác nhau trong tháng, hệ thống tách theo từng mốc để biết mốc nào dư hay thiếu
+            Tách theo từng mốc để biết chính xác đợt nào dư hay thiếu tiền
           </p>
         </div>
 
@@ -252,7 +240,7 @@
               </span>
             </div>
 
-            <!-- Khối công thức tóm tắt nhanh kiểu Notepad (Giống ảnh user gửi) -->
+            <!-- Khối công thức tóm tắt dòng tiền -->
             <div class="mx-4 mt-4 p-3.5 rounded-xl bg-white border border-slate-200 font-mono text-xs space-y-1.5 shadow-sm">
               <div v-if="carryOverBalance && stage.carriedFromPrev !== 0" class="flex items-center justify-between text-slate-500 pb-1 border-b border-dashed border-slate-200">
                 <span>Dư đợt trước chuyển sang:</span>
@@ -279,7 +267,7 @@
                 </div>
               </div>
 
-              <!-- Dòng VAY THÊM NGOÀI (Nếu có) -->
+              <!-- Dòng VAY THÊM NGOÀI -->
               <div v-if="stage.borrowMoreTotal > 0" class="flex items-start justify-between gap-2 text-violet-700">
                 <span class="font-bold shrink-0">Vay thêm:</span>
                 <div class="text-right font-bold">
@@ -325,10 +313,10 @@
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                       <span class="font-mono font-bold text-emerald-600">+{{ formatShortK(inc.totalAmount) }}</span>
-                      <button @click="openEditModal(inc)" class="text-slate-400 hover:text-indigo-600">
+                      <button @click="openEditModal(inc)" class="text-slate-400 hover:text-indigo-600 p-1">
                         <span class="material-symbols-rounded text-sm">edit</span>
                       </button>
-                      <button @click="deleteItem(inc.id)" class="text-slate-400 hover:text-rose-600">
+                      <button @click="deleteItem(inc.id)" class="text-slate-400 hover:text-rose-600 p-1">
                         <span class="material-symbols-rounded text-sm">close</span>
                       </button>
                     </div>
@@ -336,7 +324,7 @@
                 </div>
               </div>
 
-              <!-- Các khoản NỢ PHẢI TRẢ (Đã sắp xếp theo độ ưu tiên) -->
+              <!-- Các khoản NỢ PHẢI TRẢ -->
               <div class="pt-2 border-t border-slate-200/80">
                 <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-rose-700 mb-1.5">
                   <span>Khoản nợ đến hạn trả ({{ stage.debts.length }})</span>
@@ -380,10 +368,10 @@
 
                     <div class="flex items-center gap-1.5 shrink-0">
                       <span class="font-mono font-bold text-rose-600">-{{ formatShortK(debt.totalAmount - (debt.paidAmount || 0)) }}</span>
-                      <button @click="openEditModal(debt)" class="text-slate-400 hover:text-indigo-600">
+                      <button @click="openEditModal(debt)" class="text-slate-400 hover:text-indigo-600 p-1">
                         <span class="material-symbols-rounded text-sm">edit</span>
                       </button>
-                      <button @click="deleteItem(debt.id)" class="text-slate-400 hover:text-rose-600">
+                      <button @click="deleteItem(debt.id)" class="text-slate-400 hover:text-rose-600 p-1">
                         <span class="material-symbols-rounded text-sm">close</span>
                       </button>
                     </div>
@@ -391,7 +379,7 @@
                 </div>
               </div>
 
-              <!-- Các khoản VAY THÊM Ở NGOÀI trong mốc này -->
+              <!-- Các khoản VAY THÊM Ở NGOÀI -->
               <div v-if="stage.borrows.length > 0" class="pt-2 border-t border-slate-200/80">
                 <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-violet-700 mb-1.5">
                   <span>Khoản vay thêm ở ngoài ({{ stage.borrows.length }})</span>
@@ -408,10 +396,10 @@
                     </div>
                     <div class="flex items-center gap-1.5 shrink-0">
                       <span class="font-mono font-bold text-violet-700">+{{ formatShortK(b.totalAmount) }}</span>
-                      <button @click="openEditModal(b)" class="text-violet-400 hover:text-violet-800">
+                      <button @click="openEditModal(b)" class="text-violet-400 hover:text-violet-800 p-1">
                         <span class="material-symbols-rounded text-sm">edit</span>
                       </button>
-                      <button @click="deleteItem(b.id)" class="text-violet-400 hover:text-rose-600">
+                      <button @click="deleteItem(b.id)" class="text-violet-400 hover:text-rose-600 p-1">
                         <span class="material-symbols-rounded text-sm">close</span>
                       </button>
                     </div>
@@ -421,7 +409,7 @@
             </div>
           </div>
 
-          <!-- Footer Cảnh Báo Thiếu Tiền hoặc Báo Dư của từng Mốc -->
+          <!-- Footer Cảnh Báo Thiếu Tiền hoặc Báo Dư -->
           <div class="p-4 border-t border-slate-200 bg-white">
             <div v-if="stage.netResult < 0" class="space-y-2">
               <div class="flex items-center justify-between text-xs text-rose-700 font-bold">
@@ -434,7 +422,7 @@
                 class="w-full py-2 px-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
               >
                 <span class="material-symbols-rounded text-sm">handshake</span>
-                <span>+ Thêm mục Vay Thêm {{ formatShortK(Math.abs(stage.netResult)) }} (Vay ngoài)</span>
+                <span>+ Thêm mục Vay Thêm {{ formatShortK(Math.abs(stage.netResult)) }}</span>
               </button>
             </div>
             <div v-else class="flex items-center justify-between text-xs">
@@ -446,7 +434,7 @@
       </div>
     </section>
 
-    <!-- ==================== 4. DANH SÁCH XẾP HẠNG ƯU TIÊN TRẢ NỢ TRƯỚC - SAU ==================== -->
+    <!-- ==================== 4. DANH SÁCH XẾP HẠNG ƯU TIÊN TRẢ NỢ ==================== -->
     <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
         <div>
@@ -457,7 +445,7 @@
             </h3>
           </div>
           <p class="text-xs text-slate-500 mt-0.5">
-            Hệ thống tự động chấm điểm ưu tiên dựa trên: (1) Hạn trả gần nhất / Quá hạn, (2) Mức độ bắt buộc (App tín dụng Shopee/MoMo ưu tiên trước nợ linh hoạt), và (3) Khả năng tất toán bằng tiền hiện có
+            Tự động xếp hạng ưu tiên theo: Hạn gần nhất/quá hạn → Mức độ bắt buộc → Khả năng chi trả bằng nguồn thu
           </p>
         </div>
 
@@ -483,11 +471,11 @@
       <!-- Empty state -->
       <div v-if="prioritizedDebts.length === 0" class="py-12 text-center text-slate-500">
         <span class="material-symbols-rounded text-4xl text-emerald-500 mb-2">verified</span>
-        <p class="text-sm font-bold text-slate-800">Chưa có khoản nợ nào cần trả!</p>
-        <p class="text-xs text-slate-500 mt-1">Bạn có thể bấm "Nạp Mẫu Từ Ảnh" hoặc "+ Nhập Khoản Nợ" ở góc trên để bắt đầu tính toán.</p>
+        <p class="text-sm font-bold text-slate-800">Chưa có khoản nợ nào!</p>
+        <p class="text-xs text-slate-500 mt-1">Bấm nút "+ Nhập Khoản Nợ" ở góc trên để thêm khoản nợ cần theo dõi.</p>
       </div>
 
-      <!-- Table kiểu RealtimeOrders cực kỳ dễ nhìn -->
+      <!-- Table -->
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -621,7 +609,7 @@
       </div>
     </section>
 
-    <!-- ==================== MODAL THÊM / SỬA KHOẢN NỢ / TIỀN VÀO / VAY THÊM ==================== -->
+    <!-- ==================== MODAL THÊM / SỬA (ĐÃ BỎ TOÀN BỘ CÁC VÍ DỤ CỨNG) ==================== -->
     <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center px-4 bg-slate-900/50 backdrop-blur-sm">
       <div class="w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-xl transition-all">
         <div class="flex items-center justify-between pb-4 border-b border-slate-100">
@@ -642,7 +630,7 @@
               <h3 class="text-base font-extrabold text-slate-900">
                 {{ isEditing ? 'Chỉnh Sửa Khoản Mục' : getModalTitle(form.recordType) }}
               </h3>
-              <p class="text-xs text-slate-500">Hỗ trợ nhập phép cộng nhanh (VD: 1850 + 600 + 370 + 555)</p>
+              <p class="text-xs text-slate-500">Nhập số tiền hoặc phép tính cộng trừ linh hoạt</p>
             </div>
           </div>
           <button @click="showModal = false" class="text-slate-400 hover:text-slate-700">
@@ -679,53 +667,36 @@
             </button>
           </div>
 
-          <!-- Tên khoản mục -->
+          <!-- Tên khoản mục (Bỏ các phần (VD: ...)) -->
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">
-              {{ form.recordType === 'DEBT' ? 'Tên khoản nợ (VD: Nợ Shopee easy, Nợ Giang, Nợ MoMo...)' : form.recordType === 'INCOME' ? 'Tên nguồn tiền vào (VD: Đi làm, Tiền học, Tiền ăn...)' : 'Tên khoản vay thêm ở ngoài (VD: Vay bạn bè bù đợt 1-10...)' }}
+              {{ form.recordType === 'DEBT' ? 'Tên khoản nợ' : form.recordType === 'INCOME' ? 'Tên nguồn tiền vào' : 'Tên khoản vay thêm ở ngoài' }}
             </label>
             <input
               v-model="form.title"
               type="text"
               required
-              placeholder="Nhập tên khoản mục..."
+              :placeholder="form.recordType === 'DEBT' ? 'Nhập tên khoản nợ...' : form.recordType === 'INCOME' ? 'Nhập tên nguồn tiền vào...' : 'Nhập tên khoản vay thêm...'"
               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-sm focus:bg-white focus:border-indigo-600 focus:outline-none"
             />
           </div>
 
-          <!-- Ô nhập phép tính nhanh hoặc số tiền (Hỗ trợ đơn vị nghìn k hoặc VNĐ) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">
-                Nhập phép tính (Đơn vị nghìn: 1850 = 1tr850)
-              </label>
-              <input
-                v-model="expressionInput"
-                @input="evaluateExpression"
-                type="text"
-                placeholder="VD: 1850 + 600 + 370 + 555"
-                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-mono text-sm focus:bg-white focus:border-indigo-600 focus:outline-none"
-              />
-              <span class="text-[11px] text-slate-500 mt-1 block">
-                Gõ kiểu <code class="text-indigo-600 font-bold">1850 + 600</code> sẽ tự nhân 1.000đ
-              </span>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">
-                Thành tiền (VNĐ)
-              </label>
-              <input
-                v-model.number="form.totalAmount"
-                type="number"
-                min="0"
-                step="any"
-                required
-                placeholder="3375000"
-                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-mono text-sm font-bold focus:bg-white focus:border-indigo-600 focus:outline-none"
-              />
-              <span class="text-[11px] font-mono text-emerald-700 font-semibold mt-1 block">
-                = {{ formatVND(form.totalAmount || 0) }}
+          <!-- Ô nhập số tiền DUY NHẤT: Thông minh, hỗ trợ cả số tiền lẫn phép tính (1000k, 1850 + 600, 2.000.000, 10tr) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">
+              Số tiền (VNĐ hoặc phép tính cộng)
+            </label>
+            <input
+              v-model="amountRawInput"
+              type="text"
+              required
+              placeholder="Nhập số tiền..."
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 font-mono text-base font-bold focus:bg-white focus:border-indigo-600 focus:outline-none"
+            />
+            <div class="flex items-center justify-between text-xs mt-1.5 font-mono">
+              <span class="text-slate-500">Quy đổi:</span>
+              <span class="font-extrabold text-sm" :class="parsedAmount > 0 ? 'text-emerald-700' : 'text-slate-400'">
+                = {{ formatVND(parsedAmount) }} ({{ formatShortK(parsedAmount) }})
               </span>
             </div>
           </div>
@@ -738,9 +709,9 @@
                 v-model="form.periodLabel"
                 class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs font-bold focus:bg-white focus:border-indigo-600 focus:outline-none"
               >
-                <option value="1-10">Mốc Ngày 1 - 10 (Đầu tháng)</option>
-                <option value="10-21">Mốc Ngày 10 - 21 (Giữa tháng)</option>
-                <option value="21-31">Mốc Ngày 21 - 31 (Cuối tháng / Dư nợ dài hạn)</option>
+                <option value="1-10">Mốc Ngày 1 - 10</option>
+                <option value="10-21">Mốc Ngày 10 - 21</option>
+                <option value="21-31">Mốc Ngày 21 - 31</option>
               </select>
             </div>
 
@@ -763,9 +734,9 @@
             <div class="grid grid-cols-3 gap-2">
               <button
                 v-for="p in [
-                  { level: 1, title: 'Ưu tiên 1 (Gấp)', desc: 'App tín dụng, phạt trễ hạn' },
-                  { level: 2, title: 'Ưu tiên 2 (Vừa)', desc: 'Nợ bạn bè hẹn ngày trả' },
-                  { level: 3, title: 'Ưu tiên 3 (Thấp)', desc: 'Dư nợ dài hạn / Thong thả' }
+                  { level: 1, title: 'Ưu tiên 1', desc: 'Cần trả gấp' },
+                  { level: 2, title: 'Ưu tiên 2', desc: 'Quan trọng' },
+                  { level: 3, title: 'Ưu tiên 3', desc: 'Thong thả / Dài hạn' }
                 ]"
                 :key="p.level"
                 type="button"
@@ -781,13 +752,13 @@
             </div>
           </div>
 
-          <!-- Ghi chú chi tiết -->
+          <!-- Ghi chú chi tiết (Bỏ placeholder ví dụ) -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Ghi chú / Công thức chi tiết</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Ghi chú chi tiết (tùy chọn)</label>
             <input
               v-model="form.breakdownNote"
               type="text"
-              placeholder="VD: 1850 + 600 + 370 + 555 = 3375"
+              placeholder="Ghi chú thêm nếu có..."
               class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-slate-900 text-xs focus:bg-white focus:border-indigo-600 focus:outline-none"
             />
           </div>
@@ -819,15 +790,32 @@ import { ref, computed, onMounted } from 'vue';
 import { apiFetch } from '../services/api';
 
 const API_URL = '/debts';
+const STORAGE_KEY = 'second_brain_debts_v1';
 
-const records = ref([]);
+// Tải bộ nhớ đệm LocalStorage để hiển thị tức thì, không bao giờ bị trắng màn hình
+const loadLocal = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const saveLocal = (data) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {}
+};
+
+const records = ref(loadLocal());
 const isSubmitting = ref(false);
-const carryOverBalance = ref(false); // Mặc định tách riêng từng mốc như trong ảnh (1-10 còn 2039, 10-21 còn 3441), có thể bật cộng dồn
+const carryOverBalance = ref(false);
 const debtListFilter = ref('UNPAID');
 
 const showModal = ref(false);
 const isEditing = ref(false);
-const expressionInput = ref('');
+const amountRawInput = ref('');
 
 const form = ref({
   id: null,
@@ -852,7 +840,7 @@ const formatVND = (val) => {
   }).format(val || 0);
 };
 
-// Định dạng ngắn gọn kiểu trong ảnh (VD: 3375k, 4261k, 2039k)
+// Định dạng ngắn gọn (VD: 3375k, 4261k)
 const formatShortK = (val) => {
   const num = Number(val) || 0;
   const k = Math.round(num / 1000);
@@ -871,28 +859,49 @@ const formatDateFull = (dateStr) => {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 };
 
-// Tự động tính biểu thức kiểu "1850 + 600 + 370 + 555"
-const evaluateExpression = () => {
-  const raw = expressionInput.value.trim();
-  if (!raw) return;
+// Phân tích linh hoạt chuỗi số tiền (hỗ trợ 1000k, 10tr, 1850 + 600, 2.000.000, 500000)
+const parsedAmount = computed(() => {
+  const raw = String(amountRawInput.value || '').trim().toLowerCase();
+  if (!raw) return 0;
 
-  // Cho phép số, dấu +, -, *, /, dấu chấm, phẩy, khoảng trắng
-  const cleaned = raw.replace(/[^0-9+\-*/. ]/g, '');
-  try {
-    const parts = cleaned.split('+').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
-    if (parts.length > 0) {
-      const sum = parts.reduce((a, b) => a + b, 0);
-      // Nếu người dùng nhập số nhỏ hơn 100.000 (ví dụ 1850, 600, 4300), tự hiểu là đơn vị nghìn đồng (nhân 1000)
-      const actualVnd = sum < 100000 ? sum * 1000 : sum;
-      form.value.totalAmount = actualVnd;
-      if (parts.length > 1) {
-        form.value.breakdownNote = `${raw} = ${sum}`;
-      }
+  // Trường hợp nhập phép cộng (VD: 1850 + 600 + 370)
+  if (raw.includes('+')) {
+    const parts = raw.split('+').map(p => {
+      let pClean = p.trim().replace(/[,. ]/g, '');
+      return parseFloat(pClean) || 0;
+    });
+    const sum = parts.reduce((a, b) => a + b, 0);
+    // Nếu tổng các số nhỏ hơn 50.000 (như 1850, 600, 811), tự hiểu là đơn vị nghìn đồng
+    if (sum > 0 && sum < 50000) {
+      return sum * 1000;
     }
-  } catch (e) {
-    // Bỏ qua nếu đang gõ dở
+    return sum;
   }
-};
+
+  // Trường hợp có chữ 'tr' hoặc 'triệu'
+  if (raw.endsWith('tr') || raw.endsWith('triệu') || raw.endsWith('m')) {
+    const val = parseFloat(raw.replace(/(tr|triệu|m)/g, '').replace(/,/g, '.'));
+    return isNaN(val) ? 0 : Math.round(val * 1000000);
+  }
+
+  // Trường hợp có chữ 'k'
+  if (raw.endsWith('k')) {
+    const val = parseFloat(raw.replace('k', '').replace(/,/g, '.'));
+    return isNaN(val) ? 0 : Math.round(val * 1000);
+  }
+
+  // Loại bỏ dấu chấm, phẩy phân cách ngàn thông thường (2.000.000 -> 2000000)
+  const cleanNumber = raw.replace(/[,. ]/g, '');
+  const val = parseFloat(cleanNumber);
+  if (isNaN(val)) return 0;
+
+  // Nếu người dùng nhập số dưới 50.000 (như 1850, 600, 811, 4300), tự quy đổi ra nghìn đồng
+  if (val > 0 && val < 50000 && !raw.includes('.') && !raw.includes(',')) {
+    return val * 1000;
+  }
+
+  return val;
+});
 
 // Phân loại records
 const incomeRecords = computed(() => records.value.filter(r => r.recordType === 'INCOME'));
@@ -901,7 +910,7 @@ const borrowMoreRecords = computed(() => records.value.filter(r => r.recordType 
 
 const unpaidDebtsCount = computed(() => debtRecords.value.filter(d => !d.isCompleted).length);
 
-// Tổng quan toàn bộ
+// Thống kê tổng hợp
 const summaryStats = computed(() => {
   const totalIncome = incomeRecords.value.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
   const totalAllDebt = debtRecords.value.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
@@ -909,7 +918,6 @@ const summaryStats = computed(() => {
     if (r.isCompleted) return s + (Number(r.totalAmount) || 0);
     return s + (Number(r.paidAmount) || 0);
   }, 0);
-  // Chỉ tính các khoản nợ đến hạn trong mốc 1-10 và 10-21 hoặc ưu tiên cao, hoặc tính tất cả nợ chưa trả
   const totalUnpaidDebt = Math.max(0, totalAllDebt - totalPaidDebt);
   const totalBorrowedMore = borrowMoreRecords.value.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
 
@@ -986,14 +994,13 @@ const timelineStages = computed(() => {
   });
 });
 
-// Thuật toán sắp xếp các khoản nợ ưu tiên trả trước & đối chiếu với quỹ tiền hiện có
+// Xếp thứ tự ưu tiên các khoản nợ
 const prioritizedDebts = computed(() => {
   let list = [...debtRecords.value];
   if (debtListFilter.value === 'UNPAID') {
     list = list.filter(d => !d.isCompleted);
   }
 
-  // Sắp xếp: Chưa trả lên trước -> Ưu tiên 1 -> 2 -> 3 -> Ngày đến hạn sớm nhất -> Số tiền nhỏ dễ dứt điểm trước
   list.sort((a, b) => {
     if (a.isCompleted !== b.isCompleted) return a.isCompleted ? 1 : -1;
     if (a.priorityLevel !== b.priorityLevel) return a.priorityLevel - b.priorityLevel;
@@ -1002,7 +1009,6 @@ const prioritizedDebts = computed(() => {
     return (Number(a.totalAmount) || 0) - (Number(b.totalAmount) || 0);
   });
 
-  // Tính dòng tiền khả dụng để xem khoản nào đủ tiền trả, khoản nào bắt đầu thiếu
   let availablePool = summaryStats.value.totalIncome + summaryStats.value.totalBorrowedMore;
 
   return list.map(d => {
@@ -1032,7 +1038,7 @@ const prioritizedDebts = computed(() => {
 });
 
 const getPriorityLabel = (level) => {
-  if (level === 1) return 'Ưu tiên 1 • Trả gấp';
+  if (level === 1) return 'Ưu tiên 1 • Gấp';
   if (level === 2) return 'Ưu tiên 2 • Quan trọng';
   return 'Ưu tiên 3 • Dài hạn';
 };
@@ -1044,7 +1050,7 @@ const getPriorityBadgeClass = (level) => {
 };
 
 const getDueCountdownText = (dueDateStr, isCompleted) => {
-  if (isCompleted) return 'Đã hoàn thành';
+  if (isCompleted) return 'Đã xong';
   if (!dueDateStr) return '';
   const target = new Date(dueDateStr);
   const now = new Date();
@@ -1052,7 +1058,7 @@ const getDueCountdownText = (dueDateStr, isCompleted) => {
   now.setHours(0, 0, 0, 0);
   const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
   if (diffDays < 0) return `Quá hạn ${Math.abs(diffDays)} ngày`;
-  if (diffDays === 0) return 'Đến hạn hôm nay!';
+  if (diffDays === 0) return 'Đến hạn hôm nay';
   return `Còn ${diffDays} ngày`;
 };
 
@@ -1075,26 +1081,35 @@ const getModalTitle = (type) => {
   return 'Thêm Khoản Vay Thêm Ở Ngoài';
 };
 
-// API Calls
+// API Sync
 const fetchDebts = async () => {
   try {
     const res = await apiFetch(API_URL);
     if (res.ok) {
-      records.value = await res.json();
+      const serverData = await res.json();
+      if (Array.isArray(serverData) && serverData.length > 0) {
+        records.value = serverData;
+        saveLocal(serverData);
+      } else if (records.value.length > 0) {
+        // Đồng bộ các khoản đã lưu offline lên database
+        for (const r of records.value) {
+          apiFetch(API_URL, { method: 'POST', body: JSON.stringify(r) }).catch(() => {});
+        }
+      }
     }
   } catch (err) {
-    console.error('Lỗi tải dữ liệu nợ:', err);
+    console.warn('Lỗi kết nối máy chủ, đang dùng dữ liệu lưu cục bộ:', err);
   }
 };
 
 const openModal = (type = 'DEBT', defaultPeriod = '1-10') => {
   isEditing.value = false;
-  expressionInput.value = '';
+  amountRawInput.value = '';
   form.value = {
     id: null,
     title: '',
     recordType: type,
-    totalAmount: null,
+    totalAmount: 0,
     paidAmount: 0,
     breakdownNote: '',
     dueDate: new Date().toISOString().split('T')[0],
@@ -1108,14 +1123,14 @@ const openModal = (type = 'DEBT', defaultPeriod = '1-10') => {
 
 const openQuickBorrowForShortfall = (shortfallAmount, periodId) => {
   isEditing.value = false;
-  expressionInput.value = String(Math.round(shortfallAmount / 1000));
+  amountRawInput.value = String(shortfallAmount);
   form.value = {
     id: null,
-    title: `Vay thêm ở ngoài bù đợt ${periodId}`,
+    title: `Vay thêm bù đợt ${periodId}`,
     recordType: 'BORROW_MORE',
     totalAmount: shortfallAmount,
     paidAmount: 0,
-    breakdownNote: `Vay ngoài bù khoản thiếu đợt ${periodId}`,
+    breakdownNote: `Bù khoản thiếu mốc ${periodId}`,
     dueDate: new Date().toISOString().split('T')[0],
     periodLabel: periodId,
     priorityLevel: 1,
@@ -1127,7 +1142,7 @@ const openQuickBorrowForShortfall = (shortfallAmount, periodId) => {
 
 const openEditModal = (item) => {
   isEditing.value = true;
-  expressionInput.value = '';
+  amountRawInput.value = String(item.totalAmount);
   form.value = {
     id: item.id,
     title: item.title,
@@ -1144,84 +1159,94 @@ const openEditModal = (item) => {
   showModal.value = true;
 };
 
+// Lưu dữ liệu: Cập nhật NGAY LẬP TỨC trên giao diện và LocalStorage, rồi gửi lên API chạy nền
 const handleSave = async () => {
-  if (!form.value.title.trim() || !form.value.totalAmount) return;
+  const title = form.value.title.trim();
+  const amount = parsedAmount.value;
+
+  if (!title) {
+    alert('Vui lòng nhập tên khoản mục!');
+    return;
+  }
+  if (!amount || amount <= 0) {
+    alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0!');
+    return;
+  }
 
   isSubmitting.value = true;
   try {
-    const payload = {
-      title: form.value.title.trim(),
+    const rawExpression = String(amountRawInput.value || '').trim();
+    const hasMath = rawExpression.includes('+');
+
+    const itemToSave = {
+      id: isEditing.value && form.value.id ? form.value.id : (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'debt_' + Date.now()),
+      title: title,
       recordType: form.value.recordType,
-      totalAmount: Number(form.value.totalAmount),
+      totalAmount: amount,
       paidAmount: Number(form.value.paidAmount) || 0,
-      breakdownNote: form.value.breakdownNote,
-      dueDate: new Date(form.value.dueDate).toISOString(),
-      periodLabel: form.value.periodLabel,
+      breakdownNote: form.value.breakdownNote?.trim() || (hasMath ? rawExpression : ''),
+      dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : new Date().toISOString(),
+      periodLabel: form.value.periodLabel || '1-10',
       priorityLevel: Number(form.value.priorityLevel) || 2,
-      isCompleted: form.value.isCompleted,
-      categoryTag: form.value.categoryTag,
+      isCompleted: form.value.isCompleted || false,
+      categoryTag: form.value.categoryTag || 'Khác',
+      createdAt: new Date().toISOString(),
     };
 
-    const res = await apiFetch(isEditing.value ? `${API_URL}/${form.value.id}` : API_URL, {
+    // 1. CẬP NHẬT TỨC THÌ VÀO GIAO DIỆN & LOCALSTORAGE (KHÔNG PHỤ THUỘC MẠNG/API)
+    if (isEditing.value) {
+      const idx = records.value.findIndex(x => x.id === itemToSave.id);
+      if (idx !== -1) {
+        records.value[idx] = itemToSave;
+      } else {
+        records.value.unshift(itemToSave);
+      }
+    } else {
+      records.value.unshift(itemToSave);
+    }
+    
+    // Ghi đè vào LocalStorage
+    saveLocal(records.value);
+    showModal.value = false;
+
+    // 2. GỬI LÊN SERVER API
+    apiFetch(isEditing.value ? `${API_URL}/${itemToSave.id}` : API_URL, {
       method: isEditing.value ? 'PUT' : 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(itemToSave),
+    }).catch(err => {
+      console.warn('API background sync warning:', err);
     });
 
-    if (res.ok) {
-      await fetchDebts();
-      showModal.value = false;
-    }
   } catch (err) {
     console.error('Lỗi lưu khoản nợ:', err);
+    alert('Có lỗi xảy ra: ' + (err.message || 'Vui lòng thử lại'));
   } finally {
     isSubmitting.value = false;
   }
 };
 
 const toggleComplete = async (item) => {
-  try {
-    const res = await apiFetch(`${API_URL}/${item.id}/toggle`, { method: 'PATCH' });
-    if (res.ok) {
-      await fetchDebts();
-    }
-  } catch (err) {
-    console.error(err);
+  item.isCompleted = !item.isCompleted;
+  if (item.isCompleted) {
+    item.paidAmount = item.totalAmount;
+  } else {
+    item.paidAmount = 0;
   }
+  saveLocal(records.value);
+
+  apiFetch(`${API_URL}/${item.id}/toggle`, { method: 'PATCH' }).catch(() => {});
 };
 
 const deleteItem = async (id) => {
-  if (!confirm('Xóa khoản mục này?')) return;
-  try {
-    const res = await apiFetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      records.value = records.value.filter(r => r.id !== id);
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
+  if (!confirm('Bạn có chắc muốn xóa khoản mục này?')) return;
+  records.value = records.value.filter(r => r.id !== id);
+  saveLocal(records.value);
 
-const seedSampleFromImage = async () => {
-  if (records.value.length > 0) {
-    if (!confirm('Bạn có muốn nạp bộ dữ liệu mẫu từ ảnh (Shopee easy, Shopee spay, Giang, MoMo, Đi làm, Tiền học...) vào danh sách hiện tại không?')) {
-      return;
-    }
-  }
-  isSubmitting.value = true;
-  try {
-    const res = await apiFetch(`${API_URL}/seed-sample`, { method: 'POST' });
-    if (res.ok) {
-      await fetchDebts();
-    }
-  } catch (err) {
-    console.error(err);
-  } finally {
-    isSubmitting.value = false;
-  }
+  apiFetch(`${API_URL}/${id}`, { method: 'DELETE' }).catch(() => {});
 };
 
 onMounted(() => {
+  records.value = loadLocal();
   fetchDebts();
 });
 </script>
-

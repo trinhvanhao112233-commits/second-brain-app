@@ -446,6 +446,8 @@
 </template>
 
 <script setup>
+import { accountStorage } from '../services/storage';
+
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { apiFetch } from '../services/api';
 
@@ -458,7 +460,7 @@ const TX_STORAGE_KEY = 'second_brain_tx_v1';
 // Bộ nhớ đệm LocalStorage giúp giao diện phản hồi 0ms
 const loadLocalWallets = () => {
   try {
-    const raw = localStorage.getItem(WALLETS_STORAGE_KEY);
+    const raw = accountStorage.getItem(WALLETS_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -467,7 +469,7 @@ const loadLocalWallets = () => {
 
 const saveLocalWallets = (list) => {
   try {
-    localStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(list));
+    accountStorage.setItem(WALLETS_STORAGE_KEY, JSON.stringify(list));
     emit('wallets-updated');
     window.dispatchEvent(new CustomEvent('secondbrain-data-updated', { detail: { action: 'wallet' } }));
   } catch (e) {}
@@ -475,7 +477,7 @@ const saveLocalWallets = (list) => {
 
 const loadLocalTx = () => {
   try {
-    const raw = localStorage.getItem(TX_STORAGE_KEY);
+    const raw = accountStorage.getItem(TX_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -484,7 +486,7 @@ const loadLocalTx = () => {
 
 const saveLocalTx = (list) => {
   try {
-    localStorage.setItem(TX_STORAGE_KEY, JSON.stringify(list));
+    accountStorage.setItem(TX_STORAGE_KEY, JSON.stringify(list));
     emit('wallets-updated');
   } catch (e) {}
 };
@@ -619,11 +621,12 @@ const getWalletMonthlySpent = (walletId) => {
   const now = new Date();
   const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   return allTransactions.value
-    .filter(t => t.walletId === walletId && Number(t.amount) < 0 && (t.transactionDate || t.createdAt || '').startsWith(ym))
+    .filter(t => !isTransfer(t) && t.walletId === walletId && Number(t.amount) < 0 && (t.transactionDate || t.createdAt || '').startsWith(ym))
     .reduce((sum, t) => sum + Math.abs(Number(t.amount) || 0), 0);
 };
 
 // 3 Chỉ số tổng quan thực tế nhất
+const isTransfer = tx => ['Chuyển tiền đi', 'Nạp tiền từ ví khác', 'Phân bổ ví con'].includes(tx.category);
 const overviewStats = computed(() => {
   const now = new Date();
   const year = now.getFullYear();
@@ -642,6 +645,7 @@ const overviewStats = computed(() => {
   let todaySpent = 0;
 
   for (const tx of allTransactions.value) {
+    if (isTransfer(tx) || tx.category === 'Số dư đầu kỳ') continue;
     const dStr = tx.transactionDate || tx.createdAt || '';
     const amt = Number(tx.amount) || 0;
     if (dStr.startsWith(ymPrefix)) {
@@ -711,7 +715,7 @@ const ensureDefaultWallet = async () => {
     try {
       const res = await apiFetch(API_BASE_URL, {
         method: 'POST',
-        body: JSON.stringify({ name: 'Ví chính', monthlyBudget: 0, isMaster: true }),
+        body: JSON.stringify({ id: defaultWallet.id, name: 'Ví chính', monthlyBudget: 0, isMaster: true }),
       });
       if (res.ok) {
         const created = await res.json();
@@ -721,7 +725,7 @@ const ensureDefaultWallet = async () => {
       }
     } catch (e) {}
   } else if (!quickForm.value.walletId) {
-    quickForm.value.walletId = wallets.value[0].id;
+    quickForm.value.walletId = wallets.value[0]?.id || "";
   }
 };
 
@@ -731,8 +735,9 @@ const fetchWallets = async () => {
     const res = await apiFetch(API_BASE_URL);
     if (res.ok) {
       const serverWallets = await res.json();
-      if (Array.isArray(serverWallets) && serverWallets.length > 0) {
+      if (Array.isArray(serverWallets)) {
         wallets.value = serverWallets;
+        await ensureDefaultWallet();
         saveLocalWallets(serverWallets);
         if (!quickForm.value.walletId || !wallets.value.some(w => w.id === quickForm.value.walletId)) {
           quickForm.value.walletId = wallets.value[0].id;
@@ -753,12 +758,11 @@ const fetchAllTransactions = async () => {
   try {
     const txPromises = wallets.value.map(w =>
       apiFetch(`${API_BASE_URL}/${w.id}/transactions`)
-        .then(r => (r.ok ? r.json() : []))
-        .catch(() => [])
+        .then(r => { if (!r.ok) throw new Error("Không tải được giao dịch"); return r.json(); })
     );
     const results = await Promise.all(txPromises);
     const flattened = results.flat();
-    if (flattened.length > 0 || allTransactions.value.length === 0) {
+    if (true) {
       flattened.sort((a, b) => new Date(b.transactionDate || b.createdAt) - new Date(a.transactionDate || a.createdAt));
       allTransactions.value = flattened;
       saveLocalTx(flattened);
@@ -808,6 +812,7 @@ const handleQuickSubmit = async () => {
   apiFetch(`${API_BASE_URL}/${targetWalletId}/transactions`, {
     method: 'POST',
     body: JSON.stringify({
+      id: newTx.id,
       amount: signedAmount,
       category,
       note,
@@ -864,33 +869,17 @@ const handleCreateWallet = async () => {
   showNewWalletBox.value = false;
 
   try {
-    const res = await apiFetch(API_BASE_URL, {
-      method: 'POST',
-      body: JSON.stringify({ name, monthlyBudget: 0, isMaster: false }),
-    });
-    if (res.ok) {
-      const created = await res.json();
-      const idx = wallets.value.findIndex(w => w.id === tempId);
-      if (idx !== -1) {
-        wallets.value[idx].id = created.id;
-        quickForm.value.walletId = created.id;
-        saveLocalWallets(wallets.value);
-      }
-
-      if (initAmt > 0) {
-        await apiFetch(`${API_BASE_URL}/${created.id}/transactions`, {
-          method: 'POST',
-          body: JSON.stringify({
-            amount: initAmt,
-            category: 'Số dư đầu kỳ',
-            note: 'Số dư ban đầu',
-            transactionDate: new Date().toISOString(),
-          }),
-        });
-        await fetchAllTransactions();
-      }
+    const operations = [apiFetch(API_BASE_URL, {
+      method: 'POST', body: JSON.stringify({ id: tempId, name, monthlyBudget: 0, isMaster: false }),
+    })];
+    if (initAmt > 0) {
+      const tx = { id: crypto.randomUUID(), walletId: tempId, amount: initAmt, category: 'Số dư đầu kỳ', note: 'Số dư ban đầu', transactionDate: new Date().toISOString(), createdAt: new Date().toISOString() };
+      allTransactions.value.push(tx); saveLocalTx(allTransactions.value);
+      operations.push(apiFetch(        `${API_BASE_URL}/${tempId}/transactions`, { method: 'POST', body: JSON.stringify(tx) }));
     }
-  } catch (e) {}
+    await Promise.all(operations);
+    await fetchWallets();
+  } catch { /* The outbox retains both operations in their original order. */ }
 };
 
 // Xóa giao dịch nhập nhầm
@@ -906,7 +895,7 @@ const handleDeleteTransaction = async (tx) => {
     saveLocalWallets(wallets.value);
   }
 
-  apiFetch(`${API_BASE_URL}/transactions/${tx.id}`, { method: 'DELETE' }).catch(() => {});
+  apiFetch(`${API_BASE_URL}/transactions/${tx.id}`, { method: 'DELETE' }).then(() => fetchWallets()).catch(() => {});
 };
 
 // Xóa ví
@@ -948,7 +937,6 @@ const handleDataUpdated = (e) => {
 };
 
 onMounted(async () => {
-  await ensureDefaultWallet();
   await fetchWallets();
   window.addEventListener('secondbrain-data-updated', handleDataUpdated);
 });

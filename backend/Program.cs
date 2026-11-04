@@ -1,12 +1,33 @@
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using PersonalFinance.API.Security;
 using System;
 using Microsoft.EntityFrameworkCore;
 using PersonalFinance.API.Data;
+
+if (args.Contains("--generate-vapid")) {
+    var keys = WebPush.VapidHelper.GenerateVapidKeys();
+    Console.WriteLine($"VAPID_PUBLIC_KEY={keys.PublicKey}");
+    Console.WriteLine($"VAPID_PRIVATE_KEY={keys.PrivateKey}");
+    return;
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Cấu hình DbContext dùng MySQL / TiDB Cloud kèm Auto-Retry chống rớt kết nối tạm thời
 var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUser>();
+builder.Services.AddSingleton<SessionTokens>();
+builder.Services.AddSingleton<AiProposals>();
+var protection = builder.Services.AddDataProtection().SetApplicationName("PersonalOS");
+var keyPath = builder.Configuration["DataProtection:KeyPath"];
+if (!string.IsNullOrWhiteSpace(keyPath)) protection.PersistKeysToFileSystem(new DirectoryInfo(keyPath));
+builder.Services.AddAuthentication("Session").AddScheme<AuthenticationSchemeOptions, SessionAuthentication>("Session", _ => { });
+builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
@@ -24,7 +45,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.SetIsOriginAllowed(_ => true)
+        var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>()
+            ?? new[] { "https://second-brain-app-sepia.vercel.app", "http://localhost:5173", "http://localhost", "capacitor://localhost" };
+        policy.WithOrigins(origins)
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -36,6 +59,13 @@ builder.Services.AddHttpClient<PersonalFinance.API.Services.IAiParserService, Pe
 builder.Services.AddScoped<PersonalFinance.API.Services.INotificationService, PersonalFinance.API.Services.WebPushNotificationService>();
 builder.Services.AddHostedService<PersonalFinance.API.Services.EventReminderBackgroundWorker>();
 
+builder.Services.AddScoped<PersonalFinance.API.Services.ReminderDispatcher>();
+builder.Services.AddRateLimiter(options => {
+    options.RejectionStatusCode = 429;
+    options.AddPolicy("sensitive", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 15, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,78 +79,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+app.UseRateLimiter();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// 4. Tự động khởi tạo từng bảng độc lập trên TiDB Cloud (Mỗi lệnh tách riêng try/catch để không chặn nhau)
-try
-{
+// Run versioned, additive schema upgrade before accepting requests.
+if (builder.Configuration.GetValue("Database:AutoUpgrade", true)) {
     using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try { dbContext.Database.EnsureCreated(); } catch { }
-
-    string[] ddlStatements = new[]
-    {
-        @"CREATE TABLE IF NOT EXISTS `Users` (
-            `Id` char(36) COLLATE utf8mb4_general_ci NOT NULL,
-            `Username` varchar(50) CHARACTER SET utf8mb4 NOT NULL,
-            `FullName` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
-            `PasswordHash` longtext CHARACTER SET utf8mb4 NOT NULL,
-            `CreatedAt` datetime(6) NOT NULL,
-            PRIMARY KEY (`Id`),
-            UNIQUE KEY `IX_Users_Username` (`Username`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
-
-        @"CREATE TABLE IF NOT EXISTS `DebtRecords` (
-            `Id` char(36) COLLATE utf8mb4_general_ci NOT NULL,
-            `UserId` char(36) COLLATE utf8mb4_general_ci NULL,
-            `Title` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
-            `RecordType` varchar(30) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'DEBT',
-            `TotalAmount` decimal(18,2) NOT NULL DEFAULT 0,
-            `PaidAmount` decimal(18,2) NOT NULL DEFAULT 0,
-            `BreakdownNote` varchar(500) CHARACTER SET utf8mb4 NULL,
-            `DueDate` datetime(6) NOT NULL,
-            `PeriodLabel` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '1-10',
-            `PriorityLevel` int NOT NULL DEFAULT 2,
-            `IsCompleted` tinyint(1) NOT NULL DEFAULT 0,
-            `CategoryTag` varchar(100) CHARACTER SET utf8mb4 NULL,
-            `CreatedAt` datetime(6) NOT NULL,
-            PRIMARY KEY (`Id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
-
-        @"CREATE TABLE IF NOT EXISTS `PushSubscriptions` (
-            `Id` char(36) COLLATE utf8mb4_general_ci NOT NULL,
-            `UserId` char(36) COLLATE utf8mb4_general_ci NULL,
-            `Endpoint` text COLLATE utf8mb4_general_ci NOT NULL,
-            `P256dh` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-            `Auth` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-            `CreatedAt` datetime(6) NOT NULL,
-            PRIMARY KEY (`Id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
-
-        @"ALTER TABLE `Wallets` ADD COLUMN `UserId` char(36) COLLATE utf8mb4_general_ci NULL;",
-        @"ALTER TABLE `Wallets` ADD COLUMN `IsMaster` tinyint(1) NOT NULL DEFAULT 0;",
-        @"ALTER TABLE `Events` ADD COLUMN `UserId` char(36) COLLATE utf8mb4_general_ci NULL;",
-        @"ALTER TABLE `Events` ADD COLUMN `IsReminderSent` tinyint(1) NOT NULL DEFAULT 0;",
-        @"ALTER TABLE `Tasks` ADD COLUMN `UserId` char(36) COLLATE utf8mb4_general_ci NULL;",
-        @"ALTER TABLE `Notes` ADD COLUMN `UserId` char(36) COLLATE utf8mb4_general_ci NULL;"
-    };
-
-    foreach (var sql in ddlStatements)
-    {
-        try
-        {
-            dbContext.Database.ExecuteSqlRaw(sql);
-        }
-        catch
-        {
-            // Bỏ qua nếu cột hoặc bảng đã tồn tại
-        }
-    }
+    await PersonalFinance.API.Data.SchemaUpgrade.Apply(scope.ServiceProvider.GetRequiredService<AppDbContext>());
 }
-catch (Exception ex)
-{
-    Console.WriteLine($"[DB Startup Warning]: {ex.Message}");
-}
-
 app.Run();

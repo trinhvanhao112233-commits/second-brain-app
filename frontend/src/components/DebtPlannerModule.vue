@@ -20,11 +20,11 @@
               <span class="material-symbols-rounded text-xs" :class="{ 'animate-spin': cloudSyncState === 'syncing' }">
                 {{ cloudSyncState === 'syncing' ? 'sync' : 'cloud_done' }}
               </span>
-              <span>{{ cloudSyncState === 'syncing' ? 'Đang lưu Cloud...' : 'Đã đồng bộ Cloud' }}</span>
+              <span>{{ cloudSyncState === 'syncing' ? 'Đang lưu…' : cloudSyncState === 'synced' ? 'Đã đồng bộ' : cloudSyncState === 'error' ? 'Chưa đồng bộ' : 'Chưa kiểm tra' }}</span>
             </span>
           </div>
           <p class="text-xs text-slate-500 mt-0.5">
-            Chia dòng tiền theo 3 mốc (1–10, 10–21, 21–31) • Tự động xếp hạng khoản nợ ưu tiên trả trước
+            Chia dòng tiền theo 3 mốc (1–10, 11–20, 21–cuối tháng) • Tự động xếp hạng khoản nợ ưu tiên trả trước
           </p>
         </div>
       </div>
@@ -60,6 +60,8 @@
       </div>
     </header>
 
+    <div class="flex flex-wrap items-center justify-between gap-3"><label class="text-sm text-slate-600">Kỳ kế hoạch <input v-model="selectedMonth" type="month" class="ml-2 border rounded-lg p-2 bg-white" aria-label="Tháng kế hoạch"></label><button class="primary-button" @click="showPayment=true">Ghi trả nợ từ ví</button></div>
+    <DebtPaymentModal v-if="showPayment" :debts="records" @close="showPayment=false" @saved="paymentSaved" />
     <!-- ==================== 2. 4 THẺ TỔNG QUAN DÒNG TIỀN ==================== -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <!-- Card 1: Tổng Tiền Vào -->
@@ -912,6 +914,8 @@
 </template>
 
 <script setup>
+import DebtPaymentModal from './DebtPaymentModal.vue';
+const localDateKey = d => [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import {
   cloudSyncState,
@@ -927,6 +931,10 @@ import {
 const emit = defineEmits(['debts-updated']);
 
 const records = ref(getLocalDebts());
+const showPayment = ref(false);
+const selectedMonth = ref(localDateKey(new Date()).slice(0,7));
+const monthRecords = computed(() => records.value.filter(x => (x.dueDate || '').startsWith(selectedMonth.value)));
+const paymentSaved = async () => { records.value = await syncDebtsBidirectional(); emit('debts-updated'); window.dispatchEvent(new CustomEvent('secondbrain-data-updated',{detail:{action:'transaction'}})); };
 const carryOverBalance = ref(getLocalCarryOver());
 const isSubmitting = ref(false);
 const debtListFilter = ref('UNPAID');
@@ -942,7 +950,7 @@ const form = ref({
   totalAmount: 0,
   paidAmount: 0,
   breakdownNote: '',
-  dueDate: new Date().toISOString().split('T')[0],
+  dueDate: localDateKey(new Date()),
   periodLabel: '1-10',
   priorityLevel: 1,
   isCompleted: false,
@@ -1013,9 +1021,9 @@ const parsedAmount = computed(() => {
   return val;
 });
 
-const incomeRecords = computed(() => records.value.filter(r => r.recordType === 'INCOME'));
-const debtRecords = computed(() => records.value.filter(r => r.recordType === 'DEBT'));
-const borrowMoreRecords = computed(() => records.value.filter(r => r.recordType === 'BORROW_MORE'));
+const incomeRecords = computed(() => monthRecords.value.filter(r => r.recordType === 'INCOME'));
+const debtRecords = computed(() => monthRecords.value.filter(r => r.recordType === 'DEBT'));
+const borrowMoreRecords = computed(() => monthRecords.value.filter(r => r.recordType === 'BORROW_MORE'));
 
 const unpaidDebtsCount = computed(() => debtRecords.value.filter(d => !d.isCompleted).length);
 
@@ -1048,7 +1056,7 @@ const summaryStats = computed(() => {
 const timelineStages = computed(() => {
   const stageConfigs = [
     { id: '1-10', title: 'Đợt 1 (Đầu tháng)', subtitle: 'Từ ngày 01 đến ngày 10' },
-    { id: '10-21', title: 'Đợt 2 (Giữa tháng)', subtitle: 'Từ ngày 10 đến ngày 21' },
+    { id: '10-21', title: 'Đợt 2 (Giữa tháng)', subtitle: 'Từ ngày 11 đến ngày 20' },
     { id: '21-31', title: 'Đợt 3 (Cuối tháng / Dài hạn)', subtitle: 'Từ ngày 21 đến cuối tháng' },
   ];
 
@@ -1209,7 +1217,7 @@ const openModal = (type = 'DEBT', defaultPeriod = '1-10') => {
     totalAmount: 0,
     paidAmount: 0,
     breakdownNote: '',
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: localDateKey(new Date()),
     periodLabel: defaultPeriod,
     priorityLevel: type === 'DEBT' ? 1 : 2,
     isCompleted: false,
@@ -1228,7 +1236,7 @@ const openQuickBorrowForShortfall = (shortfallAmount, periodId) => {
     totalAmount: shortfallAmount,
     paidAmount: 0,
     breakdownNote: `Bù khoản thiếu mốc ${periodId}`,
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: localDateKey(new Date()),
     periodLabel: periodId,
     priorityLevel: 1,
     isCompleted: false,
@@ -1247,7 +1255,7 @@ const openEditModal = (item) => {
     totalAmount: item.totalAmount,
     paidAmount: item.paidAmount || 0,
     breakdownNote: item.breakdownNote || '',
-    dueDate: item.dueDate ? item.dueDate.split('T')[0] : new Date().toISOString().split('T')[0],
+    dueDate: item.dueDate ? item.dueDate.split('T')[0] : localDateKey(new Date()),
     periodLabel: item.periodLabel || '1-10',
     priorityLevel: item.priorityLevel || 2,
     isCompleted: item.isCompleted || false,
@@ -1283,7 +1291,7 @@ const handleSave = async () => {
       totalAmount: amount,
       paidAmount: Number(form.value.paidAmount) || 0,
       breakdownNote: form.value.breakdownNote?.trim() || (hasMath ? rawExpression : ''),
-      dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : new Date().toISOString(),
+      dueDate: form.value.dueDate ? form.value.dueDate + 'T00:00:00' : new Date().toISOString(),
       periodLabel: form.value.periodLabel || '1-10',
       priorityLevel: Number(form.value.priorityLevel) || 2,
       isCompleted: form.value.isCompleted || false,

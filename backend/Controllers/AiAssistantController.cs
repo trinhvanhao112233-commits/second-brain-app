@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.RateLimiting;
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,25 +13,28 @@ using PersonalFinance.API.Services;
 
 namespace PersonalFinance.API.Controllers
 {
+    [Authorize]
+    [EnableRateLimiting("sensitive")]
     [ApiController]
     [Route("api/[controller]")]
-    public class AiAssistantController : ControllerBase
+    public class AiAssistantController : OwnedController
     {
         private readonly AppDbContext _context;
+        private readonly AiProposals _proposals;
         private readonly IAiParserService _aiParserService;
 
-        public AiAssistantController(AppDbContext context, IAiParserService aiParserService)
+        public AiAssistantController(AppDbContext context, IAiParserService aiParserService, AiProposals proposals)
         {
             _context = context;
+            _proposals = proposals;
             _aiParserService = aiParserService;
         }
 
         [HttpPost("chat")]
         public async Task<ActionResult<AiProcessResponse>> ProcessMessage(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] AiProcessRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Message))
+            if (string.IsNullOrWhiteSpace(request.Message) || request.Message.Length > 4000)
             {
                 return BadRequest(new { message = "Nội dung tin nhắn không được để trống." });
             }
@@ -45,8 +51,20 @@ namespace PersonalFinance.API.Controllers
             var contextInfo = $"Người dùng có các ví sau: [{walletContext}].";
 
             // 2. Gọi AI Parser (Gemini hoặc Fallback NLP)
-            var actionOutput = await _aiParserService.ParseUserMessageAsync(request.Message, contextInfo);
+            AiActionOutput actionOutput;
+            if (string.IsNullOrWhiteSpace(request.ProposalToken)) {
+                actionOutput = await _aiParserService.ParseUserMessageAsync(request.Message, contextInfo);
+                if (actionOutput.ActionType != "chat") return Ok(new AiProcessResponse(true, "Kiểm tra thông tin bên dưới trước khi lưu.", "preview", new { proposalToken = _proposals.Issue(userId!.Value, actionOutput), proposal = actionOutput }));
+            } else {
+                AiProposal proposal;
+                try { proposal = _proposals.Read(request.ProposalToken); } catch { return BadRequest(new { message = "Đề xuất không hợp lệ." }); }
+                if (proposal.UserId != userId || proposal.ExpiresAt <= DateTimeOffset.UtcNow) return BadRequest(new { message = "Đề xuất hết hạn. Vui lòng nhập lại yêu cầu." });
+                actionOutput = proposal.Action;
+            }
 
+            var proposalId = request.ProposalToken == null ? Guid.NewGuid() : new Guid(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(request.ProposalToken)).Take(16).ToArray());
+            if (await _context.Transactions.AnyAsync(x => x.Id == proposalId) || await _context.Tasks.AnyAsync(x => x.Id == proposalId) || await _context.Events.AnyAsync(x => x.Id == proposalId))
+                return Ok(new AiProcessResponse(true, "Yêu cầu này đã được lưu trước đó.", "none", null));
             // 3. Thực thi hành động tương ứng vào Database
             switch (actionOutput.ActionType)
             {
@@ -87,6 +105,7 @@ namespace PersonalFinance.API.Controllers
 
                     var transaction = new Transaction
                     {
+                        Id = proposalId,
                         WalletId = targetWallet.Id,
                         Amount = finalAmount,
                         Category = string.IsNullOrWhiteSpace(actionOutput.Category) 
@@ -153,7 +172,7 @@ namespace PersonalFinance.API.Controllers
                     {
                         var title = !string.IsNullOrWhiteSpace(item.Title) ? item.Title : request.Message;
                         
-                        DateTime startTime = DateTime.Now.AddHours(1);
+                        DateTime startTime = DateTime.UtcNow.AddHours(8);
                         if (!string.IsNullOrWhiteSpace(item.StartTime) && 
                             DateTime.TryParse(item.StartTime, out var parsedStart))
                         {
@@ -167,6 +186,7 @@ namespace PersonalFinance.API.Controllers
                             endTime = parsedEnd;
                         }
 
+                        if (endTime <= startTime) return BadRequest(new { message = "Giờ kết thúc phải sau giờ bắt đầu." });
                         var category = !string.IsNullOrWhiteSpace(item.Category) ? item.Category : "Personal";
                         var color = "#10b981";
                         if (category == "Học tập") color = "#f97316";
@@ -175,6 +195,7 @@ namespace PersonalFinance.API.Controllers
 
                         var newEvent = new CalendarEvent
                         {
+                            Id = createdEvents.Count == 0 ? proposalId : Guid.NewGuid(),
                             UserId = userId,
                             Title = title,
                             Description = !string.IsNullOrWhiteSpace(item.Description) ? item.Description : null,
@@ -210,9 +231,11 @@ namespace PersonalFinance.API.Controllers
                     var taskTitle = !string.IsNullOrWhiteSpace(actionOutput.Title) ? actionOutput.Title : request.Message;
                     var task = new DailyTask
                     {
+                        Id = proposalId,
                         UserId = userId,
                         Title = taskTitle,
                         Priority = actionOutput.Priority ?? "Medium",
+                        DueDate = actionOutput.DueDate,
                         IsCompleted = false,
                         CreatedAt = DateTime.UtcNow
                     };

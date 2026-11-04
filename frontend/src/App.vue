@@ -1,290 +1,37 @@
 <template>
-  <!-- Màn hình Đăng nhập / Đăng ký -->
   <AuthView v-if="!currentUser" @auth-success="handleAuthSuccess" />
-
-  <!-- Khung Ứng Dụng Chính (Responsive Desktop Sidebar + Mobile Top/Bottom Bars) -->
-  <div v-else class="min-h-screen bg-[#f4f7fb] text-slate-900 flex flex-col md:flex-row">
-    <!-- ==================== 1. SIDEBAR MÁY TÍNH (DESKTOP) ==================== -->
-    <aside class="hidden md:flex flex-col w-68 bg-white border-r border-slate-200/90 fixed inset-y-0 left-0 z-30 select-none shadow-sm">
-      <!-- Brand Header -->
-      <div class="px-5 py-5 flex items-center justify-between border-b border-slate-100">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/25 shrink-0">
-            <span class="material-symbols-rounded text-2xl">space_dashboard</span>
-          </div>
-          <div>
-            <h1 class="font-extrabold text-base tracking-tight text-slate-900 leading-none">Personal OS</h1>
-            <p class="text-[11px] text-slate-400 font-semibold mt-1">Tài chính • Dòng tiền • Lịch</p>
-          </div>
-        </div>
-
-        <!-- Nút báo trạng thái Cloud Sync trực tiếp -->
-        <button
-          type="button"
-          @click="triggerManualCloudSync"
-          class="px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 border transition-all"
-          :class="cloudSyncState === 'syncing'
-            ? 'bg-indigo-50 text-indigo-600 border-indigo-200'
-            : cloudSyncState === 'synced'
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
-            : 'bg-amber-50 text-amber-700 border-amber-200'"
-          title="Bấm để đồng bộ dữ liệu ngay với Điện thoại / Máy tính"
-        >
-          <span
-            class="material-symbols-rounded text-xs"
-            :class="{ 'animate-spin': cloudSyncState === 'syncing' }"
-          >
-            {{ cloudSyncState === 'syncing' ? 'sync' : cloudSyncState === 'synced' ? 'cloud_done' : 'cloud_sync' }}
-          </span>
-          <span>{{ cloudSyncState === 'syncing' ? 'Đang lưu...' : 'Cloud OK' }}</span>
-        </button>
-      </div>
-
-      <!-- Thẻ tóm tắt tài chính nhanh trên Sidebar -->
-      <div class="mx-3.5 mt-4 p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-lg space-y-2.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-200">Số dư các ví</span>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-            Định mức {{ formatShortK(safeDailySpend) }}/ngày
-          </span>
-        </div>
-        <div class="text-xl font-black font-mono text-white tracking-tight">
-          {{ formatVND(totalNetWorth) }}
-        </div>
-        <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
-          <span class="text-slate-300">Nợ chưa trả:</span>
-          <span class="font-mono font-bold text-rose-300">
-            -{{ formatShortK(totalUnpaidDebt) }} ({{ unpaidDebtCount }} khoản)
-          </span>
-        </div>
-      </div>
-
-      <!-- Menu Điều Hướng -->
-      <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <button
-          v-for="item in navItems"
-          :key="item.id"
-          type="button"
-          @click="activeTab = item.id"
-          class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-150"
-          :class="activeTab === item.id
-            ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
-        >
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-rounded text-[20px]">{{ item.iconSymbol }}</span>
-            <span>{{ item.label }}</span>
-          </div>
-          <span
-            v-if="item.badge"
-            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold font-mono"
-            :class="activeTab === item.id ? 'bg-white/20 text-white' : item.badgeClass"
-          >
-            {{ item.badge }}
-          </span>
-        </button>
-      </nav>
-
-      <!-- Khu vực Tài khoản ở đáy Sidebar -->
-      <div class="p-3.5 border-t border-slate-100 space-y-2 bg-slate-50/60">
-        <div class="flex items-center justify-between px-1">
-          <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-extrabold text-xs shrink-0">
-              {{ (currentUser.fullName || currentUser.username || 'U').charAt(0).toUpperCase() }}
-            </div>
-            <div class="min-w-0">
-              <p class="text-xs font-bold text-slate-900 truncate">
-                {{ currentUser.fullName || currentUser.username }}
-              </p>
-              <p class="text-[10px] text-slate-400 truncate">@{{ currentUser.username }}</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-1 shrink-0">
-            <button
-              type="button"
-              @click="toggleNotificationSubscription"
-              class="w-7 h-7 rounded-lg flex items-center justify-center transition-colors"
-              :class="isNotificationEnabled ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400 hover:bg-slate-200 hover:text-slate-700'"
-              title="Bật thông báo nhắc lịch"
-            >
-              <span class="material-symbols-rounded text-base">
-                {{ isNotificationEnabled ? 'notifications_active' : 'notifications' }}
-              </span>
-            </button>
-            <button
-              type="button"
-              @click="showChangePasswordModal = true"
-              class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-200 hover:text-slate-700 flex items-center justify-center transition-colors"
-              title="Đổi mật khẩu"
-            >
-              <span class="material-symbols-rounded text-base">key</span>
-            </button>
-            <button
-              type="button"
-              @click="handleLogout"
-              class="w-7 h-7 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center transition-colors"
-              title="Đăng xuất"
-            >
-              <span class="material-symbols-rounded text-base">logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
+  <div v-else class="app-shell">
+    <aside class="app-sidebar">
+      <a class="app-brand" href="?tab=hub" @click.prevent="activeTab='hub'"><span class="brand-icon material-symbols-rounded">space_dashboard</span><span>Personal OS<small>Không gian của bạn</small></span></a>
+      <p class="sidebar-caption">KHÔNG GIAN LÀM VIỆC</p>
+      <nav class="sidebar-nav" aria-label="Điều hướng chính"><button v-for="item in navItems" :key="item.id" :class="['nav-link',{selected:activeTab===item.id}]" @click="activeTab=item.id"><span class="material-symbols-rounded">{{ item.iconSymbol }}</span><span>{{ item.label }}</span><span v-if="item.badge" class="nav-count">{{ item.badge }}</span></button></nav>
+      <div class="sidebar-bottom"><button class="sync-button" @click="triggerManualCloudSync"><span class="material-symbols-rounded" :class="{'animate-spin':cloudSyncState==='syncing'}">{{ cloudSyncState==='error'?'cloud_off':'cloud_sync' }}</span><span>{{ syncLabel }}<small v-if="lastSyncTime">Lần cuối {{ lastSyncTime }}</small></span></button><div class="user-panel"><span class="user-avatar">{{ (currentUser.fullName || currentUser.username).charAt(0).toUpperCase() }}</span><span class="min-w-0 flex-1"><strong class="block truncate">{{ currentUser.fullName || currentUser.username }}</strong><small>@{{ currentUser.username }}</small></span><button title="Đăng xuất" aria-label="Đăng xuất" @click="handleLogout"><span class="material-symbols-rounded">logout</span></button></div></div>
     </aside>
-
-    <!-- ==================== 2. HEADER ĐIỆN THOẠI (MOBILE TOP BAR) ==================== -->
-    <header class="md:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-3.5 py-2.5 flex items-center justify-between safe-top shadow-sm">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-sm shrink-0">
-          <span class="material-symbols-rounded text-lg">space_dashboard</span>
-        </div>
-        <div class="min-w-0">
-          <h1 class="font-extrabold text-sm text-slate-900 leading-tight truncate">{{ currentTabTitle }}</h1>
-          <div class="flex items-center gap-1.5 text-[10px] text-slate-500">
-            <span class="truncate">@{{ currentUser.username }}</span>
-            <span>•</span>
-            <button
-              type="button"
-              @click="triggerManualCloudSync"
-              class="inline-flex items-center gap-0.5 font-bold"
-              :class="cloudSyncState === 'syncing' ? 'text-indigo-600' : 'text-emerald-600'"
-            >
-              <span class="material-symbols-rounded text-[12px]" :class="{ 'animate-spin': cloudSyncState === 'syncing' }">
-                {{ cloudSyncState === 'syncing' ? 'sync' : 'cloud_done' }}
-              </span>
-              <span>{{ cloudSyncState === 'syncing' ? 'Đang đồng bộ...' : 'Đã đồng bộ' }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mobile Quick Actions -->
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button
-          type="button"
-          @click="activeTab = 'finance'"
-          class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-mono font-extrabold text-xs"
-        >
-          {{ formatShortK(totalNetWorth) }}
-        </button>
-
-        <button
-          type="button"
-          @click="triggerManualCloudSync"
-          class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:text-indigo-600 flex items-center justify-center border border-slate-200"
-          title="Đồng bộ dữ liệu ngay"
-        >
-          <span class="material-symbols-rounded text-base" :class="{ 'animate-spin text-indigo-600': cloudSyncState === 'syncing' }">sync</span>
-        </button>
-
-        <button
-          type="button"
-          @click="handleLogout"
-          class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:text-rose-600 flex items-center justify-center border border-slate-200"
-          title="Đăng xuất"
-        >
-          <span class="material-symbols-rounded text-base">logout</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- ==================== 3. NỘI DUNG CHÍNH (MAIN WORKSPACE) ==================== -->
-    <main class="flex-1 md:ml-68 pb-24 md:pb-10">
-      <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6">
-        <!-- Tab 1: Bảng Điều Khiển Hôm Nay -->
-        <DailyHub
-          v-if="activeTab === 'hub'"
-          :wallets="wallets"
-          :debts="debts"
-          :events="events"
-          :tasks="tasks"
-          :notes="notes"
-          @navigate="activeTab = $event"
-          @toggle-task="toggleTask"
-          @refresh-all="triggerManualCloudSync"
-        />
-
-        <!-- Tab 2: Quản lý Khoản Nợ & Dòng Tiền Theo Mốc -->
-        <DebtPlannerModule
-          v-else-if="activeTab === 'debts'"
-          @debts-updated="syncDebtsFromStorage"
-        />
-
-        <!-- Tab 3: Sổ Thu Chi & Ví Tiền 1 Chạm -->
-        <FinanceDashboard
-          v-else-if="activeTab === 'finance'"
-          @wallets-updated="syncWalletsFromStorage"
-        />
-
-        <!-- Tab 4: Lịch Trình Tuần & Ca Học/Làm -->
-        <CalendarModule
-          v-else-if="activeTab === 'calendar'"
-          :events="events"
-          @refresh-events="fetchEvents"
-        />
-
-        <!-- Tab 5: Công Việc & Deadline -->
-        <TasksModule
-          v-else-if="activeTab === 'tasks'"
-          :tasks="tasks"
-          @refresh-tasks="fetchTasks"
-          @toggle-task="toggleTask"
-        />
-
-        <!-- Tab 6: Sổ Ghi Chú -->
-        <NotesModule
-          v-else-if="activeTab === 'notes'"
-          :notes="notes"
-          @refresh-notes="fetchNotes"
-        />
+    <main class="app-main">
+      <header class="workspace-header"><div class="flex items-center gap-3"><span class="mobile-brand material-symbols-rounded">space_dashboard</span><span class="text-sm text-slate-500">Không gian cá nhân <span class="mx-2 text-slate-300">/</span><strong class="text-slate-800">{{ currentTabTitle }}</strong></span></div><div class="flex items-center gap-2"><button class="icon-button" aria-label="Thông báo và cài đặt" title="Thông báo và cài đặt" @click="activeTab='settings'"><span class="material-symbols-rounded">notifications</span><span v-if="unpaidDebtCount" class="notification-dot"></span></button><button class="icon-button" aria-label="Đổi mật khẩu" title="Đổi mật khẩu" @click="showChangePasswordModal=true"><span class="material-symbols-rounded">key</span></button><button class="icon-button md:hidden" aria-label="Đăng xuất" @click="handleLogout"><span class="material-symbols-rounded">logout</span></button></div></header>
+      <div v-if="cloudSyncState==='error'" class="sync-warning" role="status">Có dữ liệu chưa đồng bộ. Kiểm tra kết nối hoặc mở Cài đặt để thử lại.<button @click="triggerManualCloudSync">Thử lại</button></div>
+      <div class="workspace-content" :key="currentUser.id">
+        <DailyHub v-if="activeTab==='hub'" :user="currentUser" :wallets="wallets" :debts="debts" :events="events" :tasks="tasks" :notes="notes" @switch-tab="activeTab=$event" @toggle-task="toggleTask" @refresh-all="triggerManualCloudSync" />
+        <DebtPlannerModule v-else-if="activeTab==='debts'" @debts-updated="syncDebtsFromStorage" />
+        <FinanceDashboard v-else-if="activeTab==='finance'" @wallets-updated="syncWalletsFromStorage" />
+        <CalendarModule v-else-if="activeTab==='calendar'" :events="events" @refresh-events="handleGlobalStorageSync" />
+        <TasksModule v-else-if="activeTab==='tasks'" :tasks="tasks" @refresh-tasks="handleGlobalStorageSync" @toggle-task="toggleTask" />
+        <NotesModule v-else-if="activeTab==='notes'" :notes="notes" @refresh-notes="handleGlobalStorageSync" />
+        <NotificationSettings v-else-if="activeTab==='settings'" />
       </div>
     </main>
-
-    <!-- ==================== 4. THANH ĐIỀU HƯỚNG ĐÁY ĐIỆN THOẠI (MOBILE BOTTOM NAV) ==================== -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur-lg border-t border-slate-200/90 px-1 py-1 safe-bottom shadow-[0_-4px_20px_rgba(15,23,42,0.06)]">
-      <div class="grid grid-cols-6 gap-0.5 max-w-md mx-auto">
-        <button
-          v-for="item in navItems"
-          :key="item.id"
-          type="button"
-          @click="activeTab = item.id"
-          class="relative flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all"
-          :class="activeTab === item.id ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-800'"
-        >
-          <div
-            class="w-9 h-7 rounded-full flex items-center justify-center transition-all"
-            :class="activeTab === item.id ? 'bg-indigo-50 text-indigo-600' : ''"
-          >
-            <span class="material-symbols-rounded text-[20px]">{{ item.iconSymbol }}</span>
-          </div>
-          <span class="text-[10px] font-bold tracking-tight mt-0.5 truncate max-w-full">
-            {{ item.mobileLabel }}
-          </span>
-          <!-- Badge báo số nợ / việc -->
-          <span
-            v-if="item.badge"
-            class="absolute top-0.5 right-1.5 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-600 text-white text-[9px] font-extrabold flex items-center justify-center shadow-sm"
-          >
-            {{ item.badge }}
-          </span>
-        </button>
-      </div>
-    </nav>
-
-    <!-- Modal Đổi Mật Khẩu -->
-    <ChangePasswordModal
-      :is-open="showChangePasswordModal"
-      @close="showChangePasswordModal = false"
-    />
-
-    <!-- Trợ Lý AI Thông Minh -->
+    <nav class="mobile-nav" aria-label="Điều hướng điện thoại"><button v-for="item in navItems" :key="item.id" :class="{selected:activeTab===item.id}" @click="activeTab=item.id"><span class="material-symbols-rounded">{{ item.iconSymbol }}</span><span>{{ item.mobileLabel }}</span></button></nav>
+    <ChangePasswordModal :is-open="showChangePasswordModal" @close="showChangePasswordModal=false" />
     <AiChatWidget @data-updated="handleAiDataUpdated" />
   </div>
+  <div v-if="notice" role="status" class="app-toast"><span>{{ notice }}</span><button @click="notice=''" aria-label="Đóng thông báo">×</button></div>
 </template>
 
 <script setup>
+import { accountStorage } from './services/storage';
+
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import NotificationSettings from './components/NotificationSettings.vue';
 import DailyHub from './components/DailyHub.vue';
 import DebtPlannerModule from './components/DebtPlannerModule.vue';
 import FinanceDashboard from './components/FinanceDashboard.vue';
@@ -297,20 +44,29 @@ import AiChatWidget from './components/AiChatWidget.vue';
 import { apiFetch, getStoredUser, setStoredUser } from './services/api';
 import {
   cloudSyncState,
+  lastSyncTime,
   VAULT_NOTE_TITLE,
   getLocalDebts,
   syncDebtsBidirectional,
 } from './services/cloudSync';
-import { registerPushNotification } from './services/pushNotification';
+import { unregisterPushNotification, registerPushNotification } from './services/pushNotification';
 
 const currentUser = ref(getStoredUser());
 const showChangePasswordModal = ref(false);
 const isNotificationEnabled = ref(false);
-const activeTab = ref('hub');
+const allowedTabs = ['hub','finance','debts','calendar','tasks','notes','settings'];
+const initialTab = new URLSearchParams(location.search).get('tab');
+const activeTab = ref(allowedTabs.includes(initialTab) ? initialTab : 'hub');
+const notice = ref('');
+let noticeTimer;
+const showNotice = e => { notice.value = e.detail.message; clearTimeout(noticeTimer); noticeTimer = setTimeout(() => { notice.value = ''; }, 9000); };
+const syncLabel = computed(() => ({idle:'Chưa kiểm tra',syncing:'Đang đồng bộ…',synced:'Đã đồng bộ',error:'Chưa đồng bộ'})[cloudSyncState.value]);
+const sessionExpired = () => { currentUser.value = null; setStoredUser(null); notice.value = 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'; };
+const readLocation = () => { const tab = new URLSearchParams(location.search).get('tab'); activeTab.value = allowedTabs.includes(tab) ? tab : 'hub'; };
 
 const loadJson = (key, fallback = []) => {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = accountStorage.getItem(key);
     return raw ? JSON.parse(raw) : fallback;
   } catch {
     return fallback;
@@ -319,7 +75,7 @@ const loadJson = (key, fallback = []) => {
 
 const saveJson = (key, val) => {
   try {
-    localStorage.setItem(key, JSON.stringify(val));
+    accountStorage.setItem(key, JSON.stringify(val));
   } catch {}
 };
 
@@ -356,26 +112,27 @@ const pendingTaskCount = computed(() => {
 });
 
 const navItems = computed(() => [
-  { id: 'hub', label: 'Bảng điều khiển Hôm nay', mobileLabel: 'Hôm nay', iconSymbol: 'dashboard', badge: 0 },
+  { id: 'hub', label: 'Hôm nay', mobileLabel: 'Hôm nay', iconSymbol: 'dashboard', badge: 0 },
   {
     id: 'debts',
-    label: 'Tiền nợ & Mốc dòng tiền',
+    label: 'Khoản nợ',
     mobileLabel: 'Tiền nợ',
     iconSymbol: 'receipt_long',
     badge: unpaidDebtCount.value,
     badgeClass: 'bg-rose-100 text-rose-700',
   },
-  { id: 'finance', label: 'Ví tiền & Thu chi', mobileLabel: 'Ví tiền', iconSymbol: 'account_balance_wallet', badge: 0 },
-  { id: 'calendar', label: 'Lịch tuần & Ca học', mobileLabel: 'Lịch', iconSymbol: 'calendar_month', badge: 0 },
+  { id: 'finance', label: 'Tài chính', mobileLabel: 'Ví tiền', iconSymbol: 'account_balance_wallet', badge: 0 },
+  { id: 'calendar', label: 'Lịch trình', mobileLabel: 'Lịch', iconSymbol: 'calendar_month', badge: 0 },
   {
     id: 'tasks',
-    label: 'Công việc & Deadline',
+    label: 'Công việc',
     mobileLabel: 'Việc',
     iconSymbol: 'check_circle',
     badge: pendingTaskCount.value,
     badgeClass: 'bg-amber-100 text-amber-800',
   },
-  { id: 'notes', label: 'Sổ Ghi chú nhanh', mobileLabel: 'Ghi chú', iconSymbol: 'edit_note', badge: 0 },
+  { id: 'notes', label: 'Ghi chú', mobileLabel: 'Ghi chú', iconSymbol: 'edit_note', badge: 0 },
+  { id: 'settings', label: 'Cài đặt', mobileLabel: 'Cài đặt', iconSymbol: 'tune', badge: 0 },
 ]);
 
 const currentTabTitle = computed(() => {
@@ -429,13 +186,21 @@ const toggleNotificationSubscription = async () => {
 
 const handleAuthSuccess = (user) => {
   currentUser.value = user;
+  wallets.value = loadJson('second_brain_wallets_v1', []);
+  debts.value = getLocalDebts();
+  events.value = loadJson('second_brain_events_v1', []);
+  tasks.value = loadJson('second_brain_tasks_v1', []);
+  notes.value = loadJson('second_brain_notes_v1', []).filter(n => n.title !== VAULT_NOTE_TITLE);
   fetchAllData();
 };
 
-const handleLogout = () => {
+const handleLogout = async () => {
   if (confirm('Bạn có chắc muốn đăng xuất khỏi tài khoản?')) {
+    try { if ('serviceWorker' in navigator) await unregisterPushNotification(); }
+    catch { notice.value = 'Chưa tắt được thông báo trên máy chủ. Vui lòng kết nối mạng rồi đăng xuất lại.'; return; }
     setStoredUser(null);
     currentUser.value = null;
+    wallets.value = []; debts.value = []; events.value = []; tasks.value = []; notes.value = [];
   }
 };
 
@@ -443,26 +208,30 @@ const fetchWallets = async () => {
   syncWalletsFromStorage();
   try {
     const res = await apiFetch('/wallets');
+    if (!res.ok) throw new Error('Không tải được dữ liệu.');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         wallets.value = data;
         saveJson('second_brain_wallets_v1', data);
       }
     }
-  } catch {}
+  return true;
+  } catch { cloudSyncState.value = 'error'; return false; }
 };
 
 const fetchDebts = async () => {
   syncDebtsFromStorage();
   const synced = await syncDebtsBidirectional();
   debts.value = synced;
+  return cloudSyncState.value !== 'error';
 };
 
 const fetchEvents = async () => {
   events.value = loadJson('second_brain_events_v1', events.value);
   try {
     const res = await apiFetch('/events');
+    if (!res.ok) throw new Error('Không tải được dữ liệu.');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -470,13 +239,15 @@ const fetchEvents = async () => {
         saveJson('second_brain_events_v1', data);
       }
     }
-  } catch {}
+  return true;
+  } catch { cloudSyncState.value = 'error'; return false; }
 };
 
 const fetchTasks = async () => {
   tasks.value = loadJson('second_brain_tasks_v1', tasks.value);
   try {
     const res = await apiFetch('/tasks');
+    if (!res.ok) throw new Error('Không tải được dữ liệu.');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -484,17 +255,19 @@ const fetchTasks = async () => {
         saveJson('second_brain_tasks_v1', data);
       }
     }
-  } catch {}
+  return true;
+  } catch { cloudSyncState.value = 'error'; return false; }
 };
 
 const toggleTask = async (id) => {
   const t = tasks.value.find(x => x.id === id);
+  if (!t) return;
   if (t) {
     t.isCompleted = !t.isCompleted;
     saveJson('second_brain_tasks_v1', tasks.value);
   }
   try {
-    await apiFetch(`/tasks/${id}/toggle`, { method: 'PATCH' });
+    await apiFetch(`/tasks/${id}`, { method: 'PUT', body: JSON.stringify(t) });
   } catch {}
 };
 
@@ -502,6 +275,7 @@ const fetchNotes = async () => {
   notes.value = loadJson('second_brain_notes_v1', notes.value).filter(n => n.title !== VAULT_NOTE_TITLE);
   try {
     const res = await apiFetch('/notes');
+    if (!res.ok) throw new Error('Không tải được dữ liệu.');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -510,7 +284,8 @@ const fetchNotes = async () => {
         saveJson('second_brain_notes_v1', visibleNotes);
       }
     }
-  } catch {}
+  return true;
+  } catch { cloudSyncState.value = 'error'; return false; }
 };
 
 const handleAiDataUpdated = () => {
@@ -519,13 +294,14 @@ const handleAiDataUpdated = () => {
 
 const fetchAllData = async () => {
   if (!currentUser.value) return;
-  await Promise.all([
+  const results = await Promise.all([
     fetchDebts(),
     fetchWallets(),
     fetchEvents(),
     fetchTasks(),
     fetchNotes(),
   ]);
+  cloudSyncState.value = results.every(Boolean) ? 'synced' : 'error';
 };
 
 const triggerManualCloudSync = async () => {
@@ -533,7 +309,8 @@ const triggerManualCloudSync = async () => {
 };
 
 // Tự động đồng bộ lại khi người dùng chuyển tab trên web
-watch(activeTab, () => {
+watch(activeTab, tab => {
+  const url = new URL(location.href); url.searchParams.set('tab', tab); history.replaceState(null, '', url);
   if (currentUser.value) {
     syncDebtsBidirectional().then(list => {
       debts.value = list;
@@ -559,6 +336,10 @@ const handleVisibilityOrFocus = () => {
 let autoSyncTimer = null;
 
 onMounted(() => {
+  window.addEventListener('app-notice', showNotice);
+  window.addEventListener('session-expired', sessionExpired);
+  window.addEventListener('popstate', readLocation);
+  window.addEventListener('online', handleVisibilityOrFocus);
   fetchAllData();
   checkNotificationStatus();
   window.addEventListener('secondbrain-data-updated', handleGlobalStorageSync);
@@ -577,6 +358,11 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  clearTimeout(noticeTimer);
+  window.removeEventListener('app-notice', showNotice);
+  window.removeEventListener('session-expired', sessionExpired);
+  window.removeEventListener('popstate', readLocation);
+  window.removeEventListener('online', handleVisibilityOrFocus);
   window.removeEventListener('secondbrain-data-updated', handleGlobalStorageSync);
   window.removeEventListener('secondbrain-cloud-synced', handleGlobalStorageSync);
   window.removeEventListener('focus', handleVisibilityOrFocus);

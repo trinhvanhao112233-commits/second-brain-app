@@ -1,4 +1,6 @@
-# Ứng Dụng Quản Lý Tài Chính Cá Nhân (MVP)
+# Ứng Dụng Quản Lý Tài Chính Cá Nhân
+
+> Bản nâng cấp ngày 05/11/2026: đọc [DEPLOYMENT.md](DEPLOYMENT.md) để cấu hình xác thực, nâng cấp database và thông báo đa thiết bị. Hướng dẫn triển khai mới trong tệp đó thay thế các bước migration và cấu hình AI cũ bên dưới.
 
 Dự án Full-stack xây dựng theo kiến trúc hiện đại, sẵn sàng cho cả Web và Ứng dụng Di động (Mobile App qua Capacitor).
 

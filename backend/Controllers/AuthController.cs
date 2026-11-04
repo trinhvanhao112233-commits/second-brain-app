@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.RateLimiting;
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,15 +13,18 @@ using PersonalFinance.API.Models;
 
 namespace PersonalFinance.API.Controllers
 {
+    [EnableRateLimiting("sensitive")]
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController : OwnedController
     {
         private readonly AppDbContext _context;
+        private readonly SessionTokens _tokens;
 
-        public AuthController(AppDbContext context)
+        public AuthController(AppDbContext context, SessionTokens tokens)
         {
             _context = context;
+            _tokens = tokens;
         }
 
         /// <summary>
@@ -28,6 +34,7 @@ namespace PersonalFinance.API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserResponse>> Register([FromBody] RegisterRequest request)
         {
+            if (System.Text.Encoding.UTF8.GetByteCount(request.Password) > 72) return BadRequest(new { message = "Mật khẩu quá dài (tối đa 72 byte UTF-8)." });
             var username = request.Username.Trim().ToLowerInvariant();
             if (await _context.Users.AnyAsync(u => u.Username.ToLower() == username))
             {
@@ -46,7 +53,7 @@ namespace PersonalFinance.API.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok(new UserResponse(user.Id, user.Username, user.FullName, user.CreatedAt));
+            return Ok(new UserResponse(user.Id, user.Username, user.FullName, user.CreatedAt, _tokens.Issue(user)));
         }
 
         /// <summary>
@@ -64,21 +71,23 @@ namespace PersonalFinance.API.Controllers
                 return Unauthorized(new { message = "Tên đăng nhập hoặc mật khẩu không chính xác!" });
             }
 
-            return Ok(new UserResponse(user.Id, user.Username, user.FullName, user.CreatedAt));
+            return Ok(new UserResponse(user.Id, user.Username, user.FullName, user.CreatedAt, _tokens.Issue(user)));
         }
 
         /// <summary>
         /// POST /api/auth/change-password
         /// Đổi mật khẩu tài khoản
         /// </summary>
+        [Authorize]
         [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromHeader(Name = "X-User-Id")] Guid? userId, [FromBody] ChangePasswordRequest request)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             if (!userId.HasValue)
             {
                 return Unauthorized(new { message = "Vui lòng đăng nhập để đổi mật khẩu!" });
             }
 
+            if (System.Text.Encoding.UTF8.GetByteCount(request.NewPassword) > 72) return BadRequest(new { message = "Mật khẩu quá dài (tối đa 72 byte UTF-8)." });
             var user = await _context.Users.FindAsync(userId.Value);
             if (user == null)
             {
@@ -93,7 +102,7 @@ namespace PersonalFinance.API.Controllers
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Đổi mật khẩu thành công!" });
+            return Ok(new { message = "Đổi mật khẩu thành công!", token = _tokens.Issue(user) });
         }
     }
 }

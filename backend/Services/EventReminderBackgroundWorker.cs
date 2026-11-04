@@ -1,112 +1,38 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using PersonalFinance.API.Data;
 
-namespace PersonalFinance.API.Services
+namespace PersonalFinance.API.Services;
+
+public class EventReminderBackgroundWorker(IServiceProvider services, ILogger<EventReminderBackgroundWorker> logger) : BackgroundService
 {
-    public class EventReminderBackgroundWorker : BackgroundService
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<EventReminderBackgroundWorker> _logger;
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(1));
+        do {
+            try { await Check(stoppingToken); }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
+            catch (Exception error) { logger.LogError(error, "Không quét được nhắc nhở."); }
+        } while (await timer.WaitForNextTickAsync(stoppingToken));
+    }
 
-        public EventReminderBackgroundWorker(IServiceProvider serviceProvider, ILogger<EventReminderBackgroundWorker> logger)
-        {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation("[EventReminderBackgroundWorker] Đã khởi động dịch vụ quét nhắc nhở lịch trình trước 1 tiếng.");
-
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await CheckAndSendRemindersAsync();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "[EventReminderBackgroundWorker] Lỗi trong chu kỳ quét nhắc nhở.");
-                }
-
-                // Quét mỗi 1 phút một lần
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
-            }
-        }
-
-        private async Task CheckAndSendRemindersAsync()
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
-
-            // Lấy tất cả sự kiện chưa hoàn thành và chưa gửi thông báo
-            var pendingEvents = await db.Events
-                .Where(e => !e.IsCompleted && !e.IsReminderSent)
-                .ToListAsync();
-
-            if (pendingEvents.Count == 0) return;
-
-            var utcNow = DateTime.UtcNow;
-            var vnNow = DateTime.UtcNow.AddHours(7); // Giờ chuẩn Việt Nam (GMT+7)
-
-            foreach (var ev in pendingEvents)
-            {
-                if (!ev.UserId.HasValue) continue;
-
-                // Xác định thời gian bắt đầu của sự kiện
-                // Nếu StartTime lưu dạng giờ địa phương (15:25), so sánh trực tiếp với vnNow.
-                // Nếu StartTime lưu dạng UTC (08:25), chênh lệch vẫn tính được chuẩn xác.
-                double minutesLeft = (ev.StartTime - vnNow).TotalMinutes;
-                
-                // Trường hợp nếu StartTime đã được lưu dưới dạng UTC
-                if (minutesLeft < -120 || minutesLeft > 1440)
-                {
-                    var altMinutes = (ev.StartTime - utcNow).TotalMinutes;
-                    if (Math.Abs(altMinutes) < Math.Abs(minutesLeft))
-                    {
-                        minutesLeft = altMinutes;
-                    }
-                }
-
-                // Nếu sự kiện sắp diễn ra trong khoảng từ 0 đến 65 phút tới (ví dụ: trước 1 tiếng, trước 30p, hoặc vừa tạo lịch cận giờ)
-                if (minutesLeft >= 0 && minutesLeft <= 65)
-                {
-                    var userSubs = await db.PushSubscriptions
-                        .Where(s => s.UserId == ev.UserId.Value)
-                        .ToListAsync();
-
-                    var displayTime = ev.StartTime.ToString("HH:mm");
-                    var title = "🔔 Nhắc nhở: Lịch trình sắp bắt đầu!";
-                    string timePrompt = minutesLeft > 45 
-                        ? "còn khoảng 1 tiếng nữa" 
-                        : (minutesLeft > 15 ? $"còn khoảng {(int)minutesLeft} phút nữa" : "chuẩn bị diễn ra ngay bây giờ");
-                    var message = $"Lịch '{ev.Title}' của bạn lúc {displayTime} ({timePrompt})!";
-
-                    foreach (var sub in userSubs)
-                    {
-                        try
-                        {
-                            await notificationService.SendPushNotificationAsync(sub, title, message, "/calendar");
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning($"[EventReminderBackgroundWorker] Lỗi gửi push cho user {ev.UserId}: {ex.Message}");
-                        }
-                    }
-
-                    ev.IsReminderSent = true;
-                }
-            }
-
-            await db.SaveChangesAsync();
-        }
+    private async Task Check(CancellationToken token)
+    {
+        using var scope = services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var dispatcher = scope.ServiceProvider.GetRequiredService<ReminderDispatcher>();
+        // Calendar API stores wall-clock time in Asia/Bangkok (UTC+7), not server-local time.
+        var now = DateTime.UtcNow.AddHours(7);
+        var events = await db.Events.IgnoreQueryFilters()
+            .Where(x => !x.IsCompleted && x.UserId != null && x.StartTime >= now && x.StartTime <= now.AddHours(1)).ToListAsync(token);
+        foreach (var row in events)
+            await dispatcher.Send(row.UserId!.Value, $"event:{row.Id}:{row.StartTime:O}", "Lịch sắp bắt đầu", $"{row.Title} · {row.StartTime:HH:mm dd/MM}", "/?tab=calendar");
+        var tasks = await db.Tasks.IgnoreQueryFilters()
+            .Where(x => !x.IsCompleted && x.UserId != null && x.DueDate != null && x.DueDate < now.Date.AddDays(2)).ToListAsync(token);
+        foreach (var row in tasks)
+            await dispatcher.Send(row.UserId!.Value, $"task:{row.Id}:{row.DueDate:yyyyMMdd}:{now:yyyyMMdd}", "Công việc cần chú ý", $"{row.Title} · hạn {row.DueDate:dd/MM}", "/?tab=tasks");
+        var debts = await db.DebtRecords.IgnoreQueryFilters()
+            .Where(x => !x.IsCompleted && x.RecordType == "DEBT" && x.UserId != null && x.DueDate < now.Date.AddDays(4)).ToListAsync(token);
+        foreach (var row in debts)
+            await dispatcher.Send(row.UserId!.Value, $"debt:{row.Id}:{row.DueDate:yyyyMMdd}:{now:yyyyMMdd}", "Khoản nợ cần chú ý", $"{row.Title} · hạn {row.DueDate:dd/MM}", "/?tab=debts");
     }
 }

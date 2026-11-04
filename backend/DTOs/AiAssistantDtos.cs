@@ -5,6 +5,7 @@ namespace PersonalFinance.API.DTOs
 {
     public record AiProcessRequest(
         string Message,
+        string? ProposalToken = null,
         Guid? DefaultWalletId = null
     );
 
@@ -39,6 +40,9 @@ namespace PersonalFinance.API.DTOs
 
         [JsonPropertyName("priority")]
         public string? Priority { get; set; }
+
+        [JsonPropertyName("dueDate")]
+        public DateTime? DueDate { get; set; }
 
         [JsonPropertyName("events")]
         public List<CalendarEventItemDTO>? Events { get; set; }

@@ -1,3 +1,5 @@
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,8 @@ using PersonalFinance.API.Models;
 
 namespace PersonalFinance.API.Controllers
 {
+    public record DebtPaymentRequest(Guid Id, Guid WalletId, decimal Amount);
+
     public class SaveDebtRequest
     {
         public string? Id { get; set; }
@@ -24,53 +28,21 @@ namespace PersonalFinance.API.Controllers
         public string? CategoryTag { get; set; }
     }
 
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class DebtsController : ControllerBase
+    public class DebtsController : OwnedController
     {
         private readonly AppDbContext _context;
-        private static bool _tableEnsured = false;
 
         public DebtsController(AppDbContext context)
         {
             _context = context;
         }
 
-        private async Task EnsureTableAsync()
-        {
-            if (_tableEnsured) return;
-            try
-            {
-                await _context.Database.ExecuteSqlRawAsync(@"
-                    CREATE TABLE IF NOT EXISTS `DebtRecords` (
-                        `Id` char(36) COLLATE utf8mb4_general_ci NOT NULL,
-                        `UserId` char(36) COLLATE utf8mb4_general_ci NULL,
-                        `Title` varchar(200) CHARACTER SET utf8mb4 NOT NULL,
-                        `RecordType` varchar(30) CHARACTER SET utf8mb4 NOT NULL DEFAULT 'DEBT',
-                        `TotalAmount` decimal(18,2) NOT NULL DEFAULT 0,
-                        `PaidAmount` decimal(18,2) NOT NULL DEFAULT 0,
-                        `BreakdownNote` varchar(500) CHARACTER SET utf8mb4 NULL,
-                        `DueDate` datetime(6) NOT NULL,
-                        `PeriodLabel` varchar(50) CHARACTER SET utf8mb4 NOT NULL DEFAULT '1-10',
-                        `PriorityLevel` int NOT NULL DEFAULT 2,
-                        `IsCompleted` tinyint(1) NOT NULL DEFAULT 0,
-                        `CategoryTag` varchar(100) CHARACTER SET utf8mb4 NULL,
-                        `CreatedAt` datetime(6) NOT NULL,
-                        PRIMARY KEY (`Id`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-                ");
-                _tableEnsured = true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[EnsureTableAsync Warning]: {ex.Message}");
-            }
-        }
-
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DebtRecord>>> GetDebts([FromHeader(Name = "X-User-Id")] Guid? userId)
+        public async Task<ActionResult<IEnumerable<DebtRecord>>> GetDebts()
         {
-            await EnsureTableAsync();
 
             var query = _context.DebtRecords.AsNoTracking().AsQueryable();
             if (userId.HasValue)
@@ -89,16 +61,15 @@ namespace PersonalFinance.API.Controllers
 
         [HttpPost]
         public async Task<ActionResult<DebtRecord>> CreateDebt(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] SaveDebtRequest request)
         {
-            await EnsureTableAsync();
 
+            if (string.IsNullOrWhiteSpace(request.Title) || request.Title.Length > 200 || request.TotalAmount < 0 || request.PaidAmount < 0 || request.PaidAmount > request.TotalAmount || !new[] { "DEBT", "INCOME", "BORROW_MORE" }.Contains(request.RecordType?.ToUpperInvariant() ?? "DEBT")) return BadRequest(new { message = "Kiểm tra tên, số tiền và loại khoản mục." });
             Guid recordId = Guid.NewGuid();
             if (!string.IsNullOrWhiteSpace(request.Id) && Guid.TryParse(request.Id, out var parsedGuid) && parsedGuid != Guid.Empty)
             {
                 // Nếu đã tồn tại bản ghi có cùng Guid trên server thì cập nhật thay vì báo lỗi trùng khóa
-                var existing = await _context.DebtRecords.FindAsync(parsedGuid);
+                var existing = await _context.DebtRecords.FirstOrDefaultAsync(x => x.Id == parsedGuid && x.UserId == userId);
                 if (existing != null)
                 {
                     existing.UserId = userId ?? existing.UserId;
@@ -144,12 +115,11 @@ namespace PersonalFinance.API.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<DebtRecord>> UpdateDebt(
             Guid id,
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] SaveDebtRequest request)
         {
-            await EnsureTableAsync();
 
-            var existing = await _context.DebtRecords.FindAsync(id);
+            if (string.IsNullOrWhiteSpace(request.Title) || request.Title.Length > 200 || request.TotalAmount < 0 || request.PaidAmount < 0 || request.PaidAmount > request.TotalAmount || !new[] { "DEBT", "INCOME", "BORROW_MORE" }.Contains(request.RecordType?.ToUpperInvariant() ?? "DEBT")) return BadRequest(new { message = "Kiểm tra tên, số tiền và loại khoản mục." });
+            var existing = await _context.DebtRecords.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (existing == null)
             {
                 // Nếu chưa có trên server (do tạo lúc offline), tự động tạo mới luôn với đúng ID
@@ -190,12 +160,33 @@ namespace PersonalFinance.API.Controllers
             return Ok(existing);
         }
 
+        [HttpPost("{id:guid}/payments")]
+        public async Task<IActionResult> Pay(Guid id, [FromBody] DebtPaymentRequest request) {
+            if (request.Amount <= 0 || request.Id == Guid.Empty) return BadRequest(new { message = "Số tiền và mã thanh toán không hợp lệ." });
+            var strategy = _context.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync<IActionResult>(async () => {
+                await using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+                var debt = await _context.DebtRecords.FirstOrDefaultAsync(x => x.Id == id && x.RecordType == "DEBT");
+                var wallet = await _context.Wallets.FirstOrDefaultAsync(x => x.Id == request.WalletId);
+                if (debt == null || wallet == null) return NotFound();
+                if (await _context.Transactions.AnyAsync(x => x.Id == request.Id)) return Ok(debt);
+                if (request.Amount > debt.TotalAmount - debt.PaidAmount) return BadRequest(new { message = "Số tiền vượt khoản nợ còn lại." });
+                var balance = await _context.Transactions.Where(x => x.WalletId == wallet.Id).SumAsync(x => (decimal?)x.Amount) ?? 0;
+                if (request.Amount > balance) return BadRequest(new { message = "Số dư ví không đủ." });
+                _context.Transactions.Add(new Transaction { Id = request.Id, WalletId = wallet.Id, DebtRecordId = debt.Id, Amount = -request.Amount, Category = "Trả nợ", Note = debt.Title });
+                debt.PaidAmount += request.Amount;
+                debt.IsCompleted = debt.PaidAmount >= debt.TotalAmount;
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return Ok(debt);
+            });
+        }
+
         [HttpPatch("{id:guid}/toggle")]
         public async Task<ActionResult<DebtRecord>> ToggleDebtCompleted(Guid id)
         {
-            await EnsureTableAsync();
 
-            var existing = await _context.DebtRecords.FindAsync(id);
+            var existing = await _context.DebtRecords.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (existing == null)
                 return NotFound(new { message = "Không tìm thấy khoản mục." });
 
@@ -216,9 +207,8 @@ namespace PersonalFinance.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteDebt(Guid id)
         {
-            await EnsureTableAsync();
 
-            var existing = await _context.DebtRecords.FindAsync(id);
+            var existing = await _context.DebtRecords.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (existing == null)
                 return NotFound(new { message = "Không tìm thấy khoản mục." });
 

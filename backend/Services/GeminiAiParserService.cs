@@ -110,7 +110,7 @@ namespace PersonalFinance.API.Services
 
         private string BuildPrompt(string userMessage, string userContextInfo)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow.AddHours(7);
             var currentTimeString = now.ToString("yyyy-MM-dd HH:mm:ss (dddd)");
 
             return $@"
@@ -165,6 +165,7 @@ CẤU TRÚC JSON TRẢ VỀ:
   ""description"": string hoặc null,
   ""startTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null,
   ""endTime"": string ISO 8601 (yyyy-MM-ddTHH:mm:ss) hoặc null,
+  ""dueDate"": ngày hạn ISO 8601 hoặc null,
   ""priority"": ""High"" | ""Medium"" | ""Low"",
   ""events"": [
     {{
@@ -203,7 +204,7 @@ Tin nhắn của người dùng:
 
             var amount = ExtractAmount(lower);
 
-            if (isExpense && amount > 0)
+            if (isExpense && !isIncome && amount > 0)
             {
                 var category = DetectCategory(lower);
                 string? matchedWallet = null;
@@ -276,6 +277,7 @@ Tin nhắn của người dùng:
                     ActionType = "add_income",
                     Amount = amount,
                     Category = "Nạp tiền",
+                    WalletName = Regex.Matches(userContextInfo, @"'([^']+)'\s*\(ID:").Select(m => m.Groups[1].Value).FirstOrDefault(name => lower.Contains(name.ToLower())),
                     Note = CleanNote(raw),
                     ReplyMessage = $"Đã cộng thêm {amount:N0}đ vào ví thành công!"
                 };
@@ -317,7 +319,7 @@ Tin nhắn của người dùng:
                     }
                 }
 
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow.AddHours(7);
                 var eventDate = now;
                 if (lower.Contains("sáng mai") || lower.Contains("ngày mai") || lower.Contains("chiều mai") || lower.Contains("tối mai"))
                 {
@@ -393,6 +395,8 @@ Tin nhắn của người dùng:
                     endHour += 12;
                 }
 
+                if (startHour is < 0 or > 23 || endHour is < 0 or > 23 || startMinute is < 0 or > 59 || endMinute is < 0 or > 59)
+                    return new AiActionOutput { ActionType = "chat", ReplyMessage = "Giờ chưa hợp lệ. Bạn hãy nhập giờ bắt đầu và kết thúc rõ hơn." };
                 var start = new DateTime(eventDate.Year, eventDate.Month, eventDate.Day, startHour, startMinute, 0);
                 var end = new DateTime(eventDate.Year, eventDate.Month, eventDate.Day, endHour, endMinute, 0);
                 if (end <= start)

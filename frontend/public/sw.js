@@ -3,8 +3,8 @@ self.addEventListener('push', function(event) {
   let data = {
     title: '🔔 Second Brain Thông Báo',
     body: 'Bạn có một sự kiện lịch trình sắp diễn ra!',
-    icon: '/favicon.ico',
-    data: { url: '/calendar' }
+    icon: '/icon.svg',
+    data: { url: '/?tab=calendar' }
   };
 
   try {
@@ -19,10 +19,10 @@ self.addEventListener('push', function(event) {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: data.icon || '/icon.svg',
+    badge: '/icon.svg',
     vibrate: [200, 100, 200, 100, 200],
-    data: data.data || { url: '/calendar' },
+    data: data.data || { url: '/?tab=calendar' },
     actions: [
       { action: 'open', title: 'Xem lịch' }
     ]
@@ -37,8 +37,8 @@ self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'LOCAL_NOTIFICATION') {
     self.registration.showNotification(event.data.title || '🔔 Second Brain', {
       body: event.data.body || 'Thông báo thử nghiệm',
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
+      icon: '/icon.svg',
+      badge: '/icon.svg',
       vibrate: [200, 100, 200]
     });
   }
@@ -46,14 +46,14 @@ self.addEventListener('message', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  const urlToOpen = (event.notification.data && event.notification.data.url) || '/calendar';
+  const urlToOpen = (event.notification.data && event.notification.data.url) || '/?tab=calendar';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
       for (let i = 0; i < clientList.length; i++) {
         let client = clientList[i];
-        if (client.url.includes(urlToOpen) && 'focus' in client) {
-          return client.focus();
+        if (new URL(client.url).origin === self.location.origin && 'focus' in client) {
+          return client.navigate(urlToOpen).then(() => client.focus());
         }
       }
       if (clients.openWindow) {

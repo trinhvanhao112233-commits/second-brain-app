@@ -1,3 +1,4 @@
+using PersonalFinance.API.Security;
 using Microsoft.EntityFrameworkCore;
 using PersonalFinance.API.Models;
 
@@ -5,8 +6,10 @@ namespace PersonalFinance.API.Data
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        private readonly CurrentUser _user;
+        public AppDbContext(DbContextOptions<AppDbContext> options, CurrentUser user) : base(options) { _user = user; }
 
+        public DbSet<ReminderDelivery> ReminderDeliveries => Set<ReminderDelivery>();
         public DbSet<User> Users => Set<User>();
         public DbSet<Wallet> Wallets => Set<Wallet>();
         public DbSet<Transaction> Transactions => Set<Transaction>();
@@ -19,6 +22,14 @@ namespace PersonalFinance.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ReminderDelivery>().Property(x => x.Id).HasMaxLength(64);
+            modelBuilder.Entity<Wallet>().HasQueryFilter(x => x.UserId == _user.Id);
+            modelBuilder.Entity<Transaction>().HasQueryFilter(x => x.Wallet != null && x.Wallet.UserId == _user.Id);
+            modelBuilder.Entity<CalendarEvent>().HasQueryFilter(x => x.UserId == _user.Id);
+            modelBuilder.Entity<DailyTask>().HasQueryFilter(x => x.UserId == _user.Id);
+            modelBuilder.Entity<Note>().HasQueryFilter(x => x.UserId == _user.Id);
+            modelBuilder.Entity<DebtRecord>().HasQueryFilter(x => x.UserId == _user.Id);
+            modelBuilder.Entity<PushSubscriptionModel>().HasQueryFilter(x => x.UserId == _user.Id);
 
             // TiDB Cloud yêu cầu utf8mb4_general_ci
             modelBuilder.UseCollation("utf8mb4_general_ci");

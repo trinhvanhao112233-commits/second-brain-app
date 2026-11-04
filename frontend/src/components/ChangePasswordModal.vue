@@ -94,7 +94,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { apiFetch } from '../services/api';
+import { apiFetch, getStoredUser, setStoredUser } from '../services/api';
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
@@ -147,6 +147,7 @@ const handleChangePassword = async () => {
       throw new Error(data.message || 'Đổi mật khẩu thất bại!');
     }
 
+    if (data.token) setStoredUser({ ...getStoredUser(), token: data.token });
     successMessage.value = 'Đổi mật khẩu thành công!';
     setTimeout(() => {
       closeModal();

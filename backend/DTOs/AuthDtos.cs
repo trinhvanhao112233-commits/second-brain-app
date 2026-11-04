@@ -6,13 +6,14 @@ namespace PersonalFinance.API.DTOs
     public record RegisterRequest(
         [Required(ErrorMessage = "Tên đăng nhập không được để trống")]
         [MinLength(3, ErrorMessage = "Tên đăng nhập phải có ít nhất 3 ký tự")]
+        [MaxLength(50)]
         string Username,
 
         [Required(ErrorMessage = "Mật khẩu không được để trống")]
         [MinLength(6, ErrorMessage = "Mật khẩu phải từ 6 ký tự trở lên")]
         string Password,
 
-        string? FullName
+        [MaxLength(100)] string? FullName
     );
 
     public record LoginRequest(
@@ -36,6 +37,7 @@ namespace PersonalFinance.API.DTOs
         Guid Id,
         string Username,
         string FullName,
-        DateTime CreatedAt
+        DateTime CreatedAt,
+        string Token
     );
 }

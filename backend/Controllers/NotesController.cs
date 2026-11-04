@@ -1,3 +1,5 @@
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,10 @@ using PersonalFinance.API.Models;
 
 namespace PersonalFinance.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class NotesController : ControllerBase
+    public class NotesController : OwnedController
     {
         private readonly AppDbContext _context;
 
@@ -22,7 +25,7 @@ namespace PersonalFinance.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Note>>> GetNotes([FromHeader(Name = "X-User-Id")] Guid? userId)
+        public async Task<ActionResult<IEnumerable<Note>>> GetNotes()
         {
             var query = _context.Notes.AsNoTracking().AsQueryable();
             if (userId.HasValue)
@@ -40,11 +43,15 @@ namespace PersonalFinance.API.Controllers
 
         [HttpPost]
         public async Task<ActionResult<Note>> CreateNote(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] CreateNoteRequest request)
         {
+            if (request.Id.HasValue) {
+                var saved = await _context.Notes.FirstOrDefaultAsync(x => x.Id == request.Id.Value);
+                if (saved != null) return Ok(saved);
+            }
             var note = new Note
             {
+                Id = request.Id ?? Guid.NewGuid(),
                 UserId = userId,
                 Title = request.Title.Trim(),
                 Content = request.Content?.Trim() ?? string.Empty,
@@ -62,7 +69,7 @@ namespace PersonalFinance.API.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<Note>> UpdateNote(Guid id, [FromBody] UpdateNoteRequest request)
         {
-            var note = await _context.Notes.FindAsync(id);
+            var note = await _context.Notes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (note == null) return NotFound();
 
             note.Title = request.Title.Trim();
@@ -78,7 +85,7 @@ namespace PersonalFinance.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteNote(Guid id)
         {
-            var note = await _context.Notes.FindAsync(id);
+            var note = await _context.Notes.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (note == null) return NotFound();
 
             _context.Notes.Remove(note);

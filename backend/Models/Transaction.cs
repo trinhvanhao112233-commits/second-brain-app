@@ -5,6 +5,8 @@ namespace PersonalFinance.API.Models
     public class Transaction
     {
         public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid? DebtRecordId { get; set; }
+        public Guid? TransferId { get; set; }
         public Guid WalletId { get; set; }
         public decimal Amount { get; set; } // Số dương: Nạp / Thu nhập, Số âm: Chi tiêu
         public string Category { get; set; } = "Khác"; // Ăn uống, Đi lại, Mua sắm, Hóa đơn, Giải trí...

@@ -229,6 +229,8 @@
 </template>
 
 <script setup>
+import { accountStorage } from '../services/storage';
+
 import { ref, computed, watch } from 'vue';
 import { apiFetch } from '../services/api';
 import { VAULT_NOTE_TITLE } from '../services/cloudSync';
@@ -243,7 +245,7 @@ const NOTES_STORAGE_KEY = 'second_brain_notes_v1';
 
 const loadSavedNotes = () => {
   try {
-    const raw = localStorage.getItem(NOTES_STORAGE_KEY);
+    const raw = accountStorage.getItem(NOTES_STORAGE_KEY);
     const list = raw ? JSON.parse(raw) : [];
     return list.filter(n => n.title !== VAULT_NOTE_TITLE);
   } catch (e) {
@@ -253,7 +255,7 @@ const loadSavedNotes = () => {
 
 const saveNotesToStorage = (list) => {
   try {
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(list.filter(n => n.title !== VAULT_NOTE_TITLE)));
+    accountStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(list.filter(n => n.title !== VAULT_NOTE_TITLE)));
   } catch (e) {}
 };
 

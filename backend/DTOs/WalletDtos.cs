@@ -9,7 +9,8 @@ namespace PersonalFinance.API.DTOs
         [StringLength(100, MinimumLength = 1)]
         string Name,
         decimal MonthlyBudget = 0m,
-        bool IsMaster = false
+        bool IsMaster = false,
+        Guid? Id = null
     );
 
     public record UpdateBudgetRequest(
@@ -29,7 +30,8 @@ namespace PersonalFinance.API.DTOs
         [Range(1, double.MaxValue, ErrorMessage = "Số tiền chuyển phải lớn hơn 0")]
         decimal Amount,
         string? Note,
-        DateTime? TransactionDate
+        DateTime? TransactionDate,
+        Guid? Id = null
     );
 
     public record WalletResponse(
@@ -48,6 +50,7 @@ namespace PersonalFinance.API.DTOs
         string? Category,
         string? Note,
         DateTime? TransactionDate,
+        Guid? Id = null,
         bool DeductFromMaster = false // Nếu nạp tiền vào ví con, có thể trừ tiền tương ứng từ Ví Tổng
     );
 
@@ -64,16 +67,17 @@ namespace PersonalFinance.API.DTOs
 
     // === CALENDAR EVENTS ===
     public record CreateEventRequest(
-        [Required] string Title,
+        [Required, StringLength(200)] string Title,
         string? Description,
         DateTime StartTime,
         DateTime EndTime,
         string Category,
-        string Color
+        string Color,
+        Guid? Id = null
     );
 
     public record UpdateEventRequest(
-        [Required] string Title,
+        [Required, StringLength(200)] string Title,
         string? Description,
         DateTime StartTime,
         DateTime EndTime,
@@ -84,13 +88,14 @@ namespace PersonalFinance.API.DTOs
 
     // === DAILY TASKS ===
     public record CreateTaskRequest(
-        [Required] string Title,
+        [Required, StringLength(200)] string Title,
         DateTime? DueDate,
-        string Priority
+        string Priority,
+        Guid? Id = null
     );
 
     public record UpdateTaskRequest(
-        [Required] string Title,
+        [Required, StringLength(200)] string Title,
         DateTime? DueDate,
         string Priority,
         bool IsCompleted
@@ -98,14 +103,15 @@ namespace PersonalFinance.API.DTOs
 
     // === NOTES ===
     public record CreateNoteRequest(
-        [Required] string Title,
+        [Required, StringLength(200)] string Title,
         string Content,
         string Color,
-        bool IsPinned
+        bool IsPinned,
+        Guid? Id = null
     );
 
     public record UpdateNoteRequest(
-        [Required] string Title,
+        [Required, StringLength(200)] string Title,
         string Content,
         string Color,
         bool IsPinned

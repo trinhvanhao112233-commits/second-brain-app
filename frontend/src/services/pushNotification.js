@@ -33,15 +33,16 @@ export const registerPushNotification = async () => {
     await navigator.serviceWorker.ready;
 
     // 3. Lấy VAPID Public Key từ backend (có fallback key cứng)
-    let publicKey = 'BOOl107oDcMlc2_3Uj5hQ63qFVi2vRw0SEpborF1EZGfPAOtnwizjdckuhGylEoPjT_w4_uI50Qy3PWAS37PliI';
+    let publicKey;
     try {
       const keyRes = await apiFetch('/notification/vapid-public-key');
+      if (!keyRes.ok) throw new Error('Máy chủ chưa sẵn sàng gửi thông báo.');
       if (keyRes.ok) {
         const data = await keyRes.json();
         if (data.publicKey) publicKey = data.publicKey;
       }
     } catch (e) {
-      console.warn('[WebPush] Không thể lấy key động từ backend, dùng fallback key:', e);
+      return { success: false, reason: 'server_error' };
     }
 
     // 4. Đăng ký Subscription với Push Server của trình duyệt
@@ -75,4 +76,13 @@ export const registerPushNotification = async () => {
     console.error('[WebPush] Lỗi khi kích hoạt thông báo:', err);
     return { success: false, error: err };
   }
+};
+
+export const unregisterPushNotification = async () => {
+  const registration = await navigator.serviceWorker?.getRegistration();
+  const subscription = await registration?.pushManager.getSubscription();
+  if (!subscription) return;
+  const res = await apiFetch('/notification/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: subscription.endpoint, keys: subscription.toJSON().keys }) });
+  if (!res.ok) throw new Error('Không tắt được thông báo trên máy chủ.');
+  await subscription.unsubscribe();
 };

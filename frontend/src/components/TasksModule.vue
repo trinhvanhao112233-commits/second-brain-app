@@ -400,6 +400,9 @@
 </template>
 
 <script setup>
+const localDateKey = d => [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-');
+import { accountStorage } from '../services/storage';
+
 import { ref, computed, watch, onMounted } from 'vue';
 import { apiFetch } from '../services/api';
 
@@ -413,7 +416,7 @@ const TASKS_STORAGE_KEY = 'second_brain_tasks_v1';
 
 const loadSavedTasks = () => {
   try {
-    const raw = localStorage.getItem(TASKS_STORAGE_KEY);
+    const raw = accountStorage.getItem(TASKS_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -422,7 +425,7 @@ const loadSavedTasks = () => {
 
 const saveTasksToStorage = (list) => {
   try {
-    localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(list));
+    accountStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(list));
   } catch (e) {}
 };
 
@@ -461,7 +464,7 @@ const statusFilter = ref('Chưa xong');
 const filterTag = ref('ALL');
 
 const quickTaskTitle = ref('');
-const quickTaskDueDate = ref(new Date().toISOString().split('T')[0]);
+const quickTaskDueDate = ref(localDateKey(new Date()));
 
 const showModal = ref(false);
 const isEditing = ref(false);
@@ -484,13 +487,13 @@ const quickDeadlines = [
 const setQuickDueDate = (offsetDays) => {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
-  taskForm.value.dueDate = d.toISOString().split('T')[0];
+  taskForm.value.dueDate = localDateKey(d);
 };
 
 const setQuickBarDate = (offsetDays) => {
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
-  quickTaskDueDate.value = d.toISOString().split('T')[0];
+  quickTaskDueDate.value = localDateKey(d);
 };
 
 const getDiffDays = (dueDateStr) => {
@@ -598,7 +601,7 @@ const handleQuickAddTask = async () => {
     id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'task_' + Date.now(),
     title,
     priority: 'Medium',
-    dueDate: quickTaskDueDate.value ? new Date(quickTaskDueDate.value).toISOString() : null,
+    dueDate: quickTaskDueDate.value ? quickTaskDueDate.value + 'T00:00:00' : null,
     isCompleted: false,
     createdAt: new Date().toISOString(),
   };
@@ -630,7 +633,7 @@ const openCreateModal = () => {
   taskForm.value = {
     id: null,
     title: '',
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: localDateKey(new Date()),
     priority: 'Medium',
     isCompleted: false,
   };
@@ -658,7 +661,7 @@ const handleSaveTask = async () => {
       : (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'task_' + Date.now()),
     title: taskForm.value.title.trim(),
     priority: taskForm.value.priority,
-    dueDate: taskForm.value.dueDate ? new Date(taskForm.value.dueDate).toISOString() : null,
+    dueDate: taskForm.value.dueDate ? taskForm.value.dueDate + 'T00:00:00' : null,
     isCompleted: taskForm.value.isCompleted,
   };
 
@@ -695,7 +698,7 @@ const toggleTaskLocal = async (task) => {
   saveTasksToStorage(localTasks.value);
   emit('refresh-tasks');
 
-  apiFetch(`${API_BASE_URL}/${task.id}/toggle`, { method: 'PATCH' }).catch(() => {});
+  apiFetch(`${API_BASE_URL}/${task.id}`, { method: 'PUT', body: JSON.stringify(task) }).catch(() => {});
 };
 
 const deleteTaskLocal = async (id) => {

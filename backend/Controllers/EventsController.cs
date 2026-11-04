@@ -1,3 +1,5 @@
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,10 @@ using PersonalFinance.API.Models;
 
 namespace PersonalFinance.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class EventsController : ControllerBase
+    public class EventsController : OwnedController
     {
         private readonly AppDbContext _context;
 
@@ -23,7 +26,6 @@ namespace PersonalFinance.API.Controllers
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CalendarEvent>>> GetEvents(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromQuery] int? month, 
             [FromQuery] int? year)
         {
@@ -48,11 +50,16 @@ namespace PersonalFinance.API.Controllers
 
         [HttpPost]
         public async Task<ActionResult<CalendarEvent>> CreateEvent(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] CreateEventRequest request)
         {
+            if (request.Id.HasValue) {
+                var saved = await _context.Events.FirstOrDefaultAsync(x => x.Id == request.Id.Value);
+                if (saved != null) return Ok(saved);
+            }
+            if (request.EndTime <= request.StartTime) return BadRequest(new { message = "Giờ kết thúc phải sau giờ bắt đầu." });
             var calendarEvent = new CalendarEvent
             {
+                Id = request.Id ?? Guid.NewGuid(),
                 UserId = userId,
                 Title = request.Title.Trim(),
                 Description = request.Description?.Trim(),
@@ -72,9 +79,10 @@ namespace PersonalFinance.API.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<CalendarEvent>> UpdateEvent(Guid id, [FromBody] UpdateEventRequest request)
         {
-            var existing = await _context.Events.FindAsync(id);
+            var existing = await _context.Events.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (existing == null) return NotFound();
 
+            if (request.EndTime <= request.StartTime) return BadRequest(new { message = "Giờ kết thúc phải sau giờ bắt đầu." });
             existing.Title = request.Title.Trim();
             existing.Description = request.Description?.Trim();
             existing.StartTime = request.StartTime;
@@ -90,7 +98,7 @@ namespace PersonalFinance.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteEvent(Guid id)
         {
-            var existing = await _context.Events.FindAsync(id);
+            var existing = await _context.Events.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (existing == null) return NotFound();
 
             _context.Events.Remove(existing);

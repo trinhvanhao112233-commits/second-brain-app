@@ -616,6 +616,8 @@
 </template>
 
 <script setup>
+import { accountStorage } from '../services/storage';
+
 import { ref, computed, watch } from 'vue';
 import { apiFetch } from '../services/api';
 
@@ -629,7 +631,7 @@ const EVENTS_STORAGE_KEY = 'second_brain_events_v1';
 
 const loadLocalEvents = () => {
   try {
-    const raw = localStorage.getItem(EVENTS_STORAGE_KEY);
+    const raw = accountStorage.getItem(EVENTS_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -638,7 +640,7 @@ const loadLocalEvents = () => {
 
 const saveLocalEvents = (list) => {
   try {
-    localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(list));
+    accountStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(list));
   } catch (e) {}
 };
 
@@ -879,6 +881,7 @@ const openEditModal = (evt) => {
 
 const handleSaveEvent = async () => {
   if (!eventForm.value.title.trim()) return;
+  if (!eventForm.value.startTime || !eventForm.value.endTime || eventForm.value.endTime <= eventForm.value.startTime) { window.dispatchEvent(new CustomEvent('app-notice', {detail:{message:'Giờ kết thúc phải sau giờ bắt đầu.'}})); return; }
 
   const itemToSave = {
     id: isEditing.value && eventForm.value.id

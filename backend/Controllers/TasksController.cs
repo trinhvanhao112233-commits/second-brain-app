@@ -1,3 +1,5 @@
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,10 @@ using PersonalFinance.API.Models;
 
 namespace PersonalFinance.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class TasksController : ControllerBase
+    public class TasksController : OwnedController
     {
         private readonly AppDbContext _context;
 
@@ -22,7 +25,7 @@ namespace PersonalFinance.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DailyTask>>> GetTasks([FromHeader(Name = "X-User-Id")] Guid? userId)
+        public async Task<ActionResult<IEnumerable<DailyTask>>> GetTasks()
         {
             var query = _context.Tasks.AsNoTracking().AsQueryable();
             if (userId.HasValue)
@@ -41,11 +44,15 @@ namespace PersonalFinance.API.Controllers
 
         [HttpPost]
         public async Task<ActionResult<DailyTask>> CreateTask(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] CreateTaskRequest request)
         {
+            if (request.Id.HasValue) {
+                var saved = await _context.Tasks.FirstOrDefaultAsync(x => x.Id == request.Id.Value);
+                if (saved != null) return Ok(saved);
+            }
             var task = new DailyTask
             {
+                Id = request.Id ?? Guid.NewGuid(),
                 UserId = userId,
                 Title = request.Title.Trim(),
                 DueDate = request.DueDate,
@@ -63,7 +70,7 @@ namespace PersonalFinance.API.Controllers
         [HttpPatch("{id:guid}/toggle")]
         public async Task<ActionResult<DailyTask>> ToggleTask(Guid id)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var task = await _context.Tasks.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (task == null) return NotFound();
 
             task.IsCompleted = !task.IsCompleted;
@@ -75,7 +82,7 @@ namespace PersonalFinance.API.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<DailyTask>> UpdateTask(Guid id, [FromBody] UpdateTaskRequest request)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var task = await _context.Tasks.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (task == null) return NotFound();
 
             task.Title = request.Title.Trim();
@@ -90,7 +97,7 @@ namespace PersonalFinance.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteTask(Guid id)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var task = await _context.Tasks.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (task == null) return NotFound();
 
             _context.Tasks.Remove(task);

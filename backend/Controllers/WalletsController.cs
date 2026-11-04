@@ -1,3 +1,5 @@
+using PersonalFinance.API.Security;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +12,10 @@ using PersonalFinance.API.Models;
 
 namespace PersonalFinance.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class WalletsController : ControllerBase
+    public class WalletsController : OwnedController
     {
         private readonly AppDbContext _context;
 
@@ -26,7 +29,7 @@ namespace PersonalFinance.API.Controllers
         /// Lấy danh sách ví kèm theo số dư, ngân sách tháng, và tổng tiền đã chi trong tháng hiện tại
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<WalletResponse>>> GetWallets([FromHeader(Name = "X-User-Id")] Guid? userId)
+        public async Task<ActionResult<IEnumerable<WalletResponse>>> GetWallets()
         {
             var now = DateTime.UtcNow;
             var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -48,7 +51,7 @@ namespace PersonalFinance.API.Controllers
                     w.MonthlyBudget,
                     // Chi tiêu trong tháng là các giao dịch Amount < 0
                     Math.Abs(w.Transactions
-                        .Where(t => t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
+                        .Where(t => !t.Category.StartsWith("Chuyển tiền") && t.Category != "Phân bổ ví con" && t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
                         .Sum(t => (decimal?)t.Amount) ?? 0m),
                     w.IsMaster,
                     w.CreatedAt
@@ -64,7 +67,6 @@ namespace PersonalFinance.API.Controllers
         /// </summary>
         [HttpPost]
         public async Task<ActionResult<WalletResponse>> CreateWallet(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] CreateWalletRequest request)
         {
             if (!ModelState.IsValid)
@@ -82,8 +84,13 @@ namespace PersonalFinance.API.Controllers
                 }
             }
 
+            if (request.Id.HasValue && await _context.Wallets.AnyAsync(w => w.Id == request.Id.Value)) {
+                var saved = await _context.Wallets.FirstAsync(w => w.Id == request.Id.Value);
+                return Ok(new WalletResponse(saved.Id, saved.Name, await _context.Transactions.Where(t => t.WalletId == saved.Id).SumAsync(t => (decimal?)t.Amount) ?? 0, saved.MonthlyBudget, 0, saved.IsMaster, saved.CreatedAt));
+            }
             var wallet = new Wallet
             {
+                Id = request.Id ?? Guid.NewGuid(),
                 UserId = userId,
                 Name = request.Name.Trim(),
                 MonthlyBudget = request.MonthlyBudget >= 0 ? request.MonthlyBudget : 0m,
@@ -105,10 +112,9 @@ namespace PersonalFinance.API.Controllers
         [HttpPut("{id:guid}/master")]
         public async Task<ActionResult<WalletResponse>> SetMasterWallet(
             Guid id,
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] SetMasterWalletRequest request)
         {
-            var wallet = await _context.Wallets.FindAsync(id);
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (wallet == null)
                 return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
 
@@ -140,7 +146,7 @@ namespace PersonalFinance.API.Controllers
                 .SumAsync(t => (decimal?)t.Amount) ?? 0m;
 
             var monthlySpent = Math.Abs(await _context.Transactions
-                .Where(t => t.WalletId == id && t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
+                .Where(t => t.WalletId == id && !t.Category.StartsWith("Chuyển tiền") && t.Category != "Phân bổ ví con" && t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
                 .SumAsync(t => (decimal?)t.Amount) ?? 0m);
 
             return Ok(new WalletResponse(
@@ -161,7 +167,7 @@ namespace PersonalFinance.API.Controllers
         [HttpPut("{id:guid}/budget")]
         public async Task<ActionResult<WalletResponse>> UpdateBudget(Guid id, [FromBody] UpdateBudgetRequest request)
         {
-            var wallet = await _context.Wallets.FindAsync(id);
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (wallet == null)
                 return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
 
@@ -177,7 +183,7 @@ namespace PersonalFinance.API.Controllers
                 .SumAsync(t => (decimal?)t.Amount) ?? 0m;
 
             var monthlySpent = Math.Abs(await _context.Transactions
-                .Where(t => t.WalletId == id && t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
+                .Where(t => t.WalletId == id && !t.Category.StartsWith("Chuyển tiền") && t.Category != "Phân bổ ví con" && t.Amount < 0 && t.TransactionDate >= startOfMonth && t.TransactionDate < endOfMonth)
                 .SumAsync(t => (decimal?)t.Amount) ?? 0m);
 
             return Ok(new WalletResponse(
@@ -197,7 +203,6 @@ namespace PersonalFinance.API.Controllers
         /// </summary>
         [HttpPost("transfer")]
         public async Task<IActionResult> TransferFunds(
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] TransferWalletRequest request)
         {
             if (request.SourceWalletId == request.TargetWalletId)
@@ -206,8 +211,13 @@ namespace PersonalFinance.API.Controllers
             if (request.Amount <= 0)
                 return BadRequest(new { message = "Số tiền chuyển phải lớn hơn 0." });
 
-            var sourceWallet = await _context.Wallets.FindAsync(request.SourceWalletId);
-            var targetWallet = await _context.Wallets.FindAsync(request.TargetWalletId);
+            var strategy = _context.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync<IActionResult>(async () => {
+            await using var databaseTransaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+            var transferId = request.Id ?? Guid.NewGuid();
+            if (await _context.Transactions.AnyAsync(x => x.TransferId == transferId)) return Ok(new { message = "Giao dịch đã được ghi nhận." });
+            var sourceWallet = await _context.Wallets.FirstOrDefaultAsync(x => x.Id == request.SourceWalletId && x.UserId == userId);
+            var targetWallet = await _context.Wallets.FirstOrDefaultAsync(x => x.Id == request.TargetWalletId && x.UserId == userId);
 
             if (sourceWallet == null || targetWallet == null)
                 return NotFound(new { message = "Không tìm thấy ví nguồn hoặc ví đích." });
@@ -230,6 +240,7 @@ namespace PersonalFinance.API.Controllers
             // Trừ tiền ví nguồn
             var outTx = new Transaction
             {
+                TransferId = transferId,
                 WalletId = request.SourceWalletId,
                 Amount = -Math.Abs(request.Amount),
                 Category = "Chuyển tiền đi",
@@ -241,6 +252,7 @@ namespace PersonalFinance.API.Controllers
             // Cộng tiền vào ví đích
             var inTx = new Transaction
             {
+                TransferId = transferId,
                 WalletId = request.TargetWalletId,
                 Amount = Math.Abs(request.Amount),
                 Category = "Nạp tiền từ ví khác",
@@ -251,8 +263,10 @@ namespace PersonalFinance.API.Controllers
 
             _context.Transactions.AddRange(outTx, inTx);
             await _context.SaveChangesAsync();
+            await databaseTransaction.CommitAsync();
 
             return Ok(new { message = "Chuyển tiền thành công!", sourceWalletId = sourceWallet.Id, targetWalletId = targetWallet.Id, amount = request.Amount });
+            });
         }
 
         /// <summary>
@@ -266,6 +280,7 @@ namespace PersonalFinance.API.Controllers
             if (wallet == null)
                 return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
 
+            if (wallet.Transactions.Any(x => x.TransferId != null || x.DebtRecordId != null)) return BadRequest(new { message = "Hãy xóa giao dịch chuyển ví hoặc trả nợ liên quan trước khi xóa ví này." });
             _context.Wallets.Remove(wallet);
             await _context.SaveChangesAsync();
 
@@ -311,16 +326,19 @@ namespace PersonalFinance.API.Controllers
         [HttpPost("{id:guid}/transactions")]
         public async Task<ActionResult<TransactionResponse>> CreateTransaction(
             Guid id,
-            [FromHeader(Name = "X-User-Id")] Guid? userId,
             [FromBody] CreateTransactionRequest request)
         {
             if (request.Amount == 0)
                 return BadRequest(new { message = "Số tiền giao dịch phải khác 0." });
 
-            var wallet = await _context.Wallets.FindAsync(id);
+            var wallet = await _context.Wallets.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
             if (wallet == null)
                 return NotFound(new { message = $"Không tìm thấy ví với ID: {id}." });
 
+            if (request.Id.HasValue) {
+                var saved = await _context.Transactions.FirstOrDefaultAsync(t => t.Id == request.Id.Value && t.WalletId == id);
+                if (saved != null) return Ok(new TransactionResponse(saved.Id, id, saved.Amount, saved.Category, saved.Note, saved.TransactionDate, 0, saved.CreatedAt));
+            }
             var transactionDate = request.TransactionDate ?? DateTime.UtcNow;
 
             // Nếu nạp tiền (Amount > 0) vào ví con và có yêu cầu DeductFromMaster
@@ -360,6 +378,7 @@ namespace PersonalFinance.API.Controllers
 
             var transaction = new Transaction
             {
+                Id = request.Id ?? Guid.NewGuid(),
                 WalletId = id,
                 Amount = request.Amount,
                 Category = string.IsNullOrWhiteSpace(request.Category) ? "Khác" : request.Category.Trim(),
@@ -395,11 +414,18 @@ namespace PersonalFinance.API.Controllers
         [HttpDelete("transactions/{txId:guid}")]
         public async Task<IActionResult> DeleteTransaction(Guid txId)
         {
-            var tx = await _context.Transactions.FindAsync(txId);
+            var tx = await _context.Transactions.FirstOrDefaultAsync(x => x.Id == txId && x.Wallet!.UserId == userId);
             if (tx == null)
                 return NotFound(new { message = "Không tìm thấy giao dịch." });
 
-            _context.Transactions.Remove(tx);
+            if (tx.DebtRecordId.HasValue) {
+                var debt = await _context.DebtRecords.FirstOrDefaultAsync(x => x.Id == tx.DebtRecordId);
+                if (debt != null) { debt.PaidAmount = Math.Max(0, debt.PaidAmount - Math.Abs(tx.Amount)); debt.IsCompleted = debt.PaidAmount >= debt.TotalAmount; }
+            }
+            if (tx.TransferId.HasValue) {
+                var linked = await _context.Transactions.Where(x => x.TransferId == tx.TransferId).ToListAsync();
+                _context.Transactions.RemoveRange(linked);
+            } else _context.Transactions.Remove(tx);
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -409,7 +435,7 @@ namespace PersonalFinance.API.Controllers
         /// Xóa sạch dữ liệu tài chính (Toàn bộ giao dịch và các ví tiền)
         /// </summary>
         [HttpDelete("reset-all")]
-        public async Task<IActionResult> ResetAllFinancialData([FromHeader(Name = "X-User-Id")] Guid? userId)
+        public async Task<IActionResult> ResetAllFinancialData()
         {
             try
             {
@@ -432,12 +458,7 @@ namespace PersonalFinance.API.Controllers
 
                     _context.Wallets.RemoveRange(userWallets);
                 }
-                else
-                {
-                    // Nếu không có header userId thì xóa toàn bộ giao dịch và ví
-                    _context.Transactions.RemoveRange(_context.Transactions);
-                    _context.Wallets.RemoveRange(_context.Wallets);
-                }
+                else { return Unauthorized(); }
 
                 await _context.SaveChangesAsync();
                 return Ok(new { message = "Đã xóa toàn bộ dữ liệu ví và giao dịch thành công!" });

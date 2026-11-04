@@ -23,10 +23,10 @@
               <div class="flex items-center gap-2">
                 <h3 class="text-sm font-extrabold tracking-tight">Trợ Lý AI Second Brain</h3>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">
-                  Auto-Sync
+                  Xem trước
                 </span>
               </div>
-              <p class="text-[11px] text-indigo-100">Tự động ghi thu chi & xếp lịch trình</p>
+              <p class="text-[11px] text-indigo-100">Kiểm tra đề xuất rồi xác nhận để lưu</p>
             </div>
           </div>
 
@@ -66,9 +66,14 @@
             >
               <div class="whitespace-pre-wrap">{{ msg.text }}</div>
 
-              <!-- Thẻ xác nhận hành động tự động -->
+              <div v-if="msg.actionExecuted === 'preview'" class="mt-3 space-y-3">
+                <div class="text-xs whitespace-pre-line bg-indigo-50 p-3 rounded-lg">{{ proposalSummary(msg.actionData.proposal) }}</div>
+                <div v-if="!msg.confirmed" class="flex gap-2"><button class="primary-button" :disabled="isLoading" @click="confirmProposal(msg)">Xác nhận lưu</button><button class="secondary-button" @click="msg.confirmed=true">Bỏ qua</button></div>
+                <p v-else class="text-xs text-slate-500">Đề xuất đã được xử lý.</p>
+              </div>
+              <!-- Kết quả -->
               <div
-                v-if="msg.actionData"
+                v-if="msg.actionData && msg.actionExecuted !== 'preview'"
                 class="mt-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5 text-[11px] text-slate-800"
               >
                 <div v-if="msg.actionExecuted === 'transaction'" class="flex items-center justify-between">
@@ -229,6 +234,31 @@ const clearMessages = () => {
   ];
 };
 
+const proposalSummary = p => {
+  const lines = [];
+  if (p.actionType === 'add_expense' || p.actionType === 'add_income') {
+    lines.push(p.actionType === 'add_expense' ? 'Ghi khoản chi' : 'Ghi khoản thu');
+    lines.push('Số tiền: ' + formatVND(p.amount), 'Ví: ' + (p.walletName || 'Chưa xác định — hãy nhập lại tên ví'));
+    if (p.category) lines.push('Danh mục: ' + p.category);
+  } else if (p.actionType === 'add_event') {
+    for (const e of p.events?.length ? p.events : [p]) lines.push(e.title || 'Lịch hẹn', formatEventTime(e.startTime) + ' → ' + formatEventTime(e.endTime));
+  } else lines.push(p.title || 'Công việc mới', p.dueDate ? 'Hạn: ' + formatEventTime(p.dueDate) : 'Chưa có hạn hoàn thành');
+  return lines.join('\n');
+};
+const confirmProposal = async msg => {
+  if (isLoading.value || msg.confirmed) return;
+  isLoading.value = true;
+  try {
+    const res = await apiFetch('/aiassistant/chat', { method:'POST', body:JSON.stringify({ message:msg.sourceMessage, proposalToken:msg.actionData.proposalToken }) });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || data.reply || 'Chưa lưu được.');
+    msg.confirmed = true;
+    messages.value.push({ role:'assistant', text:data.reply, actionExecuted:data.actionExecuted, actionData:data.data, time:formatTimeNow() });
+    emit('data-updated');
+    window.dispatchEvent(new CustomEvent('secondbrain-data-updated', {detail:{action:data.actionExecuted}}));
+  } catch(e) { messages.value.push({role:'assistant',text:e.message,time:formatTimeNow()}); }
+  finally { isLoading.value=false; scrollToBottom(); }
+};
 const sendMessage = async () => {
   const text = inputText.value.trim();
   if (!text || isLoading.value) return;
@@ -258,12 +288,13 @@ const sendMessage = async () => {
     messages.value.push({
       role: 'assistant',
       text: result.reply || 'Đã thực hiện xong yêu cầu của bạn.',
+      sourceMessage: text,
       actionExecuted: result.actionExecuted,
       actionData: result.data,
       time: formatTimeNow(),
     });
 
-    if (result.actionExecuted && result.actionExecuted !== 'none') {
+    if (result.actionExecuted && !['none','preview'].includes(result.actionExecuted)) {
       emit('data-updated', {
         action: result.actionExecuted,
         data: result.data,

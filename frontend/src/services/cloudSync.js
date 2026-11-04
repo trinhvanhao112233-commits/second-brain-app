@@ -1,239 +1,95 @@
 import { ref } from 'vue';
-import { apiFetch } from './api';
+import { apiFetch, flushPending, pendingCount } from './api';
+import { accountStorage } from './storage';
 
 export const VAULT_NOTE_TITLE = '__SB_CLOUD_VAULT_V2__';
-const DEBTS_KEY = 'second_brain_debts_v1';
-const DELETED_DEBTS_KEY = 'second_brain_deleted_debts_v1';
-const CARRY_OVER_KEY = 'second_brain_carry_over_v1';
-
-// Trạng thái đồng bộ toàn cục hiển thị trên Header (PC & Mobile)
-// 'synced' | 'syncing' | 'error'
-export const cloudSyncState = ref('synced');
+const KEY = 'second_brain_debts_v1';
+const BASE = 'debts_server_snapshot_v3';
+const read = (key, fallback) => { try { return JSON.parse(accountStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+export const cloudSyncState = ref('idle');
 export const lastSyncTime = ref('');
-
-const updateTimestamp = () => {
-  const now = new Date();
-  lastSyncTime.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+window.addEventListener('api-sync-state', e => { cloudSyncState.value = e.detail; });
+export const getLocalDebts = () => read(KEY, []);
+export const setLocalDebts = list => accountStorage.setItem(KEY, JSON.stringify(list));
+export const getDeletedDebtIds = () => read('second_brain_deleted_debts_v1', []);
+export const addDeletedDebtId = id => accountStorage.setItem('second_brain_deleted_debts_v1', JSON.stringify([...new Set([...getDeletedDebtIds(), String(id)])]));
+export const getLocalCarryOver = () => accountStorage.getItem('second_brain_carry_over_v1') === 'true';
+export const setLocalCarryOver = value => accountStorage.setItem('second_brain_carry_over_v1', String(!!value));
+let running = Promise.resolve();
+const serial = fn => { const next = running.catch(() => {}).then(fn); running = next; return next; };
+const fingerprint = item => JSON.stringify(['title','recordType','totalAmount','paidAmount','breakdownNote','dueDate','periodLabel','priorityLevel','isCompleted','categoryTag'].map(k => item[k] ?? null));
+const saved = () => {
+  cloudSyncState.value = pendingCount() ? 'error' : 'synced';
+  lastSyncTime.value = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  window.dispatchEvent(new Event('secondbrain-cloud-synced'));
 };
-
-export const getLocalDebts = () => {
-  try {
-    const raw = localStorage.getItem(DEBTS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+async function sendChanges(list) {
+  const baseline = read(BASE, []);
+  const known = new Map(baseline.map(x => [String(x.id), x]));
+  for (const id of getDeletedDebtIds()) {
+    const res = await apiFetch(`/debts/${id}`, { method: 'DELETE' });
+    if (!res.ok && res.status !== 404) throw new Error('Không xóa được khoản mục.');
   }
-};
-
-export const setLocalDebts = (list) => {
-  try {
-    localStorage.setItem(DEBTS_KEY, JSON.stringify(list));
-  } catch {}
-};
-
-export const getDeletedDebtIds = () => {
-  try {
-    const raw = localStorage.getItem(DELETED_DEBTS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+  const deleted = new Set(getDeletedDebtIds());
+  for (const item of list) {
+    if (deleted.has(String(item.id))) continue;
+    if (known.has(String(item.id)) && fingerprint(known.get(String(item.id))) === fingerprint(item)) continue;
+    const res = await apiFetch(`/debts/${item.id}`, { method: 'PUT', body: JSON.stringify(item) });
+    if (!res.ok) throw new Error('Chưa lưu được khoản mục.');
   }
+  accountStorage.setItem('second_brain_deleted_debts_v1', '[]');
+  accountStorage.setItem(BASE, JSON.stringify(list.filter(x => !deleted.has(String(x.id)))));
+}
+export const pushDebtsToCloud = (list, carryOver = getLocalCarryOver()) => {
+  setLocalDebts(list);
+  setLocalCarryOver(carryOver);
+  const snapshot = JSON.parse(JSON.stringify(list));
+  return serial(async () => {
+    cloudSyncState.value = 'syncing';
+    try { await sendChanges(snapshot); saved(); return true; }
+    catch { cloudSyncState.value = 'error'; return false; }
+  });
 };
-
-export const addDeletedDebtId = (id) => {
-  try {
-    const list = getDeletedDebtIds();
-    if (!list.includes(String(id))) {
-      list.push(String(id));
-      localStorage.setItem(DELETED_DEBTS_KEY, JSON.stringify(list));
-    }
-  } catch {}
-};
-
-export const getLocalCarryOver = () => {
-  try {
-    return localStorage.getItem(CARRY_OVER_KEY) === 'true';
-  } catch {
-    return false;
-  }
-};
-
-export const setLocalCarryOver = (val) => {
-  try {
-    localStorage.setItem(CARRY_OVER_KEY, val ? 'true' : 'false');
-  } catch {}
-};
-
-/**
- * Tạo khóa định danh nội dung để chống trùng lặp khi gộp dữ liệu giữa PC và Điện thoại
- */
-const getItemSignature = (item) => {
-  return `${(item.title || '').trim().toLowerCase()}|${item.recordType || 'DEBT'}|${Number(item.totalAmount) || 0}|${item.periodLabel || '1-10'}`;
-};
-
-/**
- * Đẩy trạng thái Khoản Nợ & Dòng Tiền hiện tại lên Cloud Vault (lưu trên TiDB Cloud qua /api/notes + /api/debts)
- */
-export const pushDebtsToCloud = async (debtsList, carryOver = getLocalCarryOver()) => {
+export const syncDebtsBidirectional = () => serial(async () => {
   cloudSyncState.value = 'syncing';
   try {
-    setLocalDebts(debtsList);
-    setLocalCarryOver(carryOver);
-
-    const deletedIds = getDeletedDebtIds();
-    const vaultPayload = {
-      version: 2,
-      updatedAt: Date.now(),
-      carryOverBalance: Boolean(carryOver),
-      deletedDebtIds: deletedIds,
-      debts: debtsList,
-    };
-
-    // 1. Tìm xem bản ghi Cloud Vault đã tồn tại trong /api/notes của user chưa
-    const notesRes = await apiFetch('/notes');
-    if (notesRes.ok) {
-      const allNotes = await notesRes.json();
-      const existingVault = Array.isArray(allNotes)
-        ? allNotes.find(n => n.title === VAULT_NOTE_TITLE)
-        : null;
-
-      if (existingVault && existingVault.id) {
-        await apiFetch(`/notes/${existingVault.id}`, {
-          method: 'PUT',
-          body: JSON.stringify({
-            title: VAULT_NOTE_TITLE,
-            content: JSON.stringify(vaultPayload),
-            color: '#4f46e5',
-            isPinned: false,
-          }),
-        });
-      } else {
-        await apiFetch('/notes', {
-          method: 'POST',
-          body: JSON.stringify({
-            title: VAULT_NOTE_TITLE,
-            content: JSON.stringify(vaultPayload),
-            color: '#4f46e5',
-            isPinned: false,
-          }),
-        });
+    await flushPending();
+    const response = await apiFetch('/debts');
+    if (!response.ok) throw new Error('Không tải được khoản mục.');
+    let server = await response.json();
+    if (!accountStorage.getItem('debt_migration_v3')) {
+      const notesResponse = await apiFetch('/notes');
+      if (!notesResponse.ok) throw new Error('Chưa đọc được bản sao lưu cũ.');
+      const vaults = (await notesResponse.json()).filter(n => n.title === VAULT_NOTE_TITLE);
+      const legacy = new Map(getLocalDebts().map(x => [String(x.id), x]));
+      const deleted = new Set(getDeletedDebtIds());
+      for (const note of vaults) {
+        const vault = JSON.parse(note.content);
+        for (const id of vault.deletedDebtIds || []) deleted.add(String(id));
+        for (const item of vault.debts || []) legacy.set(String(item.id), item);
       }
-    }
-
-    cloudSyncState.value = 'synced';
-    updateTimestamp();
-    window.dispatchEvent(new CustomEvent('secondbrain-cloud-synced'));
-    return true;
-  } catch (err) {
-    console.warn('Cloud push warning:', err);
-    cloudSyncState.value = 'error';
-    return false;
-  }
-};
-
-/**
- * Đồng bộ 2 chiều thông minh giữa Máy tính (LocalStorage) và Đám mây (TiDB Cloud):
- * - Nếu Máy tính đang có sẵn dữ liệu mà Cloud chưa có -> Tự động gộp và đẩy lên Cloud để Điện thoại nhận được ngay.
- * - Nếu Cloud đã có dữ liệu mới từ thiết bị kia -> Tải về cập nhật cho máy hiện tại.
- */
-export const syncDebtsBidirectional = async () => {
-  cloudSyncState.value = 'syncing';
-  try {
-    const localDebts = getLocalDebts();
-    const localDeleted = getDeletedDebtIds();
-    let cloudDebts = [];
-    let cloudDeleted = [];
-    let cloudCarryOver = null;
-    let vaultNote = null;
-
-    // 1. Đọc từ Cloud Vault (/api/notes) - Kênh ổn định 100% trên TiDB Cloud
-    const notesRes = await apiFetch('/notes');
-    if (notesRes.ok) {
-      const allNotes = await notesRes.json();
-      if (Array.isArray(allNotes)) {
-        vaultNote = allNotes.find(n => n.title === VAULT_NOTE_TITLE);
-        if (vaultNote && vaultNote.content) {
-          try {
-            const parsed = JSON.parse(vaultNote.content);
-            if (Array.isArray(parsed.debts)) cloudDebts = parsed.debts;
-            if (Array.isArray(parsed.deletedDebtIds)) cloudDeleted = parsed.deletedDebtIds;
-            if (typeof parsed.carryOverBalance === 'boolean') cloudCarryOver = parsed.carryOverBalance;
-          } catch {}
-        }
-      }
-    }
-
-    // 2. Đọc bổ sung từ /api/debts nếu có
-    try {
-      const debtsApiRes = await apiFetch('/debts');
-      if (debtsApiRes.ok) {
-        const apiDebts = await debtsApiRes.json();
-        if (Array.isArray(apiDebts) && apiDebts.length > 0) {
-          for (const d of apiDebts) {
-            const sig = getItemSignature(d);
-            const alreadyInCloud = cloudDebts.some(
-              c => String(c.id) === String(d.id) || getItemSignature(c) === sig
-            );
-            if (!alreadyInCloud) {
-              cloudDebts.push(d);
-            }
-          }
-        }
-      }
-    } catch {}
-
-    // 3. Hợp nhất danh sách ID đã xóa
-    const mergedDeletedIds = Array.from(new Set([...localDeleted, ...cloudDeleted].map(String)));
-    try {
-      localStorage.setItem(DELETED_DEBTS_KEY, JSON.stringify(mergedDeletedIds));
-    } catch {}
-
-    // 4. Hợp nhất danh sách Khoản Nợ & Thu Nhập giữa Local và Cloud (Loại bỏ các mục đã xóa)
-    const mergedMap = new Map();
-    const seenSignatures = new Set();
-
-    // Ưu tiên dữ liệu từ Cloud trước (để lấy trạng thái cập nhật mới nhất)
-    for (const item of cloudDebts) {
-      if (!item || mergedDeletedIds.includes(String(item.id))) continue;
-      const sig = getItemSignature(item);
-      mergedMap.set(String(item.id), item);
-      seenSignatures.add(sig);
-    }
-
-    // Kiểm tra xem trên máy hiện tại (VD: Máy tính) có khoản nào mới nhập mà chưa lên Cloud không
-    let hasUnsyncedLocalChanges = false;
-    for (const localItem of localDebts) {
-      if (!localItem || mergedDeletedIds.includes(String(localItem.id))) continue;
-      const idStr = String(localItem.id);
-      const sig = getItemSignature(localItem);
-
-      if (!mergedMap.has(idStr) && !seenSignatures.has(sig)) {
-        mergedMap.set(idStr, localItem);
-        seenSignatures.add(sig);
-        hasUnsyncedLocalChanges = true;
-      }
-    }
-
-    const finalDebts = Array.from(mergedMap.values());
-    setLocalDebts(finalDebts);
-
-    if (cloudCarryOver !== null) {
-      setLocalCarryOver(cloudCarryOver);
-    }
-
-    // Nếu máy hiện tại có dữ liệu chưa lên Cloud (hoặc chưa từng có Vault trên Cloud), đẩy ngay lên Cloud!
-    if (hasUnsyncedLocalChanges || (!vaultNote && finalDebts.length > 0)) {
-      await pushDebtsToCloud(finalDebts, getLocalCarryOver());
+      for (const item of server) legacy.set(String(item.id), item);
+      const imports = [...legacy.values()].filter(x => !deleted.has(String(x.id)));
+      accountStorage.setItem('second_brain_deleted_debts_v1', JSON.stringify([...deleted]));
+      accountStorage.setItem(BASE, JSON.stringify(server));
+      await sendChanges(imports);
+      accountStorage.setItem('debt_migration_v3', 'true');
+      server = imports;
     } else {
-      cloudSyncState.value = 'synced';
-      updateTimestamp();
+      // Preserve edits waiting on this device; unchanged rows come from the server.
+      const baseline = new Map(read(BASE, []).map(x => [String(x.id), fingerprint(x)]));
+      const dirty = getLocalDebts().filter(x => baseline.get(String(x.id)) !== fingerprint(x));
+      if (dirty.length || getDeletedDebtIds().length) {
+        const merged = new Map(server.map(x => [String(x.id), x]));
+        for (const row of dirty) merged.set(String(row.id), row);
+        const deleted = new Set(getDeletedDebtIds());
+        server = [...merged.values()].filter(x => !deleted.has(String(x.id)));
+        await sendChanges(server);
+      }
     }
-
-    window.dispatchEvent(new CustomEvent('secondbrain-cloud-synced'));
-    return finalDebts;
-  } catch (err) {
-    console.warn('Bidirectional sync warning:', err);
-    cloudSyncState.value = 'error';
-    return getLocalDebts();
-  }
-};
+    setLocalDebts(server);
+    accountStorage.setItem(BASE, JSON.stringify(server));
+    saved();
+    return server;
+  } catch { cloudSyncState.value = 'error'; return getLocalDebts(); }
+});

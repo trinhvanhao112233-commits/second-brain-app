@@ -18,6 +18,7 @@ export const addDeletedDebtId = id => accountStorage.setItem('second_brain_delet
 export const getLocalCarryOver = () => accountStorage.getItem('second_brain_carry_over_v1') === 'true';
 export const setLocalCarryOver = value => accountStorage.setItem('second_brain_carry_over_v1', String(!!value));
 let running = Promise.resolve();
+let localChangeVersion = 0;
 const serial = fn => { const next = running.catch(() => {}).then(fn); running = next; return next; };
 const fingerprint = item => JSON.stringify(['title','recordType','totalAmount','paidAmount','breakdownNote','dueDate','periodLabel','priorityLevel','isCompleted','categoryTag'].map(k => item[k] ?? null));
 const saved = () => {
@@ -28,7 +29,8 @@ const saved = () => {
 async function sendChanges(list) {
   const baseline = read(BASE, []);
   const known = new Map(baseline.map(x => [String(x.id), x]));
-  for (const id of getDeletedDebtIds()) {
+  const acknowledgedDeletes = getDeletedDebtIds();
+  for (const id of acknowledgedDeletes) {
     const res = await apiFetch(`/debts/${id}`, { method: 'DELETE' });
     if (!res.ok && res.status !== 404) throw new Error('Không xóa được khoản mục.');
   }
@@ -39,20 +41,23 @@ async function sendChanges(list) {
     const res = await apiFetch(`/debts/${item.id}`, { method: 'PUT', body: JSON.stringify(item) });
     if (!res.ok) throw new Error('Chưa lưu được khoản mục.');
   }
-  accountStorage.setItem('second_brain_deleted_debts_v1', '[]');
+  accountStorage.setItem('second_brain_deleted_debts_v1', JSON.stringify(getDeletedDebtIds().filter(id => !acknowledgedDeletes.includes(id))));
   accountStorage.setItem(BASE, JSON.stringify(list.filter(x => !deleted.has(String(x.id)))));
 }
 export const pushDebtsToCloud = (list, carryOver = getLocalCarryOver()) => {
+  const version = ++localChangeVersion;
   setLocalDebts(list);
   setLocalCarryOver(carryOver);
   const snapshot = JSON.parse(JSON.stringify(list));
   return serial(async () => {
+    if (version === localChangeVersion) setLocalDebts(snapshot);
     cloudSyncState.value = 'syncing';
     try { await sendChanges(snapshot); saved(); return true; }
     catch (error) { syncError.value = error.message || 'Chưa lưu được khoản nợ.'; cloudSyncState.value = 'error'; return false; }
   });
 };
 export const syncDebtsBidirectional = () => serial(async () => {
+  const version = localChangeVersion;
   cloudSyncState.value = 'syncing';
   try {
     await flushPending();
@@ -89,9 +94,11 @@ export const syncDebtsBidirectional = () => serial(async () => {
         await sendChanges(server);
       }
     }
-    setLocalDebts(server);
+    // A user may press Paid while this request is in flight. Their queued write
+    // owns the local view until it is sent; an older response must not replace it.
+    if (version === localChangeVersion) setLocalDebts(server);
     accountStorage.setItem(BASE, JSON.stringify(server));
     saved();
-    return server;
+    return getLocalDebts();
   } catch (error) { syncError.value = error.message || 'Chưa tải được khoản nợ.'; cloudSyncState.value = 'error'; return getLocalDebts(); }
 });

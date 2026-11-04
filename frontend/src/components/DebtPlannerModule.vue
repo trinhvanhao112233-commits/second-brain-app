@@ -374,7 +374,7 @@
                     <div class="flex items-center gap-2.5 min-w-0">
                       <button
                         type="button"
-                        @click="toggleComplete(debt)"
+                        @click="toggleComplete(debt)" :disabled="completionPending.has(String(debt.id))"
                         class="w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 transition-colors"
                         :class="debt.isCompleted ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 hover:border-emerald-600 text-transparent'"
                         title="Đánh dấu đã trả xong"
@@ -580,7 +580,7 @@
             <div class="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
-                @click="toggleComplete(item)"
+                @click="toggleComplete(item)" :disabled="completionPending.has(String(item.id))"
                 class="px-3 py-1.5 rounded-xl text-xs font-bold border transition-all"
                 :class="item.isCompleted
                   ? 'bg-white text-slate-600 border-slate-200'
@@ -705,7 +705,7 @@
                 <div class="flex items-center justify-end gap-1.5">
                   <button
                     type="button"
-                    @click="toggleComplete(item)"
+                    @click="toggleComplete(item)" :disabled="completionPending.has(String(item.id))"
                     class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-all"
                     :class="item.isCompleted
                       ? 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
@@ -937,6 +937,7 @@ const monthRecords = computed(() => records.value.filter(x => (x.dueDate || '').
 const paymentSaved = async () => { records.value = await syncDebtsBidirectional(); emit('debts-updated'); window.dispatchEvent(new CustomEvent('secondbrain-data-updated',{detail:{action:'transaction'}})); };
 const carryOverBalance = ref(getLocalCarryOver());
 const isSubmitting = ref(false);
+const completionPending = ref(new Set());
 const debtListFilter = ref('UNPAID');
 
 const showModal = ref(false);
@@ -987,6 +988,7 @@ const formatDateFull = (dateStr) => {
 const parsedAmount = computed(() => {
   const raw = String(amountRawInput.value || '').trim().toLowerCase();
   if (!raw) return 0;
+  const explicitVnd = /(?:đ|₫|vnd)/i.test(raw);
 
   if (raw.includes('+')) {
     const parts = raw.split('+').map(p => {
@@ -994,7 +996,7 @@ const parsedAmount = computed(() => {
       return parseFloat(pClean) || 0;
     });
     const sum = parts.reduce((a, b) => a + b, 0);
-    if (sum > 0 && sum < 50000) {
+    if (sum > 0 && sum < 50000 && !explicitVnd) {
       return sum * 1000;
     }
     return sum;
@@ -1014,7 +1016,7 @@ const parsedAmount = computed(() => {
   const val = parseFloat(cleanNumber);
   if (isNaN(val)) return 0;
 
-  if (val > 0 && val < 50000 && !raw.includes('.') && !raw.includes(',')) {
+  if (val > 0 && val < 50000 && !raw.includes('.') && !raw.includes(',') && !explicitVnd) {
     return val * 1000;
   }
 
@@ -1199,7 +1201,9 @@ const notifyAndPushCloud = async () => {
   setLocalDebts(records.value);
   emit('debts-updated');
   window.dispatchEvent(new CustomEvent('secondbrain-data-updated', { detail: { action: 'debt' } }));
-  await pushDebtsToCloud(records.value, carryOverBalance.value);
+  const synced = await pushDebtsToCloud(records.value, carryOverBalance.value);
+  if (!synced) window.dispatchEvent(new CustomEvent('app-notice', { detail: { message: 'Thay đổi đã lưu trên thiết bị, nhưng chưa đồng bộ lên máy chủ. Bấm Thử lại khi có kết nối.' } }));
+  return synced;
 };
 
 const handleCarryOverChange = async () => {
@@ -1247,7 +1251,7 @@ const openQuickBorrowForShortfall = (shortfallAmount, periodId) => {
 
 const openEditModal = (item) => {
   isEditing.value = true;
-  amountRawInput.value = String(item.totalAmount);
+  amountRawInput.value = `${Number(item.totalAmount) || 0}đ`;
   form.value = {
     id: item.id,
     title: item.title,
@@ -1276,6 +1280,10 @@ const handleSave = async () => {
     alert('Vui lòng nhập số tiền hợp lệ lớn hơn 0!');
     return;
   }
+  if (Number(form.value.paidAmount) < 0 || Number(form.value.paidAmount) > amount) {
+    window.dispatchEvent(new CustomEvent('app-notice', { detail: { message: 'Số tiền đã trả phải nằm trong khoảng từ 0 đến tổng khoản mục.' } }));
+    return;
+  }
 
   isSubmitting.value = true;
   try {
@@ -1289,7 +1297,7 @@ const handleSave = async () => {
       title,
       recordType: form.value.recordType,
       totalAmount: amount,
-      paidAmount: Number(form.value.paidAmount) || 0,
+      paidAmount: form.value.isCompleted ? amount : (Number(form.value.paidAmount) || 0),
       breakdownNote: form.value.breakdownNote?.trim() || (hasMath ? rawExpression : ''),
       dueDate: form.value.dueDate ? form.value.dueDate + 'T00:00:00' : new Date().toISOString(),
       periodLabel: form.value.periodLabel || '1-10',
@@ -1318,9 +1326,20 @@ const handleSave = async () => {
 };
 
 const toggleComplete = async (item) => {
-  item.isCompleted = !item.isCompleted;
-  item.paidAmount = item.isCompleted ? item.totalAmount : 0;
-  await notifyAndPushCloud();
+  const id = String(item.id);
+  if (completionPending.value.has(id)) return;
+  const index = records.value.findIndex(record => String(record.id) === id);
+  if (index === -1) return;
+  // Prioritized rows include computed fields and are copies; always change the source.
+  const record = records.value[index];
+  const isCompleted = !record.isCompleted;
+  records.value[index] = { ...record, isCompleted, paidAmount: isCompleted ? Number(record.totalAmount) : 0 };
+  completionPending.value.add(id);
+  try {
+    const synced = await notifyAndPushCloud();
+    if (synced) window.dispatchEvent(new CustomEvent('app-notice', { detail: { message: isCompleted ? 'Đã đánh dấu khoản nợ đã trả. Chọn Tất cả để xem hoặc hoàn tác.' : 'Đã hoàn tác trạng thái đã trả.' } }));
+  }
+  finally { completionPending.value.delete(id); }
 };
 
 const deleteItem = async (id) => {

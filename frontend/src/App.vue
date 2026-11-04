@@ -9,7 +9,7 @@
     </aside>
     <main class="app-main">
       <header class="workspace-header"><div class="flex items-center gap-3"><span class="mobile-brand material-symbols-rounded">space_dashboard</span><span class="text-sm text-slate-500">Không gian cá nhân <span class="mx-2 text-slate-300">/</span><strong class="text-slate-800">{{ currentTabTitle }}</strong></span></div><div class="flex items-center gap-2"><button class="icon-button" aria-label="Thông báo và cài đặt" title="Thông báo và cài đặt" @click="activeTab='settings'"><span class="material-symbols-rounded">notifications</span><span v-if="unpaidDebtCount" class="notification-dot"></span></button><button class="icon-button" aria-label="Đổi mật khẩu" title="Đổi mật khẩu" @click="showChangePasswordModal=true"><span class="material-symbols-rounded">key</span></button><button class="icon-button md:hidden" aria-label="Đăng xuất" @click="handleLogout"><span class="material-symbols-rounded">logout</span></button></div></header>
-      <div v-if="cloudSyncState==='error'" class="sync-warning" role="status">Có dữ liệu chưa đồng bộ. Kiểm tra kết nối hoặc mở Cài đặt để thử lại.<button @click="triggerManualCloudSync">Thử lại</button></div>
+      <div v-if="cloudSyncState==='error'" class="sync-warning" role="status"><span>{{ syncError || 'Chưa tải hoặc đồng bộ đủ dữ liệu. Kiểm tra kết nối và thử lại.' }}</span><button @click="triggerManualCloudSync">Thử lại</button></div>
       <div class="workspace-content" :key="currentUser.id">
         <DailyHub v-if="activeTab==='hub'" :user="currentUser" :wallets="wallets" :debts="debts" :events="events" :tasks="tasks" :notes="notes" @switch-tab="activeTab=$event" @toggle-task="toggleTask" @refresh-all="triggerManualCloudSync" />
         <DebtPlannerModule v-else-if="activeTab==='debts'" @debts-updated="syncDebtsFromStorage" />
@@ -29,6 +29,7 @@
 
 <script setup>
 import { accountStorage } from './services/storage';
+import { signOut } from './services/session';
 
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import NotificationSettings from './components/NotificationSettings.vue';
@@ -44,6 +45,7 @@ import AiChatWidget from './components/AiChatWidget.vue';
 import { apiFetch, getStoredUser, setStoredUser } from './services/api';
 import {
   cloudSyncState,
+  syncError,
   lastSyncTime,
   VAULT_NOTE_TITLE,
   getLocalDebts,
@@ -196,11 +198,17 @@ const handleAuthSuccess = (user) => {
 
 const handleLogout = async () => {
   if (confirm('Bạn có chắc muốn đăng xuất khỏi tài khoản?')) {
-    try { if ('serviceWorker' in navigator) await unregisterPushNotification(); }
-    catch { notice.value = 'Chưa tắt được thông báo trên máy chủ. Vui lòng kết nối mạng rồi đăng xuất lại.'; return; }
-    setStoredUser(null);
+    // Browser unsubscribe prevents further delivery. Server cleanup must never block logout.
+    void signOut().then(cleaned => {
+      if (!cleaned) {
+        notice.value = 'Đã đăng xuất. Nếu còn thông báo, hãy tắt quyền thông báo của trang trong trình duyệt.';
+      }
+    });
     currentUser.value = null;
     wallets.value = []; debts.value = []; events.value = []; tasks.value = []; notes.value = [];
+    showChangePasswordModal.value = false;
+    cloudSyncState.value = 'idle';
+    syncError.value = '';
   }
 };
 
@@ -294,6 +302,7 @@ const handleAiDataUpdated = () => {
 
 const fetchAllData = async () => {
   if (!currentUser.value) return;
+  syncError.value = '';
   const results = await Promise.all([
     fetchDebts(),
     fetchWallets(),

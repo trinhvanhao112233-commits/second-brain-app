@@ -15,6 +15,7 @@ export const setStoredUser = user => {
 };
 const notice = message => window.dispatchEvent(new CustomEvent('app-notice', { detail: { message, type: 'error' } }));
 const status = state => window.dispatchEvent(new CustomEvent('api-sync-state', { detail: state }));
+const reportError = message => window.dispatchEvent(new CustomEvent('api-sync-error', { detail: message }));
 export const pendingCount = () => JSON.parse(accountStorage.getItem('outbox') || '[]').length;
 let flushing = null;
 const responses = new Map();
@@ -23,16 +24,28 @@ async function request(endpoint, options = {}) {
   const user = getStoredUser();
   const owner = user?.id;
   const revision = accountStorage.getItem('data_revision');
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers, ...(user ? { Authorization: `Bearer ${user.token}` } : {}) },
     signal: AbortSignal.timeout(30000),
-  });
+    });
+  } catch (error) {
+    if (!/^\/(auth|notification|aiassistant)\//.test(endpoint)) {
+      reportError(`Không kết nối được API ${endpoint}. Máy chủ có thể đang khởi động hoặc kết nối bị chặn.`);
+      status('error');
+    }
+    throw error;
+  }
   if (getStoredUser()?.id !== owner && !endpoint.startsWith('/auth/')) throw new Error('Tài khoản đã thay đổi.');
   if ((!options.method || options.method === 'GET') && revision !== accountStorage.getItem('data_revision')) throw new Error('Dữ liệu đã thay đổi trong khi tải. Vui lòng làm mới.');
   if (response.status === 401 && !endpoint.startsWith('/auth/')) {
     window.dispatchEvent(new Event('session-expired'));
     throw new Error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+  }
+  if (!response.ok && !/^\/(auth|notification|aiassistant)\//.test(endpoint)) {
+    reportError(`API ${endpoint} trả lỗi ${response.status}. ${response.status >= 500 ? 'Cần kiểm tra log backend Render.' : 'Mở Cài đặt để kiểm tra thao tác chờ gửi.'}`);
   }
   return response;
 }
@@ -90,7 +103,7 @@ export async function apiFetch(endpoint, options = {}) {
   }
   if (method === 'GET' && !endpoint.startsWith('/notification/') && getStoredUser() && pendingCount()) await flushPending();
   const res = await request(endpoint, options);
-  if (!res.ok) status('error');
+  if (!res.ok && !/^\/(auth|notification|aiassistant)\//.test(endpoint)) status('error');
   return res;
 }
 

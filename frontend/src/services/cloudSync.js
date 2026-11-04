@@ -7,6 +7,8 @@ const KEY = 'second_brain_debts_v1';
 const BASE = 'debts_server_snapshot_v3';
 const read = (key, fallback) => { try { return JSON.parse(accountStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 export const cloudSyncState = ref('idle');
+export const syncError = ref('');
+window.addEventListener('api-sync-error', e => { syncError.value = e.detail; });
 export const lastSyncTime = ref('');
 window.addEventListener('api-sync-state', e => { cloudSyncState.value = e.detail; });
 export const getLocalDebts = () => read(KEY, []);
@@ -47,7 +49,7 @@ export const pushDebtsToCloud = (list, carryOver = getLocalCarryOver()) => {
   return serial(async () => {
     cloudSyncState.value = 'syncing';
     try { await sendChanges(snapshot); saved(); return true; }
-    catch { cloudSyncState.value = 'error'; return false; }
+    catch (error) { syncError.value = error.message || 'Chưa lưu được khoản nợ.'; cloudSyncState.value = 'error'; return false; }
   });
 };
 export const syncDebtsBidirectional = () => serial(async () => {
@@ -55,11 +57,11 @@ export const syncDebtsBidirectional = () => serial(async () => {
   try {
     await flushPending();
     const response = await apiFetch('/debts');
-    if (!response.ok) throw new Error('Không tải được khoản mục.');
+    if (!response.ok) throw new Error(`API /debts trả lỗi ${response.status}. Kiểm tra log backend Render nếu lỗi từ máy chủ.`);
     let server = await response.json();
     if (!accountStorage.getItem('debt_migration_v3')) {
       const notesResponse = await apiFetch('/notes');
-      if (!notesResponse.ok) throw new Error('Chưa đọc được bản sao lưu cũ.');
+      if (!notesResponse.ok) throw new Error(`API /notes trả lỗi ${notesResponse.status}; chưa đọc được bản sao lưu cũ.`);
       const vaults = (await notesResponse.json()).filter(n => n.title === VAULT_NOTE_TITLE);
       const legacy = new Map(getLocalDebts().map(x => [String(x.id), x]));
       const deleted = new Set(getDeletedDebtIds());
@@ -91,5 +93,5 @@ export const syncDebtsBidirectional = () => serial(async () => {
     accountStorage.setItem(BASE, JSON.stringify(server));
     saved();
     return server;
-  } catch { cloudSyncState.value = 'error'; return getLocalDebts(); }
+  } catch (error) { syncError.value = error.message || 'Chưa tải được khoản nợ.'; cloudSyncState.value = 'error'; return getLocalDebts(); }
 });

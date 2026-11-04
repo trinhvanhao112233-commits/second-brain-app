@@ -78,10 +78,15 @@ export const registerPushNotification = async () => {
   }
 };
 
-export const unregisterPushNotification = async () => {
+export const unregisterPushNotification = async ({ localOnly = false } = {}) => {
+  if (!('serviceWorker' in navigator)) return;
   const registration = await navigator.serviceWorker?.getRegistration();
   const subscription = await registration?.pushManager.getSubscription();
   if (!subscription) return;
+  if (localOnly) {
+    await subscription.unsubscribe();
+    return;
+  }
   const res = await apiFetch('/notification/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: subscription.endpoint, keys: subscription.toJSON().keys }) });
   if (!res.ok) throw new Error('Không tắt được thông báo trên máy chủ.');
   await subscription.unsubscribe();

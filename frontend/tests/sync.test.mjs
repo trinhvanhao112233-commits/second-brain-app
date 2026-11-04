@@ -25,7 +25,11 @@ async function setup(fetcher) {
     .replace("'./api'",JSON.stringify(url(source)))
     .replace("'./storage'",JSON.stringify(storageUrl));
   const cloud=await import(url(cloudSource));
-  return {...api,...storage,...cloud};
+  const pushSource=(await readFile(new URL('../src/services/pushNotification.js',import.meta.url),'utf8')).replace("'./api'",JSON.stringify(url(source)));
+  const pushUrl=url(pushSource);
+  const sessionSource=(await readFile(new URL('../src/services/session.js',import.meta.url),'utf8')).replace("'./api'",JSON.stringify(url(source))).replace("'./pushNotification'",JSON.stringify(pushUrl));
+  const session=await import(url(sessionSource));
+  return {...api,...storage,...cloud,...session};
 }
 const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}});
 
@@ -111,4 +115,30 @@ test('migrates vault debts once and retains legacy notes as a backup',async()=>{
   assert.equal(debts[0].id,'legacy');
   assert.deepEqual(writes,['https://test.invalid/api/debts/legacy']);
   assert.equal(api.accountStorage.getItem('debt_migration_v3'),'true');
+});
+test('logout clears credentials and keeps pending data when browser unsubscribe fails',async()=>{
+  let requests=0;
+  const api=await setup(()=>{requests++;throw new Error('offline');});
+  api.accountStorage.setItem('outbox','[{"id":"pending"}]');
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{serviceWorker:{getRegistration:async()=>({pushManager:{getSubscription:async()=>({unsubscribe:async()=>{throw new Error('browser failed');}})}})}}});
+  const cleanup=api.signOut();
+  assert.equal(api.getStoredUser(),null);
+  assert.equal(await cleanup,false);
+  assert.equal(requests,0);
+  api.setStoredUser({id:'alice',token:'new-session'});
+  assert.equal(api.pendingCount(),1);
+});
+test('logout cancels browser delivery without waiting for backend',async()=>{
+  let unsubscribed=false;
+  const api=await setup(()=>{throw new Error('Must not contact server on logout');});
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:{serviceWorker:{getRegistration:async()=>({pushManager:{getSubscription:async()=>({unsubscribe:async()=>{unsubscribed=true;}})}})}}});
+  assert.equal(await api.signOut(),true);
+  assert.equal(api.getStoredUser(),null);
+  assert.equal(unsubscribed,true);
+});
+test('missing notification configuration does not mark data sync as failed',async()=>{
+  const api=await setup(()=>json({message:'Not configured'},503));
+  const states=[];window.addEventListener('api-sync-state',e=>states.push(e.detail));
+  await api.apiFetch('/notification/vapid-public-key');
+  assert.equal(states.includes('error'),false);
 });

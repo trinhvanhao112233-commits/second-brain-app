@@ -267,3 +267,33 @@ test('Paid remains visible as a pending local edit when offline and is sent on r
     assert.equal(server[0].isCompleted,true);assert.equal(api.pendingCount(),0);
   } finally { planner.unmount(); }
 });
+
+test('paying debt never increases forecast surplus, carry-over, or available repayment funds',async()=>{
+  const month=new Date().toISOString().slice(0,7);
+  let server=[
+    {id:'income',title:'Lương',recordType:'INCOME',totalAmount:10000,paidAmount:0,isCompleted:false,dueDate:month+'-01T00:00:00',periodLabel:'1-10',priorityLevel:1},
+    {id:'debt-a',title:'Nợ A',recordType:'DEBT',totalAmount:3000,paidAmount:1000,isCompleted:false,dueDate:month+'-05T00:00:00',periodLabel:'1-10',priorityLevel:1},
+    {id:'debt-b',title:'Nợ B',recordType:'DEBT',totalAmount:8000,paidAmount:0,isCompleted:false,dueDate:month+'-15T00:00:00',periodLabel:'10-21',priorityLevel:2},
+  ];
+  const api=await setup(async(url,options)=>{
+    if(options.method==='PUT'){const row=JSON.parse(options.body);server=server.map(x=>x.id===row.id?row:x);return json(row);}
+    return json(url.endsWith('/debts')?server:[]);
+  });
+  api.accountStorage.setItem('debt_migration_v3','true');api.setLocalDebts(server);
+  api.accountStorage.setItem('debts_server_snapshot_v3',JSON.stringify(server));
+  const planner=await mountDebtPlanner(api);
+  try {
+    planner.state.carryOverBalance=true;
+    assert.equal(planner.state.summaryStats.netBalanceAfterBorrow,-1000);
+    assert.equal(planner.state.timelineStages[0].netResult,7000);
+    assert.equal(planner.state.timelineStages[1].carriedFromPrev,7000);
+    assert.equal(planner.state.prioritizedDebts.find(x=>x.id==='debt-b').shortfallAmount,1000);
+    await planner.state.toggleComplete(planner.state.prioritizedDebts.find(x=>x.id==='debt-a'));
+    assert.equal(planner.state.summaryStats.totalPaidDebt,3000);
+    assert.equal(planner.state.summaryStats.totalUnpaidDebt,8000);
+    assert.equal(planner.state.summaryStats.netBalanceAfterBorrow,-1000);
+    assert.equal(planner.state.timelineStages[0].netResult,7000);
+    assert.equal(planner.state.timelineStages[1].carriedFromPrev,7000);
+    assert.equal(planner.state.prioritizedDebts.find(x=>x.id==='debt-b').shortfallAmount,1000);
+  } finally { planner.unmount(); }
+});

@@ -278,11 +278,16 @@
 
               <!-- Dòng CHI (NỢ) -->
               <div class="flex items-start justify-between gap-2">
-                <span class="font-bold text-rose-600 shrink-0">Chi (Nợ):</span>
+                <span class="font-bold text-rose-600 shrink-0">Còn phải trả:</span>
                 <div class="text-right text-slate-700 break-all">
                   <span>{{ stage.debtFormula || '0' }}</span>
                   <span class="font-black text-rose-600"> = {{ formatShortK(stage.debtTotal) }}</span>
                 </div>
+              </div>
+
+              <div v-if="stage.paidDebtTotal > 0" class="flex items-center justify-between gap-2 text-slate-500">
+                <span>Đã dùng trả nợ:</span>
+                <span class="font-bold">−{{ formatVND(stage.paidDebtTotal) }}</span>
               </div>
 
               <!-- Dòng VAY THÊM NGOÀI -->
@@ -459,7 +464,7 @@
               </button>
             </div>
             <div v-else class="flex items-center justify-between text-xs">
-              <span class="text-slate-600 font-semibold">✅ Trả xong mốc {{ stage.id }}, còn dư:</span>
+              <span class="text-slate-600 font-semibold">Dư dự kiến sau trả hết nợ mốc {{ stage.id }}:</span>
               <span class="font-mono font-black text-sm text-emerald-600">+{{ formatVND(stage.netResult) }}</span>
             </div>
           </div>
@@ -1039,8 +1044,10 @@ const summaryStats = computed(() => {
   const totalUnpaidDebt = Math.max(0, totalAllDebt - totalPaidDebt);
   const totalBorrowedMore = borrowMoreRecords.value.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
 
-  const rawBalance = totalIncome - totalUnpaidDebt;
-  const netBalanceAfterBorrow = totalIncome + totalBorrowedMore - totalUnpaidDebt;
+  // Paid debt has already consumed income. Forecasting the final surplus must
+  // subtract both the paid and the outstanding portions of the original debt.
+  const rawBalance = totalIncome - totalAllDebt;
+  const netBalanceAfterBorrow = totalIncome + totalBorrowedMore - totalAllDebt;
   const neededToBorrow = netBalanceAfterBorrow < 0 ? Math.abs(netBalanceAfterBorrow) : 0;
 
   return {
@@ -1076,10 +1083,11 @@ const timelineStages = computed(() => {
     const borrows = borrowMoreRecords.value.filter(r => r.periodLabel === cfg.id);
 
     const incomeTotal = incomes.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
-    const debtTotal = debts.reduce((s, r) => {
-      if (r.isCompleted) return s;
-      return s + Math.max(0, (Number(r.totalAmount) || 0) - (Number(r.paidAmount) || 0));
-    }, 0);
+    const plannedDebtTotal = debts.reduce((s, r) => s + Math.max(0, Number(r.totalAmount) || 0), 0);
+    const paidDebtTotal = debts.reduce((s, r) => s + (r.isCompleted
+      ? Math.max(0, Number(r.totalAmount) || 0)
+      : Math.min(Math.max(0, Number(r.totalAmount) || 0), Math.max(0, Number(r.paidAmount) || 0))), 0);
+    const debtTotal = plannedDebtTotal - paidDebtTotal;
     const borrowMoreTotal = borrows.reduce((s, r) => s + (Number(r.totalAmount) || 0), 0);
 
     const incomeFormula = incomes.map(i => Math.round((Number(i.totalAmount) || 0) / 1000)).join(' + ');
@@ -1089,7 +1097,7 @@ const timelineStages = computed(() => {
       .join(' + ');
 
     const carriedFromPrev = carryOverBalance.value ? runningCarry : 0;
-    const netResult = carriedFromPrev + incomeTotal + borrowMoreTotal - debtTotal;
+    const netResult = carriedFromPrev + incomeTotal + borrowMoreTotal - plannedDebtTotal;
 
     if (carryOverBalance.value) {
       runningCarry = netResult;
@@ -1102,6 +1110,8 @@ const timelineStages = computed(() => {
       borrows,
       incomeTotal,
       debtTotal,
+      plannedDebtTotal,
+      paidDebtTotal,
       borrowMoreTotal,
       incomeFormula,
       debtFormula,
@@ -1125,7 +1135,7 @@ const prioritizedDebts = computed(() => {
     return (Number(a.totalAmount) || 0) - (Number(b.totalAmount) || 0);
   });
 
-  let availablePool = summaryStats.value.totalIncome + summaryStats.value.totalBorrowedMore;
+  let availablePool = summaryStats.value.totalIncome + summaryStats.value.totalBorrowedMore - summaryStats.value.totalPaidDebt;
 
   return list.map(d => {
     const remainingAmount = d.isCompleted ? 0 : Math.max(0, (Number(d.totalAmount) || 0) - (Number(d.paidAmount) || 0));

@@ -9,7 +9,7 @@
         <div>
           <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">Sổ Thu Chi & Quản Lý Ví</h2>
           <p class="text-xs text-slate-500 mt-0.5">
-            Ghi thu chi 1 chạm • Tự động tính định mức tiêu mỗi ngày trong tháng {{ currentMonthLabel }}
+            Ghi thu chi 1 chạm • Tự đặt ngân sách tuần và tính trung bình mỗi ngày
           </p>
         </div>
       </div>
@@ -82,29 +82,29 @@
         </div>
       </div>
 
-      <!-- Ô 3: Định Mức Được Tiêu Mỗi Ngày -->
-      <div
-        class="rounded-2xl p-5 shadow-sm border flex flex-col justify-between"
-        :class="overviewStats.safeDailyAllowance > 0 ? 'bg-indigo-50/50 border-indigo-200' : 'bg-rose-50/60 border-rose-200'"
-      >
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-indigo-900">
-            Được Tiêu Mỗi Ngày
-          </span>
-          <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
-            <span class="material-symbols-rounded text-lg">today</span>
-          </div>
+      <div class="rounded-2xl p-5 shadow-sm border border-indigo-200 bg-indigo-50/50 space-y-3">
+        <span class="text-xs font-bold uppercase text-indigo-900">Được tiêu mỗi ngày trong tuần</span>
+        <div class="flex items-center justify-between gap-2 text-xs text-indigo-900">
+          <button type="button" @click="changeWeek(-1)" aria-label="Tuần trước" class="p-2 rounded hover:bg-indigo-100">←</button>
+          <span>{{ weekLabel }} (T2–CN)</span>
+          <button type="button" @click="changeWeek(1)" aria-label="Tuần sau" class="p-2 rounded hover:bg-indigo-100">→</button>
         </div>
-        <div class="my-2">
-          <div class="text-2xl sm:text-3xl font-black font-mono text-indigo-700">
-            {{ formatVND(overviewStats.safeDailyAllowance) }}<span class="text-xs font-sans font-semibold text-slate-500">/ngày</span>
-          </div>
-          <div class="text-xs text-slate-600 mt-0.5">
-            Còn <strong>{{ overviewStats.daysRemainingInMonth }} ngày</strong> nữa hết tháng {{ new Date().getMonth() + 1 }}
-          </div>
+        <div class="text-2xl font-black font-mono text-indigo-700">
+          {{ weeklyBudget === null ? 'Chưa đặt' : formatVND(Math.floor(weeklyBudget / 7)) }}<span v-if="weeklyBudget !== null" class="text-xs text-slate-500">/ngày</span>
         </div>
-        <div class="text-xs text-indigo-800 pt-2 border-t border-indigo-200/70 flex items-center justify-between font-medium">
-          <span>Giữ mức này để cuối tháng không thiếu tiền</span>
+        <p class="text-xs text-slate-600">Ngân sách tuần ÷ 7 ngày</p>
+        <form @submit.prevent="saveWeeklyBudget" class="space-y-2">
+          <label for="weekly-budget" class="block text-xs font-bold text-indigo-900">Số tiền bạn muốn tiêu trong tuần</label>
+          <div class="flex gap-2">
+            <input id="weekly-budget" v-model="weeklyBudgetInput" type="text" inputmode="decimal" placeholder="Ví dụ: 700k hoặc 1tr" required class="min-w-0 w-full px-3 py-2 bg-white border border-indigo-200 rounded-xl text-sm" />
+            <button type="submit" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">Lưu</button>
+          </div>
+          <p v-if="weeklyBudgetMessage" role="status" class="text-xs text-indigo-800">{{ weeklyBudgetMessage }}</p>
+        </form>
+        <div v-if="weeklyBudget !== null" class="text-xs pt-2 border-t border-indigo-200 space-y-1">
+          <div class="flex justify-between"><span>Ngân sách tuần:</span><strong>{{ formatVND(weeklyBudget) }}</strong></div>
+          <div class="flex justify-between"><span>Đã chi trong tuần:</span><strong>{{ formatVND(weeklySpent) }}</strong></div>
+          <div class="flex justify-between" :class="weeklySpent > weeklyBudget ? 'text-rose-700' : 'text-indigo-800'"><span>{{ weeklySpent > weeklyBudget ? 'Vượt ngân sách:' : 'Còn lại trong tuần:' }}</span><strong>{{ formatVND(Math.abs(weeklyBudget - weeklySpent)) }}</strong></div>
         </div>
       </div>
     </div>
@@ -375,6 +375,14 @@
       </div>
 
       <!-- Empty State -->
+      <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-rose-100 bg-rose-50 px-4 py-3">
+        <div>
+          <span class="text-xs font-bold text-rose-800">Tổng tiền đã chi</span>
+          <p class="text-[11px] text-slate-500 mt-0.5">Theo thời gian và ví đang chọn · Không tính chuyển tiền giữa các ví</p>
+        </div>
+        <strong class="font-mono text-lg text-rose-600">{{ formatVND(filteredTotalSpent) }}</strong>
+      </div>
+
       <div v-if="filteredTransactions.length === 0" class="py-10 text-center text-slate-400 text-xs">
         <span class="material-symbols-rounded text-3xl mb-1 text-slate-300">receipt</span>
         <p>Chưa có giao dịch nào trong khoảng thời gian này.</p>
@@ -448,7 +456,7 @@
 <script setup>
 import { accountStorage } from '../services/storage';
 
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { apiFetch } from '../services/api';
 
 const emit = defineEmits(['wallets-updated']);
@@ -524,10 +532,71 @@ const newWalletForm = ref({
   initialBalance: '',
 });
 
-const currentMonthLabel = computed(() => {
-  const now = new Date();
-  return `${now.getMonth() + 1}/${now.getFullYear()}`;
+const monday = new Date();
+monday.setHours(0, 0, 0, 0);
+monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+const selectedWeek = ref(monday);
+const weeklyBudgetInput = ref('');
+const weeklyBudgetMessage = ref('');
+const WEEKLY_BUDGET_KEY = 'second_brain_weekly_budgets_v1';
+const loadWeeklyBudgets = () => {
+  try {
+    const data = JSON.parse(accountStorage.getItem(WEEKLY_BUDGET_KEY) || '{}');
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+  } catch { return {}; }
+};
+const weeklyBudgets = ref(loadWeeklyBudgets());
+const weekKey = computed(() => {
+  const d = selectedWeek.value;
+  return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
 });
+const weekEnd = computed(() => {
+  const d = new Date(selectedWeek.value);
+  d.setDate(d.getDate() + 7);
+  return d;
+});
+const weekLabel = computed(() => {
+  const last = new Date(weekEnd.value);
+  last.setDate(last.getDate() - 1);
+  return selectedWeek.value.toLocaleDateString('vi-VN') + ' – ' + last.toLocaleDateString('vi-VN');
+});
+const weeklyBudget = computed(() => {
+  const value = weeklyBudgets.value[weekKey.value];
+  return Number.isSafeInteger(value) && value >= 0 ? value : null;
+});
+watch(weekKey, () => {
+  weeklyBudgetInput.value = weeklyBudget.value === null ? '' : weeklyBudget.value.toLocaleString('vi-VN');
+  weeklyBudgetMessage.value = '';
+}, { immediate: true });
+const changeWeek = offset => {
+  const d = new Date(selectedWeek.value);
+  d.setDate(d.getDate() + offset * 7);
+  selectedWeek.value = d;
+};
+const saveWeeklyBudget = () => {
+  const raw = weeklyBudgetInput.value.trim();
+  if (!/^[0-9]+(?:[., ][0-9]+)*(?:\s*(?:k|tr|triệu|m))?$/i.test(raw)) {
+    weeklyBudgetMessage.value = 'Vui lòng nhập số tiền hợp lệ, ví dụ 700k.';
+    return;
+  }
+  // Plain numbers are VND; abbreviations use the existing amount parser.
+  const amount = /[a-zệ]/i.test(raw) ? parseSmartAmount(raw) : Number(raw.replace(/[., ]/g, ''));
+  if (!Number.isSafeInteger(amount) || amount < 0) {
+    weeklyBudgetMessage.value = 'Vui lòng nhập số tiền hợp lệ.';
+    return;
+  }
+  const next = { ...weeklyBudgets.value, [weekKey.value]: amount };
+  try {
+    accountStorage.setItem(WEEKLY_BUDGET_KEY, JSON.stringify(next));
+    weeklyBudgets.value = next;
+    weeklyBudgetMessage.value = 'Đã lưu ngân sách tuần.';
+  } catch { weeklyBudgetMessage.value = 'Chưa lưu được. Vui lòng thử lại.'; }
+};
+const weeklySpent = computed(() => allTransactions.value.reduce((sum, tx) => {
+  const date = new Date(tx.transactionDate || tx.createdAt);
+  return !isTransfer(tx) && tx.category !== 'Số dư đầu kỳ' && Number(tx.amount) < 0 && date >= selectedWeek.value && date < weekEnd.value
+    ? sum + Math.abs(Number(tx.amount)) : sum;
+}, 0));
 
 // Hàm phân tích chuỗi tiền thông minh (50k, 2tr, 30+20, 50000...)
 const parseSmartAmount = (input) => {
@@ -632,8 +701,6 @@ const overviewStats = computed(() => {
   const year = now.getFullYear();
   const month = now.getMonth();
   const todayDate = now.getDate();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const daysRemainingInMonth = Math.max(1, daysInMonth - todayDate + 1);
 
   const ymPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
   const todayPrefix = `${ymPrefix}-${String(todayDate).padStart(2, '0')}`;
@@ -661,7 +728,6 @@ const overviewStats = computed(() => {
   }
 
   const avgDailySpent = Math.round(monthlySpent / Math.max(1, todayDate));
-  const safeDailyAllowance = totalBalance > 0 ? Math.floor(totalBalance / daysRemainingInMonth) : 0;
 
   return {
     totalBalance,
@@ -669,8 +735,6 @@ const overviewStats = computed(() => {
     monthlyIncome,
     todaySpent,
     avgDailySpent,
-    daysRemainingInMonth,
-    safeDailyAllowance,
   };
 });
 
@@ -694,6 +758,12 @@ const filteredTransactions = computed(() => {
 
   return list.sort((a, b) => new Date(b.transactionDate || b.createdAt) - new Date(a.transactionDate || a.createdAt));
 });
+
+const filteredTotalSpent = computed(() => filteredTransactions.value.reduce((sum, tx) => {
+  const amount = Number(tx.amount);
+  return Number.isFinite(amount) && amount < 0 && !isTransfer(tx) && tx.category !== 'Số dư đầu kỳ'
+    ? sum + Math.abs(amount) : sum;
+}, 0));
 
 // Đảm bảo luôn có ít nhất 1 ví mặc định để người dùng ghi thu chi ngay mà không bị chặn
 const ensureDefaultWallet = async () => {

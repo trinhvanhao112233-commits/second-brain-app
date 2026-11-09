@@ -1,90 +1,83 @@
-# Cập nhật Personal OS
+# Bản thay thế LifeOS — Vercel + Render
 
-Thay đổi này sửa xác thực, quyền sở hữu dữ liệu, đồng bộ, giao diện Hôm nay, ghi trả nợ từ ví và thông báo đa thiết bị. Chưa triển khai lên Vercel/Render và chưa kết nối kiểm thử cơ sở dữ liệu production.
+## Phạm vi
 
-## Trước khi cập nhật
+Thay toàn bộ mã Second Brain bằng Quản lý cá nhân. Giữ lịch sử Git để khôi phục; không
+đẩy .env/token/khóa hoặc cấu hình Sites. API dùng bảng mới `LifeOsUsers`, `LifeOsStates`,
+`LifeOsBankConnections`, `LifeOsBankEvents`. Không xóa/sửa các bảng Second Brain.
+Tài khoản/dữ liệu Second Brain không tự chuyển sang bản mới: sao lưu bản cũ và đăng ký
+tài khoản LifeOS. Không có tài khoản mẫu công khai.
 
-1. Sao lưu database. Giữ lại LocalStorage và các ghi chú `__SB_CLOUD_VAULT_V2__` cũ; không xóa dữ liệu trình duyệt khi đang chuyển đổi.
-2. Cập nhật backend và frontend trong cùng một đợt bảo trì. Backend mới không còn chấp nhận `X-User-Id`; frontend cũ không dùng được với backend mới.
-3. Người dùng cần đăng nhập lại. Cache cũ chỉ được chuyển sang tài khoản khi ID người đăng nhập trùng ID chủ sở hữu đã ghi trong trình duyệt. Cache của mỗi tài khoản được tách riêng.
+## Vercel
 
-## Backend trên Render
-
-Thiết lập biến môi trường:
-
-| Biến | Nội dung |
+| Mục | Giá trị |
 | --- | --- |
-| `ConnectionStrings__MySqlConnection` | Chuỗi kết nối MySQL/TiDB đang sử dụng |
-| `Cors__Origins__0` | `https://second-brain-app-sepia.vercel.app` |
-| `VAPID_PUBLIC_KEY` | Khóa công khai mới |
-| `VAPID_PRIVATE_KEY` | Khóa riêng mới, chỉ đặt trên backend |
-| `VAPID_SUBJECT` | `mailto:` kèm địa chỉ liên hệ thực tế |
-| `DataProtection__KeyPath` | Thư mục trên ổ lưu bền, ví dụ `/var/data/personal-os-keys` |
-| `GEMINI_API_KEY` | Tùy chọn, dùng AI ngoài thay cho bộ phân tích cục bộ |
-| `GEMINI_MODEL` | Tên model đã được bật trong tài khoản của bạn |
+| Root Directory | `frontend` |
+| Framework Preset | `Other` nếu đang khóa preset Vue/Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Install Command | `npm ci` |
+| `VITE_API_URL` | `https://<backend-render>/api` |
 
-Tạo cặp khóa VAPID mới trên máy quản trị:
+Build tạo config.js từ biến API và sao chép HTML/CSS/JS sang dist; không có thư viện
+frontend. Đổi URL backend thì build lại frontend. URL dự phòng trùng backend hiện tại.
+`frontend/vercel.json` ghi đè preset thành Other và khai báo build/output/install để
+không tiếp tục dùng thiết lập Vue/Vite cũ.
 
-```powershell
-dotnet run --project backend -- --generate-vapid
-```
+## Render
 
-Không đưa khóa riêng vào frontend hoặc Git. Đã xóa cặp khóa dự phòng viết cứng trong source. Nếu bản cũ đang dùng cặp khóa đó, thay cả hai khóa và tắt/bật đăng ký thông báo trên từng thiết bị.
+Root Directory `backend`, Dockerfile `Dockerfile`, cổng 5000 và tên project .NET giữ
+tương thích với cấu hình cũ, nhưng mã API đã được viết lại. Giữ các biến đang dùng:
 
-Phiên đăng nhập được bảo vệ bằng ASP.NET Core Data Protection, có hạn 7 ngày và bị vô hiệu khi mật khẩu thay đổi. Thư mục khóa phải được lưu bền; các instance backend phải dùng chung key ring. Nếu không cấu hình lưu bền, khởi động lại có thể yêu cầu người dùng đăng nhập lại.
+| Biến | Giá trị |
+| --- | --- |
+| `ConnectionStrings__MySqlConnection` | Chuỗi MySQL/TiDB hiện tại |
+| `Cors__Origins__0` | Domain Vercel, không có dấu `/` cuối |
+| `DataProtection__KeyPath` | Tùy chọn: thư mục key ring trên ổ bền |
 
-## Database
+Không cần biến Gemini, VAPID hoặc khóa SePay global. Không tự xóa secret cũ nếu dịch vụ
+khác còn dùng. Backend cần quyền CREATE TABLE cho bốn bảng mới và đọc/ghi trên chúng.
+Thử schema `Store.Schema` trên staging trước production. Chỉ CREATE IF NOT EXISTS, không
+DROP. Nếu key ring không bền, restart có thể yêu cầu đăng nhập lại; Webhook key hash
+vẫn giữ trong MySQL và tiếp tục nhận giao dịch.
 
-Ứng dụng áp dụng bản nâng cấp cộng thêm `backend/Schema/20261105.sql` và ghi nhận vào `AppSchemaVersions`. Bổ sung:
+Deploy Render trước; `GET /api/health` phải trả `ok:true`, rồi deploy Vercel. Nếu đang
+bật tự deploy main, push sẽ kích hoạt pipeline theo cấu hình của bạn.
 
-- `Users.NotificationSettings`.
-- `Transactions.TransferId`, `Transactions.DebtRecordId`.
-- Bảng `ReminderDeliveries` theo dõi kết quả gửi từng thiết bị.
-- Các bảng/cột cũ còn thiếu theo bootstrap của dự án.
+## SePay
 
-Không xóa bảng hoặc dữ liệu. Chỉ bỏ qua lỗi cột/index đã tồn tại; lỗi khác làm startup thất bại để tránh chạy với schema thiếu. Chưa xác minh script với database thực của bạn, vì vậy cần thử trên bản sao/staging trước production.
+1. Đăng ký/đăng nhập LifeOS; mặc định tài khoản trống, không có thu chi mẫu.
+2. Cài đặt → Kết nối VietinBank & SePay → nhập số tài khoản đã nhận cả tiền vào/ra
+   trên SePay → Tạo kết nối. Một kết nối VietinBank cho mỗi tài khoản LifeOS.
+3. SePay → Tích hợp Webhooks → Thêm webhook. Dán URL và API Key từ LifeOS.
+4. Chọn cả tiền vào/ra, đúng tài khoản. Bảo mật **API Key**, không chọn HMAC. Header
+   gửi đến là `Authorization: Apikey <key>`. Dùng HTTPS và `application/json`.
+5. Bật tự gửi lại và kiểm tra bộ lọc. VietinBank có điều kiện nội dung SEVQR; ứng dụng
+   không thể nhận giao dịch SePay không gửi.
+6. Gửi thử ID 0 không tạo thu chi. Đối chiếu một giao dịch thật trên SePay với LifeOS.
+   Không gửi dữ liệu tài chính giả vào production. Replay thật không được ghi hai lần.
+7. Nếu quên API Key, Tạo khóa mới rồi cập nhật trên SePay. Khóa cũ ngừng hoạt động.
+   Khóa chỉ trả về lần tạo/đổi, không lưu LocalStorage hoặc trả từ endpoint đọc.
 
-Đây là cơ chế nâng cấp schema theo phiên bản dành cho database đã bootstrap trước đây. Không chạy lại migration `InitialCreate` cũ trên database production. Nếu đội vận hành áp dụng SQL thủ công, xử lý các cột đã tồn tại, ghi nhận version sau khi hoàn tất và đặt `Database__AutoUpgrade=false`.
+Chỉ báo thành công sau khi lưu ledger. Primary key MySQL chặn cùng ID, kể cả callback
+đồng thời. Replay giống trả 200; cùng ID khác nội dung trả 409. Số tiền/chiều lấy từ
+ledger bất biến; người dùng chỉ đổi nhãn/danh mục/ghi chú. bankSeenIds ghi nhớ khoản
+đã nhập/xóa: giữ các ID này trong bản sao lưu để replay không phục hồi khoản đã xóa.
 
-Khoản nợ trong Cloud Vault cũ được nhập sang `/api/debts` một lần, giữ ID và ID đã xóa. Ghi chú cũ được giữ làm bản sao lưu và ẩn khỏi màn hình ghi chú. Cờ chuyển số dư giữa các đợt hiện lưu riêng trên từng thiết bị.
+Máy chủ nhận khi đóng web; tab đang mở tải mỗi 15 giây và hiện thông báo trong web.
+Chưa có Web Push khi đóng trình duyệt. Render Free ngủ sau 15 phút không có request,
+cần khoảng một phút khởi động; Webhook có thể chậm và cần retry. Không cam kết tức thì.
 
-## Frontend trên Vercel
+Nguồn: https://developer.sepay.vn/vi/sepay-webhooks/tich-hop-webhook,
+https://developer.sepay.vn/vi/sepay-webhooks/xac-thuc,
+https://docs.sepay.vn/ket-noi-vietinbank.html, https://render.com/docs/free.
 
-- Root Directory: `frontend`.
-- Build Command: `npm run build`.
-- Output Directory: `dist`.
-- `VITE_API_URL`: `https://<backend-domain>/api`.
+## Kiểm tra
 
-Đường dẫn thông báo dùng `/?tab=calendar`, `/?tab=tasks`, `/?tab=debts`, không yêu cầu rewrite cho đường dẫn con.
+Build .NET/frontend và chạy các test trong README. Test mã không kết nối database thật.
+Thử schema/quyền MySQL trên staging, kiểm tra hai tài khoản không đọc dữ liệu của nhau,
+đổi mật khẩu/đăng xuất, nhiều tab và xung đột revision. Khi xung đột, tải bản sao lưu
+thay đổi trước khi tải lại; không tự ghi đè server. Kiểm tra Webhook thật và số dư ghi sổ.
 
-## Kiểm tra sau deploy
-
-1. Đăng nhập lại và xác nhận ví, khoản nợ, công việc, lịch, ghi chú cũ vẫn đủ.
-2. Dùng hai tài khoản để kiểm tra không nhìn thấy dữ liệu/cache của nhau.
-3. Tạo một giao dịch; làm mới trên thiết bị khác và đối chiếu số dư.
-4. Thử mất mạng, tạo công việc, kết nối lại và chọn đồng bộ. Khi lỗi, kiểm tra hàng đợi trong Cài đặt. Thao tác bị từ chối không được đánh dấu thành công; có thể bỏ thao tác đầu nếu dữ liệu không hợp lệ. Bản sao thao tác bỏ vẫn nằm trên thiết bị.
-5. Ghi trả nợ từ ví: đối chiếu số dư và số đã trả; đây là ghi sổ trong ứng dụng, không chuyển tiền ngân hàng.
-6. Vào **Cài đặt → Bật thông báo → Gửi thử** trên từng thiết bị. iPhone/iPad cần mở web từ Màn hình chính trên hệ điều hành hỗ trợ Web Push.
-7. Tạo lịch trong giờ tới, một công việc sắp hạn và khoản nợ trong 3 ngày tới. Kiểm tra giờ yên lặng và nhấp thông báo mở đúng tab.
-
-Worker nhắc lịch cần backend hoạt động liên tục. Nếu hosting tạm dừng tiến trình, nhắc lịch có thể bị bỏ lỡ; các nhắc nợ/công việc được kiểm tra lại khi tiến trình hoạt động. Việc gửi push có thể bị chậm/chặn bởi hệ điều hành hoặc mạng. Nếu crash xảy ra sau khi nhà cung cấp nhận push nhưng trước khi lưu kết quả, lần thử sau có thể gửi trùng.
-
-## Giới hạn còn lại
-
-- Lịch và deadline dùng giờ Việt Nam/UTC+7; giao dịch lưu thời điểm UTC. Dữ liệu lịch cũ từng được ghi UTC cần đối chiếu và chỉnh nếu lệch giờ; không tự dịch hàng loạt vì định dạng cũ lẫn lộn.
-- Đồng bộ xếp hàng theo thiết bị và giữ ID khi gửi lại. Hai thiết bị sửa cùng một bản ghi vẫn theo lần lưu sau cùng; chưa có màn hình giải quyết xung đột hoặc cộng tác thời gian thực.
-- Giao dịch chuyển ví mới có liên kết hai đầu; giao dịch cũ không có `TransferId` không được tự đoán liên kết.
-- Luồng “Ghi trả nợ từ ví” lưu giao dịch tương ứng. Đánh dấu hoàn thành thủ công trên khoản cũ vẫn chỉ thay đổi trạng thái, không tự trừ tiền lần nữa.
-- Có xuất sao lưu JSON; chưa có nhập/khôi phục, thu chi định kỳ, mục tiêu tiết kiệm hay báo cáo nâng cao trong đợt sửa này.
-- Đã build và chạy kiểm tra mã; chưa kiểm chứng hiển thị desktop/mobile bằng ảnh trình duyệt, chưa thử push thực trên thiết bị hoặc giao dịch với database staging.
-
-## Kiểm tra mã
-
-```powershell
-npm.cmd --prefix frontend run build
-npm.cmd --prefix frontend test
-dotnet run --project tests/SecurityChecks
-dotnet build backend/PersonalFinance.API.csproj
-```
-
-Các kiểm tra tự động không kết nối hoặc sửa dữ liệu production.
+Nếu rollback, redeploy commit cũ. Bảng cũ còn nguyên, nhưng dữ liệu LifeOS không tự nhập
+vào mô hình Second Brain cũ nên hai phiên bản có dữ liệu riêng.

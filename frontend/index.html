@@ -1,23 +1,598 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#ffffff" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Second Brain" />
-    <title>Second Brain — Quản Lý Tài Chính & Công Việc</title>
-    <!-- Google Fonts: Inter & Plus Jakarta Sans & Material Symbols -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  </head>
-  <body class="bg-[#f4f6fa] text-slate-800 antialiased selection:bg-indigo-500/20 selection:text-indigo-700">
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Lý Cá Nhân — Lịch làm việc, Deadline, Thu Chi, Công nợ & Ghi chú</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="appearance.css" />
+  <link rel="stylesheet" href="online.css" />
+</head>
+<body>
+
+  <!-- ==================== MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ ==================== -->
+  <div class="auth-wrapper" id="auth-screen">
+    <div class="auth-intro">
+      <div class="intro-brand"><span class="brand-symbol">L</span> LifeOS <span class="intro-tag">PERSONAL WORKSPACE</span></div>
+      <div class="intro-copy"><span class="eyebrow">MỘT CHÚT NGĂN NẮP. NHIỀU HƠN THẢNH THƠI.</span><h2>Dành không gian<br>cho điều quan trọng.</h2><p>Lịch trình, công việc và tài chính cá nhân.<br>Tất cả trong một góc nhỏ của riêng bạn.</p></div>
+      <div class="intro-note"><span class="intro-dot"></span> Một nơi để bắt đầu mỗi ngày.</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="eyebrow">CHÀO MỪNG ĐẾN VỚI LIFEOS</span>
+        <h1>Không gian của bạn</h1>
+        <p>Đăng nhập để tiếp tục ngày mới có kế hoạch.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-btn-login" onclick="switchAuthMode('login')">Đăng nhập</button>
+        <button class="auth-tab" id="tab-btn-register" onclick="switchAuthMode('register')">Đăng ký tài khoản</button>
+      </div>
+
+      <div class="auth-error" id="auth-error-box"></div>
+
+      <!-- Form Đăng Nhập -->
+      <form class="auth-form" id="form-login" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Tên đăng nhập</label>
+          <input type="text" class="input" id="login-username" required autocomplete="username" placeholder="Nhập tên đăng nhập" />
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input type="password" class="input" id="login-password" required autocomplete="current-password" placeholder="Nhập mật khẩu" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 4px; padding: 10px;">
+          Đăng nhập vào hệ thống
+        </button>
+      </form>
+
+      <!-- Form Đăng Ký -->
+      <form class="auth-form" id="form-register" style="display: none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Họ và tên hiển thị *</label>
+          <input type="text" class="input" id="reg-fullname" required placeholder="VD: Nguyễn Văn A" />
+        </div>
+        <div class="form-group">
+          <label>Tên đăng nhập *</label>
+          <input type="text" class="input" id="reg-username" required placeholder="Viết liền không dấu (VD: nguyenvana)" />
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu *</label>
+          <input type="password" class="input" id="reg-password" required minlength="8" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự" />
+        </div>
+        <div class="form-group">
+          <label>Nhập lại mật khẩu *</label>
+          <input type="password" class="input" id="reg-confirm" required placeholder="Xác nhận mật khẩu" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 4px; padding: 10px;">
+          Tạo tài khoản mới
+        </button>
+      </form>
+
+      <div class="auth-footer-demo">
+        <span style="font-size: 0.78rem; color: var(--text-secondary);">
+          Tạo tài khoản riêng để lưu dữ liệu trực tuyến. Không có tài khoản mẫu mặc định.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== GIAO DIỆN CHÍNH (SAU KHI ĐĂNG NHẬP) ==================== -->
+  <div class="app-layout hidden" id="app-main-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-symbol" aria-hidden="true">L</span>
+        <div class="brand-text">
+          <h1>LifeOS<span class="brand-period">.</span></h1>
+          <span>Quản lý cuộc sống của bạn</span>
+        </div>
+      </div>
+
+      <!-- Thông tin tài khoản đang đăng nhập -->
+      <div class="user-profile-box">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <div class="user-details">
+            <strong id="user-display-name">Người dùng</strong>
+            <small id="user-display-username">@admin</small>
+          </div>
+        </div>
+        <button class="btn btn-xs btn-secondary" onclick="handleLogout()" title="Đăng xuất">Thoát</button>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-label">Tổng quan & Thời gian</div>
+        <button class="nav-item active" data-tab="dashboard">
+          <span>Bảng tổng hợp</span>
+        </button>
+
+        <button class="nav-item" data-tab="schedule">
+          <span>Lịch làm việc</span>
+          <span class="nav-badge" id="badge-schedule">0</span>
+        </button>
+
+        <button class="nav-item" data-tab="deadlines">
+          <span>Lịch Deadline</span>
+          <span class="nav-badge urgent" id="badge-deadlines">0</span>
+        </button>
+
+        <div class="nav-section-label">Tài chính & Công nợ</div>
+        <button class="nav-item" data-tab="finance">
+          <span>Quản lý Chi tiêu</span>
+        </button>
+
+        <button class="nav-item" data-tab="debts">
+          <span>Quản lý & Ưu tiên Nợ</span>
+          <span class="nav-badge urgent" id="badge-debts">0</span>
+        </button>
+
+        <div class="nav-section-label">Lưu trữ & Hệ thống</div>
+        <button class="nav-item" data-tab="notes">
+          <span>Sổ ghi chú</span>
+          <span class="nav-badge" id="badge-notes">0</span>
+        </button>
+
+        <button class="nav-item" data-tab="settings">
+          <span>Cài đặt & Giao diện</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn btn-sm btn-secondary" style="width: 100%;" id="theme-toggle-btn" onclick="toggleTheme()">
+          Chuyển chế độ sáng / tối
+        </button>
+        <small class="sidebar-caption">Theo nhịp sống của riêng bạn.</small>
+      </div>
+    </aside>
+    <button class="sidebar-scrim" id="sidebar-scrim" onclick="toggleSidebar()" aria-label="Đóng menu điều hướng" tabindex="-1"></button>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-wrapper">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()" aria-expanded="false" aria-controls="sidebar">Menu</button>
+          <div class="page-title">
+            <h2 id="topbar-title">Bảng tổng hợp</h2>
+            <p id="topbar-subtitle">Theo dõi nhanh lịch làm việc, deadline, chi tiêu và các khoản nợ ưu tiên</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="live-clock" id="live-clock">--:--:--</div>
+          <button class="btn btn-sm btn-secondary" onclick="openScheduleModal()">+ Thêm lịch</button>
+          <button class="btn btn-sm btn-secondary" onclick="openDeadlineModal()">+ Thêm deadline</button>
+          <button class="btn btn-sm btn-primary" onclick="openTransactionModal('expense')">+ Ghi chi tiêu</button>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT AREA -->
+      <div class="online-strip"><span id="online-sync-status" role="status">Đang kết nối…</span><div id="online-conflict" hidden>Có thay đổi chưa được lưu. Hãy tải bản sao lưu trước khi tải lại.<button class="btn btn-xs btn-secondary" onclick="exportBackupJSON()">Tải bản sao lưu</button><button class="btn btn-xs btn-secondary" onclick="reloadOnline()">Tải lại</button><button class="btn btn-xs btn-secondary" onclick="handleLogout()">Đăng nhập lại</button></div></div>
+      <main class="content-area">
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section class="tab-pane active" id="tab-dashboard">
+          <div class="dashboard-welcome">
+            <div><span class="eyebrow">KHÔNG GIAN CÁ NHÂN</span><h2>Chào <span id="welcome-name">bạn</span>, ngày mới có kế hoạch.</h2><p>Dành một phút nhìn lại, rồi tập trung vào điều quan trọng hôm nay.</p></div>
+            <button class="btn btn-secondary welcome-settings" onclick="switchTab('settings')">Cá nhân hóa giao diện <span aria-hidden="true">↗</span></button>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span>Số dư ghi nhận</span>
+              <h3 id="dash-net-balance">0 ₫</h3>
+              <small id="dash-income-expense-sub">Thu: 0 ₫ • Chi: 0 ₫</small>
+            </div>
+
+            <div class="stat-card">
+              <span>Tổng nợ cần trả (Còn lại)</span>
+              <h3 id="dash-total-debt" style="color: var(--danger);">0 ₫</h3>
+              <small id="dash-debt-sub">Khoản cho vay cần thu: 0 ₫</small>
+            </div>
+
+            <div class="stat-card">
+              <span>Deadline chưa hoàn thành</span>
+              <h3 id="dash-active-deadlines">0</h3>
+              <small id="dash-deadline-sub">0 việc khẩn cấp / sát hạn</small>
+            </div>
+
+            <div class="stat-card">
+              <span>Lịch làm việc hôm nay</span>
+              <h3 id="dash-today-schedules">0 ca</h3>
+              <small id="dash-today-date-label">Hôm nay</small>
+            </div>
+          </div>
+
+          <div class="dashboard-columns">
+            <div class="dashboard-column">
+            <!-- Khoản nợ ưu tiên trả trước -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Ưu tiên trả nợ theo thời gian</div>
+                  <div class="card-subtitle">Các khoản quá hạn hoặc sắp đến ngày hẹn trả được xếp lên đầu</div>
+                </div>
+                <button class="btn btn-xs btn-secondary" onclick="switchTab('debts')">Chi tiết công nợ</button>
+              </div>
+              <div class="item-list" id="dash-priority-debts"></div>
+            </div>
+
+            <!-- Lịch hôm nay -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Lịch làm việc trong ngày hôm nay</div>
+                  <div class="card-subtitle">Theo khung giờ từ sáng đến tối</div>
+                </div>
+                <button class="btn btn-xs btn-secondary" onclick="switchTab('schedule')">Mở lịch đầy đủ</button>
+              </div>
+              <div class="item-list" id="dash-today-schedule-list"></div>
+            </div>
+            </div>
+
+            <div class="dashboard-column">
+            <!-- Deadline gần nhất -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Deadline cần xử lý sớm</div>
+                  <div class="card-subtitle">Sắp xếp theo thời hạn gần nhất</div>
+                </div>
+                <button class="btn btn-xs btn-secondary" onclick="switchTab('deadlines')">Tất cả deadline</button>
+              </div>
+              <div class="item-list" id="dash-upcoming-deadlines"></div>
+            </div>
+
+            <!-- Tóm tắt chi tiêu -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Tỷ trọng chi tiêu & Ngân sách tháng</div>
+                  <div class="card-subtitle">Phân bổ các khoản đã chi</div>
+                </div>
+                <button class="btn btn-xs btn-secondary" onclick="switchTab('finance')">Sổ thu chi</button>
+              </div>
+              <div id="dash-budget-bar-wrap" style="margin-bottom: 14px;"></div>
+              <div class="chart-container" id="dash-expense-chart"></div>
+            </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 2: LỊCH LÀM VIỆC (NGÀY / TUẦN / THÁNG) ==================== -->
+        <section class="tab-pane" id="tab-schedule">
+          <div class="toolbar">
+            <div class="filter-group">
+              <!-- Chế độ xem: Ngày / Tuần / Tháng -->
+              <div class="pill-tabs" id="schedule-view-tabs">
+                <button class="pill-tab" id="sch-view-day" onclick="setScheduleViewMode('day')">Xem theo Ngày</button>
+                <button class="pill-tab active" id="sch-view-week" onclick="setScheduleViewMode('week')">Xem theo Tuần</button>
+                <button class="pill-tab" id="sch-view-month" onclick="setScheduleViewMode('month')">Xem theo Tháng</button>
+              </div>
+
+              <button class="btn btn-sm btn-secondary" onclick="navigateSchedulePeriod(-1)">Trước</button>
+              <button class="btn btn-sm btn-secondary" onclick="navigateScheduleToday()">Hôm nay</button>
+              <button class="btn btn-sm btn-secondary" onclick="navigateSchedulePeriod(1)">Tiếp</button>
+              <strong id="schedule-period-label" style="font-size: 0.95rem; margin-left: 6px;">--</strong>
+            </div>
+
+            <div class="filter-group">
+              <select class="select" id="schedule-filter-type" onchange="renderScheduleTab()">
+                <option value="all">Tất cả phân loại</option>
+                <option value="work">Ca làm việc</option>
+                <option value="meeting">Cuộc họp</option>
+                <option value="personal">Cá nhân</option>
+              </select>
+              <button class="btn btn-primary" onclick="openScheduleModal()">+ Thêm lịch làm việc</button>
+            </div>
+          </div>
+
+          <!-- Khung hiển thị chính cho Ngày / Tuần / Tháng -->
+          <div id="schedule-main-viewport"></div>
+        </section>
+
+        <!-- ==================== TAB 3: LỊCH DEADLINE ==================== -->
+        <section class="tab-pane" id="tab-deadlines">
+          <div class="toolbar">
+            <div class="filter-group">
+              <div class="pill-tabs" id="deadline-status-tabs">
+                <button class="pill-tab active" onclick="setDeadlineFilter('all')">Tất cả</button>
+                <button class="pill-tab" onclick="setDeadlineFilter('active')">Chưa hoàn thành</button>
+                <button class="pill-tab" onclick="setDeadlineFilter('overdue')">Khẩn cấp / Quá hạn</button>
+                <button class="pill-tab" onclick="setDeadlineFilter('done')">Đã xong</button>
+              </div>
+              <select class="select" id="deadline-sort-by" onchange="renderDeadlinesTab()">
+                <option value="due_asc">Sắp xếp: Hạn chót gần nhất</option>
+                <option value="priority_desc">Sắp xếp: Mức độ ưu tiên cao nhất</option>
+                <option value="progress_asc">Sắp xếp: Tiến độ thấp nhất</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="openDeadlineModal()">+ Thêm Deadline</button>
+          </div>
+
+          <div class="stats-grid" id="deadline-summary-stats"></div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Danh sách công việc & Thời hạn</div>
+                <div class="card-subtitle">Kéo thanh trượt để cập nhật nhanh % tiến độ hoàn thành</div>
+              </div>
+            </div>
+            <div class="item-list" id="deadline-list-container"></div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 4: QUẢN LÝ CHI TIÊU ==================== -->
+        <section class="tab-pane" id="tab-finance">
+          <div class="toolbar">
+            <div class="filter-group">
+              <div class="pill-tabs">
+                <button class="pill-tab active" id="fin-filter-all" onclick="setFinanceTypeFilter('all')">Tất cả</button>
+                <button class="pill-tab" id="fin-filter-expense" onclick="setFinanceTypeFilter('expense')">Khoản Chi</button>
+                <button class="pill-tab" id="fin-filter-income" onclick="setFinanceTypeFilter('income')">Khoản Thu</button>
+              </div>
+              <select class="select" id="fin-category-filter" onchange="renderFinanceTab()">
+                <option value="all">Tất cả danh mục</option>
+              </select>
+              <input type="text" class="input" id="fin-search-input" placeholder="Tìm tên khoản thu/chi..." oninput="renderFinanceTab()" />
+            </div>
+            <div class="filter-group">
+              <button class="btn btn-secondary" onclick="openBudgetModal()">Đặt ngân sách tháng</button>
+              <button class="btn btn-primary" onclick="openTransactionModal('expense')">+ Ghi Thu / Chi</button>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="finance-kpi-grid"></div>
+
+          <div class="grid-sidebar-right">
+            <!-- Sổ giao dịch chi tiết -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Lịch sử giao dịch Thu & Chi</div>
+                  <div class="card-subtitle">Chi tiết các khoản tiền vào và ra</div>
+                </div>
+                <button class="btn btn-xs btn-secondary" onclick="exportTransactionsCSV()">Xuất file CSV</button>
+              </div>
+              <div class="item-list" id="transaction-list-container"></div>
+            </div>
+
+            <!-- Biểu đồ cơ cấu chi tiêu -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Phân tích cơ cấu chi tiêu</div>
+                  <div class="card-subtitle">Tổng hợp theo danh mục</div>
+                </div>
+              </div>
+              <div class="chart-container" id="finance-donut-chart"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 5: QUẢN LÝ NỢ & ƯU TIÊN TRẢ NỢ ==================== -->
+        <section class="tab-pane" id="tab-debts">
+          <div class="toolbar">
+            <div class="filter-group">
+              <div class="pill-tabs">
+                <button class="pill-tab active" id="debt-dir-borrowed" onclick="setDebtDirectionFilter('borrowed')">Khoản mình nợ (Cần trả)</button>
+                <button class="pill-tab" id="debt-dir-lent" onclick="setDebtDirectionFilter('lent')">Người khác nợ mình (Cần thu)</button>
+                <button class="pill-tab" id="debt-dir-all" onclick="setDebtDirectionFilter('all')">Tất cả</button>
+              </div>
+
+              <select class="select" id="debt-strategy-select" onchange="renderDebtsTab()">
+                <option value="time">Ưu tiên: Theo thời gian đáo hạn (Quá hạn & Sắp đến hạn trước)</option>
+                <option value="avalanche">Ưu tiên: Lãi suất & Mức độ gấp cao nhất trước</option>
+                <option value="snowball">Ưu tiên: Khoản nhỏ trả dứt điểm trước</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="openDebtModal()">+ Thêm khoản nợ / cho vay</button>
+          </div>
+
+          <div class="stats-grid" id="debt-summary-stats"></div>
+
+          <!-- Bảng tính phân bổ tiền trả nợ -->
+          <div class="card" style="margin-bottom: 22px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Gợi ý phân bổ tiền trả nợ theo thứ tự ưu tiên</div>
+                <div class="card-subtitle">Nhập số tiền bạn hiện có thể dùng để trả nợ, hệ thống sẽ tính toán thứ tự thanh toán tối ưu</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;">
+              <label style="font-size: 0.84rem; font-weight: 500; color: var(--text-secondary);">Số tiền dự kiến trả nợ đợt này (VNĐ):</label>
+              <input type="number" class="input" id="debt-payoff-budget-input" value="4500000" step="100000" style="width: 200px; font-weight: 600;" oninput="renderDebtPayoffPlan()" />
+              <button class="btn btn-sm btn-primary" onclick="renderDebtPayoffPlan()">Tính toán phương án</button>
+            </div>
+            <div id="debt-payoff-plan-result"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Danh sách các khoản công nợ</div>
+                <div class="card-subtitle">Đã sắp xếp tự động theo tiêu chí ưu tiên đã chọn</div>
+              </div>
+            </div>
+            <div class="item-list" id="debt-list-container"></div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 6: SỔ GHI CHÚ THUẦN TÚY ==================== -->
+        <section class="tab-pane" id="tab-notes">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Sổ ghi chú cá nhân</div>
+                <div class="card-subtitle">Soạn thảo và lưu trữ văn bản thuần túy, tự động lưu nhanh</div>
+              </div>
+              <button class="btn btn-primary" onclick="createNewPureNote()">+ Tạo ghi chú mới</button>
+            </div>
+
+            <div class="notes-workspace">
+              <!-- Cột trái: Tìm kiếm & Danh sách ghi chú -->
+              <div style="display: flex; flex-direction: column; gap: 10px; border-right: 1px solid var(--border-color); padding-right: 16px;">
+                <input type="text" class="input" id="note-search-input" placeholder="Tìm kiếm ghi chú..." oninput="renderNotesTab()" />
+                <div class="notes-sidebar-list" id="notes-sidebar-list"></div>
+              </div>
+
+              <!-- Cột phải: Khung soạn thảo thuần ghi chú -->
+              <div class="note-editor-pane" id="note-editor-pane">
+                <input type="text" class="input note-editor-title" id="active-note-title" placeholder="Tiêu đề ghi chú..." oninput="autoSaveActiveNote()" />
+                <textarea class="textarea note-editor-textarea" id="active-note-content" placeholder="Nhập nội dung ghi chú tại đây..." oninput="autoSaveActiveNote()"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.76rem; color: var(--text-muted);" id="active-note-status">Đã lưu tự động</span>
+                  <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-sm btn-primary" onclick="manualSaveActiveNote()">Lưu ghi chú</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteActiveNote()">Xóa ghi chú này</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 7: SAO LƯU & CÀI ĐẶT ==================== -->
+        <section class="tab-pane" id="tab-settings">
+          <div class="card online-bank-card">
+            <div class="card-header"><div><div class="card-title">Kết nối VietinBank & SePay</div><div class="card-subtitle">Máy chủ nhận giao dịch khi bạn đóng web; số dư ghi nhận tự cập nhật khi mở lại.</div></div><button class="btn btn-sm btn-secondary" onclick="pollOnlineState(true)">Kiểm tra giao dịch</button></div>
+            <p id="bank-status" class="online-bank-status" role="status">Chưa cấu hình kết nối</p>
+            <form class="online-bank-form" onsubmit="createBankConnection(event)"><div class="form-group"><label for="bank-account">Số tài khoản VietinBank đã liên kết trên SePay</label><input class="input" id="bank-account" required pattern="[0-9]{6,30}" inputmode="numeric" autocomplete="off" placeholder="Nhập số tài khoản ngân hàng"></div><button type="submit" class="btn btn-primary" id="bank-create-btn">Tạo kết nối</button></form>
+            <div id="bank-connection-details" hidden>
+              <div class="form-group"><label for="bank-url">URL Webhook — dán vào SePay</label><div class="online-copy"><input class="input" id="bank-url" readonly><button class="btn btn-secondary" onclick="copyBankValue('bank-url')">Sao chép URL</button></div></div>
+              <div class="form-group"><label for="bank-key">API Key — chỉ trả về trong lần tạo hoặc đổi khóa</label><div class="online-copy"><input class="input" type="password" id="bank-key" readonly autocomplete="off" placeholder="Khóa không được lưu trong trình duyệt"><button class="btn btn-secondary" onclick="toggleBankKey()">Hiện / Ẩn</button><button class="btn btn-secondary" onclick="copyBankValue('bank-key')">Sao chép khóa</button></div></div>
+              <button class="btn btn-sm btn-secondary" onclick="rotateBankKey()">Tạo khóa mới nếu đã quên</button>
+            </div>
+            <details class="online-bank-help"><summary>Cách tạo Webhook trên SePay</summary><ol><li>SePay → Tích hợp Webhooks → Thêm webhook.</li><li>Dán URL ở trên; chọn <strong>cả tiền vào và tiền ra</strong>, đúng tài khoản VietinBank.</li><li>Chọn bảo mật <strong>API Key</strong>, dán khóa vừa tạo. Giữ Content-Type là <strong>application/json</strong>.</li><li>Bật tự động gửi lại và kiểm tra bộ lọc. Bấm <strong>Gửi thử</strong>; ID 0 không tạo khoản thu chi.</li><li>Đối chiếu một giao dịch thật đã nhận trên SePay với phần Thu Chi.</li></ol><p>VietinBank yêu cầu nội dung SEVQR theo điều kiện kết nối. Ứng dụng chỉ nhận những giao dịch SePay gửi đến. Khóa chỉ lưu bản băm trên máy chủ; không gửi khóa hoặc OTP vào chat.</p></details>
+            <p class="online-bank-hint">Tiền ra vào Chi phí khác, tiền vào vào Thu nhập khác. Hãy phân loại lại chuyển nội bộ, trả nợ và khoản đã nhập tay trùng. Số dư ghi nhận là tổng thu trừ chi trong ứng dụng, không tự đặt bằng số dư ngân hàng. Render Free có thể cần khởi động lại nên Webhook có thể chậm và cần gửi lại.</p>
+          </div>
+          <div class="section-intro"><span class="eyebrow">THEO CÁCH CỦA BẠN</span><h2>Một không gian, nhiều sắc thái.</h2><p>Chọn giao diện khiến bạn thấy thoải mái. Mọi thay đổi được áp dụng và lưu ngay cho tài khoản này.</p></div>
+          <div class="card appearance-card">
+            <div class="appearance-controls">
+              <div class="card-header"><div><div class="card-title">Giao diện & Màu sắc</div><div class="card-subtitle">Tinh chỉnh góc làm việc của riêng bạn</div></div><span class="saved-indicator" id="appearance-status" role="status">Đã lưu tự động</span></div>
+              <h3 class="setting-label">01 <span>Chế độ hiển thị</span></h3>
+              <div class="mode-options" id="theme-mode-options" role="group" aria-label="Chế độ hiển thị"></div>
+              <h3 class="setting-label">02 <span>Bảng màu chủ đạo</span></h3>
+              <div class="palette-options" id="theme-palette-options" role="group" aria-label="Bảng màu chủ đạo"></div>
+              <div class="custom-color-row"><div><label for="custom-accent">Màu của riêng bạn</label><p>Hoặc chọn bất kỳ sắc màu nào bạn yêu thích.</p></div><div class="custom-color-control"><span id="custom-accent-value"></span><input id="custom-accent" type="color" value="#6366f1" onchange="setAccentColor(this.value)" aria-label="Chọn màu chủ đạo tùy chỉnh"></div></div>
+              <button class="btn btn-sm btn-secondary" onclick="resetAppearance()">Khôi phục giao diện mặc định</button>
+            </div>
+            <div class="appearance-preview"><div class="preview-label"><span class="eyebrow">GÓC NHÌN CỦA BẠN</span><span id="appearance-name"></span></div><div class="mini-app" aria-hidden="true"><div class="mini-sidebar"><span class="mini-logo">L</span><i class="mini-nav selected"></i><i class="mini-nav"></i><i class="mini-nav"></i></div><div class="mini-content"><div class="mini-heading">Một ngày thật nhẹ nhàng.</div><div class="mini-subheading">Mọi thứ đang ở đúng nơi của nó.</div><div class="mini-stats"><div><small>Công việc</small><strong>08</strong></div><div><small>Hoàn thành</small><strong>05</strong></div></div><div class="mini-task"><span class="mini-check">✓</span> Lên kế hoạch hôm nay</div><div class="mini-task"><span class="mini-check empty"></span> Dành thời gian cho bản thân</div><span class="mini-button">+ Thêm điều quan trọng</span></div></div><p>Màu sắc mới, cảm hứng mới.<br>Mọi dữ liệu vẫn luôn ở đây với bạn.</p></div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Thông tin tài khoản & Đổi mật khẩu</div>
+                  <div class="card-subtitle">Cập nhật tên hiển thị hoặc mật khẩu đăng nhập của bạn</div>
+                </div>
+              </div>
+              <form class="auth-form" onsubmit="handleUpdateAccount(event)">
+                <div class="form-group">
+                  <label>Họ và tên hiển thị</label>
+                  <input type="text" class="input" id="acc-fullname" required placeholder="Nhập tên hiển thị" />
+                </div>
+                <div class="form-group">
+                  <label>Mật khẩu mới (Để trống nếu không đổi)</label>
+                  <input type="password" class="input" id="acc-new-password" placeholder="Nhập mật khẩu mới..." />
+                </div>
+                <div>
+                  <button type="submit" class="btn btn-sm btn-primary">Lưu thông tin tài khoản</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Sao lưu & Khôi phục dữ liệu</div>
+                  <div class="card-subtitle">Dữ liệu được lưu riêng cho từng tài khoản đăng nhập</div>
+                </div>
+              </div>
+              <div class="item-list">
+                <div class="list-item">
+                  <div>
+                    <div class="item-title">Xuất toàn bộ dữ liệu ra file (.JSON)</div>
+                    <div class="item-meta">Tải file sao lưu về máy tính</div>
+                  </div>
+                  <button class="btn btn-sm btn-primary" onclick="exportBackupJSON()">Tải bản sao lưu</button>
+                </div>
+
+                <div class="list-item">
+                  <div>
+                    <div class="item-title">Khôi phục dữ liệu từ file (.JSON)</div>
+                    <div class="item-meta">Nhập lại file sao lưu đã tải về trước đó</div>
+                  </div>
+                  <label class="btn btn-sm btn-secondary" style="cursor: pointer;">
+                    Chọn file JSON
+                    <input type="file" accept=".json" style="display: none;" onchange="importBackupJSON(event)" />
+                  </label>
+                </div>
+
+                <div class="list-item">
+                  <div>
+                    <div class="item-title">Xuất sổ Thu Chi ra file Excel (.CSV)</div>
+                    <div class="item-meta">Mở bằng Microsoft Excel hoặc Google Sheets</div>
+                  </div>
+                  <button class="btn btn-sm btn-secondary" onclick="exportTransactionsCSV()">Xuất file CSV</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Quản lý dữ liệu mẫu</div>
+                <div class="card-subtitle">Thiết lập lại dữ liệu trong tài khoản hiện tại</div>
+              </div>
+            </div>
+            <div class="item-list">
+              <div class="list-item">
+                <div>
+                  <div class="item-title">Nạp lại dữ liệu mẫu ban đầu</div>
+                  <div class="item-meta">Khôi phục các ví dụ mẫu để tham khảo</div>
+                </div>
+                <button class="btn btn-sm btn-secondary" onclick="handleResetSampleData()">Nạp dữ liệu mẫu</button>
+              </div>
+
+              <div class="list-item">
+                <div>
+                  <div class="item-title">Xóa trắng toàn bộ dữ liệu</div>
+                  <div class="item-meta">Xóa sạch dữ liệu mẫu để bắt đầu nhập dữ liệu thật</div>
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="handleClearAllData()">Xóa trắng</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL DÙNG CHUNG -->
+  <div class="modal-backdrop" id="modal-backdrop" onclick="handleBackdropClick(event)">
+    <div class="modal" id="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title">Thông tin</h3>
+        <button class="btn btn-xs btn-secondary" onclick="closeModal()">Đóng</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- THÔNG BÁO NHANH -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+  <script src="online-storage.js"></script>
+  <script src="app.js"></script>
+  <script src="online.js"></script>
+</body>
 </html>

@@ -1,0 +1,17 @@
+.online-strip { padding:10px 32px; background:var(--bg-card); border-bottom:1px solid var(--border-color); color:var(--success); font-size:11px; }
+.online-strip .warning { color:var(--warning); }
+#online-conflict { margin-top:10px; color:var(--danger); line-height:1.8; }
+#online-conflict button { margin:5px; }
+.online-bank-card { margin-bottom:28px; }
+.online-bank-status { padding:12px; background:var(--bg-primary); border:1px solid var(--border-color); border-radius:10px; font-size:12px; line-height:1.8; }
+.online-bank-form { display:flex; align-items:end; gap:12px; margin:24px 0; }
+.online-bank-form .form-group { flex:1; margin:0; }
+.online-copy { display:flex; align-items:center; gap:8px; margin:10px 0 20px; }
+.online-copy input { flex:1; min-width:0; font-family:monospace; }
+.online-bank-help { font-size:12px; line-height:1.9; border-block:1px solid var(--border-color); padding:20px 0; margin-top:24px; }
+.online-bank-help summary { cursor:pointer; font-weight:600; }
+.online-bank-help ol { padding-left:20px; margin:14px 0; }
+.online-bank-help p,.online-bank-hint { font-size:11px; color:var(--text-secondary); line-height:1.9; }
+.online-bank-hint { margin-top:16px; }
+#bank-connection-details { margin-top:20px; }
+@media(max-width:768px) { .online-strip { padding:10px 16px; } .online-bank-form { flex-direction:column; align-items:stretch; } .online-copy { flex-wrap:wrap; } .online-copy input { flex-basis:100%; } }

@@ -1,25 +1,16 @@
-# .NET
 bin/
 obj/
-*.user
-*.suo
-
-# Node
 node_modules/
 dist/
-.env.local
-.env.*.local
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# IDEs
+outputs/
+.env
+.env.*
+!.env.example
+.dev.vars*
+.vs/
 .vscode/
 .idea/
-*.swp
+*.user
+*.suo
+*.log
 .DS_Store
-Thumbs.db
-
-# Test scripts
-test_gemini*.js
-backend/test_gemini*.js

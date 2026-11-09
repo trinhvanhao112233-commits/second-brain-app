@@ -1,0 +1,13 @@
+import { mkdir, copyFile, writeFile, readFile } from 'node:fs/promises';
+import { Script } from 'node:vm';
+const destination = new URL('../dist/', import.meta.url);
+await mkdir(destination, { recursive: true });
+for (const file of ['index.html','data.js','app.js','styles.css','appearance.css','online-storage.js','online.js','online.css']) await copyFile(new URL('../' + file, import.meta.url), new URL(file, destination));
+const html = await readFile(new URL('index.html', destination), 'utf8');
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+if (new Set(ids).size !== ids.length) throw new Error('HTML contains duplicate element IDs.');
+for (const file of ['data.js','app.js','online-storage.js','online.js']) new Script(await readFile(new URL(file, destination), 'utf8'), { filename: file });
+const api = (process.env.VITE_API_URL || 'https://second-brain-app-21j2.onrender.com/api').replace(/\/$/, '');
+if (!/^https?:\/\//.test(api)) throw new Error('VITE_API_URL must be an absolute http(s) API URL.');
+await writeFile(new URL('config.js', destination), 'window.LIFEOS_API_URL=' + JSON.stringify(api) + ';\n');
+console.log('Built the Personal Manager HTML/CSS/JavaScript application.');

@@ -1,108 +1,40 @@
-# Ứng Dụng Quản Lý Tài Chính Cá Nhân
+# LifeOS — Quản lý cá nhân
 
-> Bản nâng cấp ngày 05/11/2026: đọc [DEPLOYMENT.md](DEPLOYMENT.md) để cấu hình xác thực, nâng cấp database và thông báo đa thiết bị. Hướng dẫn triển khai mới trong tệp đó thay thế các bước migration và cấu hình AI cũ bên dưới.
+Bản thay thế mã ứng dụng Second Brain bằng chương trình Quản lý cá nhân HTML/CSS/JS:
+bảng tổng hợp, lịch, deadline, thu chi, công nợ, ghi chú và các chủ đề Sáng/Tối đổi màu.
 
-Dự án Full-stack xây dựng theo kiến trúc hiện đại, sẵn sàng cho cả Web và Ứng dụng Di động (Mobile App qua Capacitor).
+- `frontend/`: đúng giao diện Quản lý cá nhân, build tĩnh cho Vercel, không còn Vue.
+- `backend/`: API ASP.NET Core 8 mới cho Render, lưu MySQL/TiDB và nhận Webhook SePay.
+- `tests/`: kiểm tra parser, phiên đăng nhập, sổ giao dịch; không dùng dữ liệu thật.
 
----
+Giữ Root Directory Vercel là `frontend`, build `npm run build`, output `dist`.
+Giữ Root Directory Render là `backend` và dùng Dockerfile. Chi tiết: [DEPLOYMENT.md](DEPLOYMENT.md).
 
-## 📁 Cấu Trúc Dự Án
+Backend tạo bảng riêng có tiền tố `LifeOs`. Không xóa bảng/database Second Brain cũ.
+Tài khoản/dữ liệu cũ không tự chuyển: sau cập nhật, đăng ký tài khoản LifeOS riêng.
+Không có tài khoản mặc định admin/123.
 
-```text
-f:/CODE WORK/Cá nhân/
-├── backend/                  # ASP.NET Core 8 Web API & EF Core
-│   ├── Controllers/          # WalletsController.cs
-│   ├── Data/                 # AppDbContext.cs (SQL Server & MySQL)
-│   ├── DTOs/                 # WalletDtos.cs (Request/Response DTOs)
-│   ├── Models/               # Wallet.cs & Transaction.cs
-│   ├── PersonalFinance.API.csproj
-│   ├── Program.cs            # DI, CORS & DbContext setup
-│   └── appsettings.json      # Connection strings
-│
-└── frontend/                 # Vue 3 (Composition API) + TailwindCSS
-    ├── capacitor.config.json # Cấu hình ứng dụng Mobile
-    ├── index.html            # Hỗ trợ Safe Area (tai thỏ / home bar)
-    ├── package.json
-    ├── tailwind.config.js
-    ├── vite.config.js
-    └── src/
-        ├── App.vue
-        ├── main.js
-        ├── style.css
-        └── components/
-            └── FinanceDashboard.vue   # UI Thẻ ATM, Nạp/Rút trực tiếp
+## Kết nối SePay
+
+Đăng nhập → Cài đặt → Kết nối VietinBank & SePay → Tạo kết nối. Sao chép URL và API Key
+vào Webhook SePay; chọn cả tiền vào/ra và bảo mật API Key. Dùng JSON, bật tự gửi lại.
+Máy chủ chỉ lưu bản băm của khóa. Không gửi khóa, mật khẩu hoặc OTP qua chat.
+
+Webhook dùng khóa duy nhất `(ConnectionId, SePayId)` chống trùng. Tiền ra ghi chi,
+tiền vào ghi thu. Web kiểm tra thay đổi mỗi 15 giây khi mở; máy chủ vẫn nhận khi đóng web.
+Đây là ghi sổ, không chuyển/rút tiền ngân hàng. Số dư ứng dụng là tổng thu trừ chi đã ghi.
+Rà soát khoản nhập tay trùng, chuyển nội bộ và trả nợ. Điều kiện VietinBank/SEVQR vẫn áp
+dụng; không tự nhập giao dịch lịch sử trước khi tạo Webhook.
+
+## Kiểm tra mã
+
+```powershell
+npm.cmd --prefix frontend ci
+npm.cmd --prefix frontend run build
+npm.cmd --prefix frontend test
+dotnet build backend/PersonalFinance.API.csproj
+dotnet run --project tests/LifeOSChecks
 ```
 
----
-
-## 🚀 Hướng Dẫn Khởi Chạy
-
-### 1. Khởi chạy Backend (.NET 8)
-
-Mở terminal tại thư mục `backend`:
-```bash
-cd "f:\CODE WORK\Cá nhân\backend"
-
-# 1. Khởi tạo Migration và Cập nhật Database
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-
-# 2. Khởi chạy API
-dotnet run
-```
-API sẽ lắng nghe tại `http://localhost:5000` (hoặc cổng cấu hình trong `launchSettings.json`).
-Bạn có thể truy cập Swagger UI tại: `http://localhost:5000/swagger` để kiểm thử các API.
-
-> **Mẹo Database:** Mặc định `AppDbContext` đang dùng SQL Server (`localhost`). Nếu dùng MySQL, mở file [Program.cs](file:///f:/CODE%20WORK/C%C3%A1%20nh%C3%A2n/backend/Program.cs) và bỏ comment dòng `UseMySql`.
-
----
-
-### 1.1 Cấu hình Trợ lý AI (Google Gemini API)
-Mở [appsettings.json](file:///f:/CODE%20WORK/C%C3%A1%20nh%C3%A2n/backend/appsettings.json) và dán API Key của bạn vào mục `Gemini`:
-```json
-"Gemini": {
-  "ApiKey": "YOUR_GEMINI_API_KEY",
-  "Model": "gemini-1.5-flash"
-}
-```
-*(Nếu chưa có API Key, hệ thống tự động kích hoạt bộ phân tích NLP nội bộ cực nhanh để nhận diện các câu tiếng Việt như "Đã ăn sáng hết 70k", "9h sáng mai họp", "cần nộp báo cáo").*
-
----
-
-### 2. Khởi chạy Frontend (Vue 3 + Vite)
-
-Mở một terminal khác tại thư mục `frontend`:
-```bash
-cd "f:\CODE WORK\Cá nhân\frontend"
-
-# 1. Cài đặt thư viện
-npm install
-
-# 2. Chạy môi trường Dev
-npm run dev
-```
-Trang web sẽ chạy tại: `http://localhost:5173`
-
----
-
-### 3. Đóng gói Ứng Dụng Mobile (Capacitor)
-
-Nếu bạn muốn build app cho Android hoặc iOS:
-```bash
-cd "f:\CODE WORK\Cá nhân\frontend"
-
-# 1. Build bản web tĩnh
-npm run build
-
-# 2. Thêm nền tảng Android / iOS
-npx cap add android
-npx cap add ios
-
-# 3. Đồng bộ code web vào Native project
-npx cap sync
-
-# 4. Mở trong Android Studio / Xcode
-npx cap open android
-npx cap open ios
-```
-*Lưu ý: Khi test trên máy thật/máy ảo điện thoại, đổi `API_BASE_URL` trong [FinanceDashboard.vue](file:///f:/CODE%20WORK/C%C3%A1%20nh%C3%A2n/frontend/src/components/FinanceDashboard.vue) từ `localhost` thành IP máy tính của bạn (ví dụ: `http://192.168.1.15:5000/api/wallets`).*
+Bản trong thư mục Quản lý cá nhân ban đầu tiếp tục dùng offline được. `frontend/` của
+repo này dành cho Vercel và cần backend. Test mã không thay thế kiểm tra MySQL staging.

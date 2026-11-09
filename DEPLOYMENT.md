@@ -41,6 +41,16 @@ Thử schema `Store.Schema` trên staging trước production. Chỉ CREATE IF N
 DROP. Nếu key ring không bền, restart có thể yêu cầu đăng nhập lại; Webhook key hash
 vẫn giữ trong MySQL và tiếp tục nhận giao dịch.
 
+Nếu Render chỉ có GEMINI_API_KEY, phải thêm ConnectionStrings__MySqlConnection trước
+khi deploy. Bấm Environment → Edit → thêm biến → Save, rebuild, and deploy. Giá trị lấy
+từ nhà cung cấp database, không phải URL Vercel/Render. Ví dụ định dạng cho TiDB:
+`Server=HOST;Port=4000;Database=TEN_DATABASE;User ID=TEN_USER;Password=MAT_KHAU_MOI;SslMode=Required;`.
+Dùng đúng host, port, tên DB, tài khoản và cấu hình TLS do nhà cung cấp yêu cầu.
+
+Startup thiếu/sai cấu hình sẽ báo LIFEOS_DATABASE_CONFIG_MISSING/INVALID/INCOMPLETE
+với tên biến cần sửa. Lỗi đăng nhập/quyền/network được phân loại theo mã MySQL, không
+in mật khẩu/chuỗi kết nối. Không bỏ qua lỗi khởi tạo database để báo deploy thành công.
+
 Deploy Render trước; `GET /api/health` phải trả `ok:true`, rồi deploy Vercel. Nếu đang
 bật tự deploy main, push sẽ kích hoạt pipeline theo cấu hình của bạn.
 

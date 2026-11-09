@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using LifeOS;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
 
 var count = 0;
 void Check(bool condition, string message) { if (!condition) throw new Exception(message); count++; Console.WriteLine("PASS " + message); }
@@ -38,4 +39,16 @@ var tokens = new SessionTokens(new EphemeralDataProtectionProvider());
 var user = new AppUser(Guid.NewGuid(), "alice", "Alice", "hash", 4); var session = tokens.Issue(user);
 Check(tokens.Read(session).Id == user.Id && tokens.Read(session).Version == 4, "Session binds owner and password version");
 Reject(() => tokens.Read(session[..^8] + "tampered"), "Tampered session rejected");
+IConfiguration DbConfig(string? value) => new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string,string?> { ["ConnectionStrings:MySqlConnection"] = value }).Build();
+foreach (var value in new string?[] { null, "", "   " }) {
+    try { DatabaseConfiguration.Read(DbConfig(value)); throw new Exception("Missing DB configuration accepted"); }
+    catch (DatabaseConfigurationException error) { Check(error.Message.Contains("ConnectionStrings__MySqlConnection") && error.Message.Contains("Render > Environment"), "Missing DB configuration points to the exact Render variable instead of connecting to localhost"); }
+}
+try { DatabaseConfiguration.Read(DbConfig("Server=database.invalid;Database=lifeos;User ID=user;Password=fake-private-test-value;UnsupportedOption=true")); throw new Exception("Invalid config accepted"); }
+catch (DatabaseConfigurationException error) { Check(!error.Message.Contains("fake-private-test-value") && !error.Message.Contains("database.invalid"), "Invalid connection strings are diagnosed without leaking their contents"); }
+try { DatabaseConfiguration.Read(DbConfig("Database=lifeos;User ID=user;Password=fake")); throw new Exception("Missing host accepted"); }
+catch (DatabaseConfigurationException) { Check(true, "Remote database host must be explicit"); }
+var configured = new MySqlConnector.MySqlConnectionStringBuilder(DatabaseConfiguration.Read(DbConfig("Server=database.invalid;Port=4000;Database=lifeos;User ID=user;Password=fake;SslMode=Required")));
+Check(configured.Port == 4000 && configured.SslMode == MySqlConnector.MySqlSslMode.Required, "Connection and TLS settings supplied by the provider are preserved");
+Check(DatabaseConfiguration.StartupHint(1045).Contains("authentication") && DatabaseConfiguration.StartupHint(1142).Contains("permissions"), "Authentication and schema-permission failures get distinct safe hints");
 Console.WriteLine($"{count} checks passed. No database or production financial data used.");

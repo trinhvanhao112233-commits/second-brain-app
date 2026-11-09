@@ -96,7 +96,17 @@ app.MapPost("/api/bank/sepay/{id:guid}", async (HttpContext context, Guid id, St
     return Results.Ok(new { success = true });
 });
 
-await app.Services.GetRequiredService<Store>().Initialize();
+try { await app.Services.GetRequiredService<Store>().Initialize(); }
+catch (DatabaseConfigurationException error) {
+    Console.Error.WriteLine(error.Message);
+    Environment.ExitCode = 78;
+    return;
+}
+catch (MySqlConnector.MySqlException error) {
+    Console.Error.WriteLine($"LIFEOS_DATABASE_STARTUP_FAILED (MySQL {error.Number}): {DatabaseConfiguration.StartupHint(error.Number)}");
+    Environment.ExitCode = 1;
+    return;
+}
 await app.RunAsync();
 
 static AppUser User(HttpContext context) => (AppUser)context.Items["user"]!;

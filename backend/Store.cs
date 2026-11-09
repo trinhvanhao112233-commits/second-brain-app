@@ -6,8 +6,9 @@ namespace LifeOS;
 public sealed class Store(IConfiguration config)
 {
     private async Task<MySqlConnection> Open(CancellationToken ct = default) {
-        var connection = new MySqlConnection(config.GetConnectionString("MySqlConnection"));
-        await connection.OpenAsync(ct); return connection;
+        var connection = new MySqlConnection(DatabaseConfiguration.Read(config));
+        try { await connection.OpenAsync(ct); return connection; }
+        catch { await connection.DisposeAsync(); throw; }
     }
     private static MySqlCommand Cmd(MySqlConnection db, string sql, params object?[] values) {
         var command = new MySqlCommand(sql, db);
